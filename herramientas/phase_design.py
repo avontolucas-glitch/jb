@@ -86,6 +86,14 @@ class Pkg:
         open(f'{s.d}/word/_rels/{name}.rels','w',encoding='utf8').write(rels)
         s.ct=s.ct.replace('</Types>',f'<Override PartName="/word/{name}" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/></Types>')
         return s.add_rel('header',name)
+    def part(s,kind,name,body_xml,img=None):
+        ns=('xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" mc:Ignorable="w14"')
+        tag='w:hdr' if kind=='header' else 'w:ftr'
+        open(f'{s.d}/word/{name}','w',encoding='utf8').write(f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<{tag} {ns}>{body_xml}</{tag}>')
+        rel='' if not img else f'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/{img}"/>'
+        open(f'{s.d}/word/_rels/{name}.rels','w',encoding='utf8').write(f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">{rel}</Relationships>')
+        s.ct=s.ct.replace('</Types>',f'<Override PartName="/word/{name}" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.{kind}+xml"/></Types>')
+        return s.add_rel(kind,name)
     def save(s):
         if 'Extension="jpg"' not in s.ct and 'Extension="jpeg"' not in s.ct:
             s.ct=s.ct.replace('</Types>','<Default Extension="jpg" ContentType="image/jpeg"/></Types>')
@@ -100,6 +108,16 @@ def epi_text(p):
         if e.tag==W+'t': out.append(e.text or '')
         elif e.tag==W+'br': out.append('\n')
     return ''.join(out)
+BOOKTITLE={'receta':'LA RECETA DE LA MANIFESTACIÓN','pensamiento':'EL PENSAMIENTO ES TU FE','biografia':'LA BIOGRAFÍA'}
+DROP={'receta':'E6D8B4','pensamiento':'2B2B2B','biografia':'C9D5EA'}
+def rx(text,color,size=15,track=60,sc=False):
+    t=html_esc(text)
+    return (f'<w:r><w:rPr><w:rFonts w:ascii="Palatino Linotype" w:hAnsi="Palatino Linotype" w:cs="Palatino Linotype"/>'
+            + ('<w:smallCaps/>' if sc else '') + f'<w:color w:val="{color}"/><w:spacing w:val="{track}"/><w:sz w:val="{size}"/><w:szCs w:val="{size}"/><w:lang w:val="es-AR"/></w:rPr><w:t xml:space="preserve">{t}</w:t></w:r>')
+def html_esc(t): return t.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+def inline_img(did,inch=0.24):
+    sz=int(inch*EMU)
+    return (f'<w:r><w:rPr><w:position w:val="-6"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{sz}" cy="{sz}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{did}" name="Emblema{did}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="{did}" name="Emblema{did}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId1"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{sz}" cy="{sz}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>')
 def design(b):
     P=Pkg(b); body=P.body; C=COL[b]; LOGD=[]
     ps=paras(body)
@@ -160,6 +178,22 @@ def design(b):
         if p is not None and not ptext(p).strip(): run_e.append(p); continue
         for x in run_e[1:]: x.getparent().remove(x)
         run_e=[]
+    LEGAL={'receta':'CFC8B8','pensamiento':'4A4640','biografia':'B9C6DA'}[b]
+    for p in cp:
+        if p.getparent() is None: continue
+        for r_ in p.iter(W+'r'):
+            rp_=r_.find(W+'rPr')
+            if rp_ is None: rp_=el('w:rPr'); r_.insert(0,rp_)
+            for tag in ('rFonts','color','sz','szCs'):
+                for x in rp_.findall(W+tag): rp_.remove(x)
+            rp_.insert(0,el('w:rFonts',ascii='Palatino Linotype',hAnsi='Palatino Linotype',cs='Palatino Linotype'))
+            order=[W+t for t in ('rStyle','rFonts','b','bCs','i','iCs','caps','smallCaps','strike','dstrike','outline','shadow','emboss','imprint','noProof','snapToGrid','vanish','webHidden','color','spacing','w','kern','position','sz','szCs')]
+            for tag,val in (('color',LEGAL),('sz','16'),('szCs','16')):
+                e_=el('w:'+tag,val=val); idx=order.index(W+tag)
+                pos=len(rp_)
+                for i_,c in enumerate(rp_):
+                    if c.tag in order and order.index(c.tag)>idx: pos=i_; break
+                rp_.insert(pos,e_)
     set_bg(toc_head,f'{b}_toc','fondo_indice.jpg')
     # ---------- capítulos
     heads=[p for p in paras(body) if re.fullmatch(r'CAPÍTULO \d+',ptext(p).strip())]
@@ -286,7 +320,17 @@ def design(b):
     restyle_runs(tq,rpr(size=26,color=C['main'],i=True,track=10))
     pp=tq.find(W+'pPr'); ind=el('w:ind'); ind.set(q('w:left'),'560'); ind.set(q('w:right'),'560')
     jcx=pp.find(W+'jc'); jcx.addprevious(ind)
-    # ---------- encabezados por capítulo
+    # ---------- titulillos (par: libro · impar: capítulo) y folios
+    heads_now=[p for p in paras(body) if re.fullmatch(r'CAPÍTULO \d+',ptext(p).strip())]
+    ctitles=[ptext(h.getnext()).strip() for h in heads_now]
+    mu=C['muted']
+    odd={}; even={}
+    for i in range(nch):
+        odd[i]=P.part('header',f'headerJBimpar{i}.xml',f'<w:p><w:pPr><w:jc w:val="right"/></w:pPr>{rx(ctitles[i],mu)}{rx("   ",mu)}{inline_img(9800+i)}</w:p>',f'emblema{i}.png')
+        even[i]=P.part('header',f'headerJBpar{i}.xml',f'<w:p><w:pPr><w:jc w:val="left"/></w:pPr>{inline_img(9850+i)}{rx("   ",mu)}{rx(BOOKTITLE[b],mu)}</w:p>',f'emblema{i}.png')
+    fld=(f'<w:fldSimple w:instr=" PAGE ">{rx("1",mu,size=17,track=20)}</w:fldSimple>')
+    ftr=P.part('footer','footerJB.xml',f'<w:p><w:pPr><w:jc w:val="center"/></w:pPr>{rx("·   ",mu,size=17,track=0)}{fld}{rx("   ·",mu,size=17,track=0)}</w:p>')
+    ftr0=P.part('footer','footerJBvacio.xml','<w:p><w:pPr><w:jc w:val="center"/></w:pPr></w:p>')
     cur=None
     for x in body:
         if x.tag==W+'p':
@@ -296,8 +340,16 @@ def design(b):
         elif x.tag==W+'sectPr': sp=x
         else: sp=None
         if sp is None or cur is None: continue
-        rid=hdr_empty if (x is tq) else hdr_rid[cur]
-        for hr in sp.findall(W+'headerReference'): hr.set(q('r:id'),rid)
+        for r_ in sp.findall(W+'headerReference')+sp.findall(W+'footerReference'): sp.remove(r_)
+        if x is tq: refs=[('header','default',hdr_empty),('header','even',hdr_empty),('footer','default',ftr0),('footer','even',ftr0)]
+        else: refs=[('header','default',odd[cur]),('header','even',even[cur]),('footer','default',ftr),('footer','even',ftr)]
+        for k,(kind,typ,rid) in enumerate(refs):
+            e_=el(f'w:{kind}Reference',type=typ); e_.set(q('r:id'),rid); sp.insert(k,e_)
+    st=open(f'{P.d}/word/settings.xml',encoding='utf8').read()
+    if '<w:evenAndOddHeaders' not in st:
+        m=re.search(r'<w:(bookFoldRevPrinting|bookFoldPrinting|drawingGridHorizontalSpacing|drawingGridVerticalSpacing|displayHorizontalDrawingGridEvery|displayVerticalDrawingGridEvery|doNotUseMarginsForDrawingGridOrigin|drawingGridHorizontalOrigin|drawingGridVerticalOrigin|doNotShadeFormData|noPunctuationKerning|characterSpacingControl)\b',st)
+        st=st[:m.start()]+'<w:evenAndOddHeaders/>'+st[m.start():]
+        open(f'{P.d}/word/settings.xml','w',encoding='utf8').write(st)
     # ---------- índice (CONTENIDOS) en el orden nuevo, con emblemas
     tsect=None
     for p in toc:
@@ -339,6 +391,37 @@ def design(b):
         if pb is not None: hp.remove(pb)
         hp.find(W+'spacing').set(q('w:before'),'0')
         h.addprevious(spacer)
+    # ---------- letra capital de tres líneas en cada apertura
+    for h in [p for p in paras(body) if re.fullmatch(r'CAPÍTULO \d+',ptext(p).strip())]:
+        e=h.getnext()
+        while e is not None:
+            jc_=e.find(W+'pPr/'+W+'jc') if e.tag==W+'p' else None
+            if jc_ is not None and jc_.get(q('w:val'))=='both' and ptext(e).strip(): break
+            e=e.getnext()
+        ts=[t for t in tnodes(e) if (t.text or '').strip()]
+        first=ts[0]; lead=first.text.lstrip(); letter=lead[0]
+        first.text=lead[1:]
+        dp=el('w:p'); pp_=el('w:pPr'); sub(pp_,'w:keepNext')
+        pb=e.find(W+'pPr/'+W+'pageBreakBefore')
+        if pb is not None: e.find(W+'pPr').remove(pb); sub(pp_,'w:pageBreakBefore')
+        fp=sub(pp_,'w:framePr',dropCap='drop',lines=3,wrap='around',vAnchor='text',hAnchor='text')
+        sub(pp_,'w:spacing',before=0,after=0,line=880,lineRule='exact'); sub(pp_,'w:textAlignment',val='baseline')
+        dp.append(pp_)
+        rp_=rpr(size=108,color=DROP[b]); pos=el('w:position',val=-9)
+        rp_.insert([c.tag for c in rp_].index(W+'sz'),pos)
+        dp.append(run(letter,rp_))
+        e.addprevious(dp)
+    # ---------- página «La trilogía» antes del índice
+    toc_head=[p for p in paras(body) if ptext(p).strip()=='CONTENIDOS'][0]
+    mu=C['muted']; mn=C['main'] if b!='pensamiento' else '2B2B2B'
+    items=[('I','LA RECETA DE LA MANIFESTACIÓN','el cómo','receta'),('II','EL PENSAMIENTO ES TU FE','el porqué','pensamiento'),('III','LA BIOGRAFÍA','el quién','biografia')]
+    blk=[para('LA TRILOGÍA',ppr(before=2300,after=120,pb=True,keep=True),rpr(size=22,color=mu,track=160)),
+         para('◆',ppr(after=560,keep=True),rpr(size=16,color=mu))]
+    for num,tit,sub_,bk in items:
+        cur_=bk==b
+        blk.append(para(f'{num}  ·  {tit}',ppr(after=40,keep=True),rpr(size=20 if cur_ else 18,color=mn if cur_ else mu,track=70)))
+        blk.append(para(sub_,ppr(after=380,keep=True),rpr(size=17,color=mu,i=True,track=20)))
+    for x in blk: toc_head.addprevious(x)
     P.save()
     # ---------- limpieza de medios viejos sin referencia
     doc=open(f'{P.d}/word/document.xml',encoding='utf8').read()

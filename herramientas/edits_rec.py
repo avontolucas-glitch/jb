@@ -94,7 +94,7 @@ REPS=[
 ("la propia imagen de lo que vos te enseñaron,","la propia imagen de lo que a vos te enseñaron,",G),
 ("solucionaste la vida, para vos es importante — cuando vos ves","solucionaste la vida —para vos es importante—, cuando vos ves",P),
 ]
-SPLITS=["Esa conversación que acaba de tener","Entonces, claramente ahí no estás en un punto cero","Entonces, esto es un trabajo que, como es más el amor","Número dos, ahora tenés un universo",
+SPLITS=["Entonces el surfer toma la decisión","Ese pez es perfectamente conseguible","Esa conversación que acaba de tener","Entonces, claramente ahí no estás en un punto cero","Entonces, esto es un trabajo que, como es más el amor","Número dos, ahora tenés un universo",
 "Realmente, realmente, uno tiene que monitorear","¿Por qué? Porque una persona piensa que de 4 a 6","Entonces, paradójicamente, la actividad es pensar desde",
 "Entonces, lo más paradójico de todo esto","Bien. Esta persona está trabajando.","Por ejemplo, sentís que tuviste que hacer un juego de llaves",
 "Entonces, por eso te digo, la mente es muy específica","Fijate que el ejercicio no se posterga","Mientras estoy en la computadora mirando",

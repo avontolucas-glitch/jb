@@ -21,7 +21,7 @@ Vigentes (edición integral, sept. 2026):
 
 Versiones anteriores, que se conservan intactas: `(nueva versión)`, `(sincronizado)`, `(sincronizada)` y `Hoja de Revisión para Julian.docx` (1ª pasada).
 
-Además: `vista previa/` tiene los PDF de los libros (la vista previa usa TeX Gyre Pagella en lugar de Palatino), `diseño/grabados/` los grabados sueltos en alta resolución y `herramientas/` los scripts de construcción.
+Además: `diseño/portadas/` tiene tapa y contratapa de cada libro (5.5×8.5 con 0.125" de sangrado, 300 dpi; las tapas llevan los tres corazones del Cap. 1, las contratapas la frase de transición de Julián con espacio para el código de barras); `vista previa/` tiene los PDF de los libros (la vista previa usa TeX Gyre Pagella en lugar de Palatino), `diseño/grabados/` los grabados sueltos en alta resolución y `herramientas/` los scripts de construcción.
 
 ## Sincronía capítulo a capítulo
 
@@ -61,6 +61,7 @@ Nunca autor, nunca coautor. No se agregan enseñanzas, conceptos, ejemplos, anal
 - Cuerpo: Palatino Linotype 11 pt, interlineado 1,2, 7,5 pt entre párrafos, justificado.
 - Aperturas: grabado del capítulo en el fondo (arriba), espaciador de altura fija, «CAPÍTULO N» en 9,5 pt con tracking, título en 16,5 pt y epígrafe «…» en itálica con la cita en versalitas. Los epígrafes van en RVR1960; los no confirmados llevan `[versículo propuesto — a confirmar]`.
 - Encabezado: el emblema del capítulo arriba a la derecha (0.30"). Portada, copyright e índice van sin ícono; la transición lleva encabezado vacío.
+- Letra capital de 3 líneas en cada apertura. Titulillos: página par = título del libro con emblema a la izquierda; impar = título del capítulo con emblema a la derecha. Folios «· N ·» centrados. Copyright en Palatino 8 pt en el tono del libro. Página «La trilogía» antes del índice.
 - «En el principio» en versalitas en cada Cap. 0. Cierre de capítulo con ◆ ◆ ◆ en el color de acento, siempre pegado al último párrafo.
 - Imprenta: Receta y Biografía tienen fondo de página completo oscuro, así que al exportar para imprimir hay que pedir sangrado (0.125").
 
@@ -71,6 +72,7 @@ Nunca autor, nunca coautor. No se agregan enseñanzas, conceptos, ejemplos, anal
 - `edits_*.py`: la lista de correcciones por libro.
 - `phase_text.py`: aplica texto, estructura y sincronía.
 - `phase_design.py`: aplica maqueta, íconos, índice y ornamentos.
+- `covers.py`: genera las tapas y contratapas.
 - `make_docs.py`: genera el registro de cambios y la Hoja de Revisión.
 
 Las rutas de trabajo están fijadas a la sesión donde se crearon: para reusarlos hay que ajustarlas.

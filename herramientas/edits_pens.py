@@ -87,7 +87,7 @@ REPS=[
 ("tiene la intención — vos decís, ¿qué es mirar para adentro? No importa lo que sea mirar para adentro. Cuando tenés la intención de crear desde la mente, no desde las manos — ya cuando tenés","tiene la intención... Vos decís: «¿qué es mirar para adentro?». No importa lo que sea mirar para adentro. Cuando tenés la intención de crear desde la mente, no desde las manos —ya cuando tenés",P),
 ("pero desde la mente, no desde las manos —, paradójicamente,","pero desde la mente, no desde las manos—, paradójicamente,",P),
 ]
-SPLITS=["O sea, de tanto hurgar","Es como un control de máquina","Entonces ahí ya casi que no te dan más ganas","Cuando entendemos que el estado de conciencia",
+SPLITS=["De tantas formas lógicas y abiertas","Cuando tenés la intención de crear desde la mente","O sea, de tanto hurgar","Es como un control de máquina","Entonces ahí ya casi que no te dan más ganas","Cuando entendemos que el estado de conciencia",
 "Verdaderamente no hay nada que te distraiga","Porque justamente, si no conseguís la fuerza","Entonces, acá, en la propia pregunta","Y si esa persona tiene rostro",
 "Vamos a hacer un ejemplo que vi","Vos me podés decir:","O sea, yo realmente, si vos entendés","Uno no puede levantarse un superman",
 "Entonces, esa conversación empezó a tomar forma","En un momento, para que el bullying","Y si bien hay una profundidad muy fuerte",
