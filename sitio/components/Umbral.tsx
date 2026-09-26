@@ -23,16 +23,32 @@ export default function Umbral() {
       sessionStorage.setItem(CLAVE_UMBRAL, "1");
     } catch {}
     const quieto = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // 1) se apagan los textos y el ojo se acerca; 2) la oscuridad se abre desde
+    // la pupila como un iris; 3) el sitio despierta y empieza su propia secuencia.
     html.classList.add("umbral-saliendo");
-    setTimeout(() => html.classList.add("umbral-visto"), quieto ? 0 : 1100);
+    const despertar = () => {
+      html.classList.remove("en-umbral");
+      window.dispatchEvent(new Event("umbral:abierto"));
+    };
+    if (quieto) {
+      despertar();
+      html.classList.add("umbral-visto");
+      html.classList.remove("umbral-saliendo");
+      return;
+    }
+    setTimeout(despertar, 900);
+    setTimeout(() => html.classList.add("umbral-visto"), 2500);
+    setTimeout(() => html.classList.remove("umbral-saliendo"), 5200);
   }
 
   return (
     <div className="umbral" role="dialog" aria-modal="true" aria-labelledby="umbral-titulo" data-testid="umbral">
       <div className="umbral-caja">
         <p className="umbral-aviso texto-2">{umbral.aviso}</p>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/grabados/observador-crema.webp" alt="" width={800} height={800} draggable={false} className="estampa mx-auto w-40 sm:w-48 h-auto select-none" />
+        <div className="umbral-ojo mx-auto w-40 sm:w-48">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/grabados/observador-crema.webp" alt="" width={800} height={800} draggable={false} className="estampa w-full h-auto select-none" />
+        </div>
         <h2 id="umbral-titulo" className="titulo text-3xl sm:text-4xl mt-6">
           {umbral.bienvenida}
         </h2>

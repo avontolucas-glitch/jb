@@ -22,6 +22,7 @@ export default function Atencion() {
         raf = 0;
         const max = document.documentElement.scrollHeight - window.innerHeight;
         if (barra) barra.style.transform = `scaleX(${max > 0 ? Math.min(1, window.scrollY / max) : 0})`;
+        document.documentElement.classList.toggle("bajo", window.scrollY > 60);
       });
     };
     alBajar();

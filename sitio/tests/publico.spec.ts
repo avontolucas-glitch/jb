@@ -70,8 +70,13 @@ sinAtajo("al entrar aparece el cuadro de bienvenida, una vez por visita", async 
   await expect(umbral).toContainText("espacio exclusivo");
   await expect(umbral).toContainText("prohibida toda reproducción o difusión");
   await expect(page.getByRole("button", { name: "Entrar" })).toBeFocused();
+  // detrás de la bienvenida no se revela nada todavía
+  await page.waitForTimeout(800);
+  await expect(page.locator(".revelar.visto")).toHaveCount(0);
   await page.getByRole("button", { name: "Entrar" }).click();
+  await expect(page.locator("html")).toHaveClass(/umbral-saliendo/);
   await expect(umbral).toBeHidden();
+  await expect(page.locator(".revelar.visto").first()).toBeAttached();
   await expect(page.getByRole("heading", { name: "Los libros" })).toBeVisible();
   await page.goto("/");
   await expect(page.getByTestId("umbral")).toBeHidden();

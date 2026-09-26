@@ -2,6 +2,7 @@ import Link from "next/link";
 import Grabado from "@/components/Grabado";
 import TituloTinta from "@/components/TituloTinta";
 import Estrellas from "@/components/Estrellas";
+import Divisor from "@/components/Divisor";
 import Texto from "@/components/Marcador";
 import EspacioFoto from "@/components/EspacioFoto";
 import Epigrafe from "@/components/Epigrafe";
@@ -30,11 +31,11 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
           lento
         />
         <div className="relative mx-auto max-w-3xl text-center mt-6">
-          <TituloTinta texto={sitio.nombre} desde={1.1} className="titulo text-5xl sm:text-7xl" />
-          <p className="texto-2 mt-6 text-xl sm:text-2xl aparece" style={{ animationDelay: "1.8s" }}>
+          <TituloTinta texto={sitio.nombre} desde={1.7} paso={0.07} className="titulo text-5xl sm:text-7xl" />
+          <p className="texto-2 mt-6 text-xl sm:text-2xl aparece" style={{ animationDelay: "2.9s" }}>
             {inicio.bajada}
           </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center aparece" style={{ animationDelay: "2.3s" }}>
+          <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center aparece" style={{ animationDelay: "3.5s" }}>
             <Link href="/en-vivo" className="boton boton-lleno llamado">
               Masterclass en vivo
             </Link>
@@ -43,11 +44,12 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
             </Link>
           </div>
         </div>
+        <span className="bajar" aria-hidden="true" />
       </section>
 
       <section className="hondo px-5 py-20 sm:py-28 border-t borde" aria-labelledby="quien">
         <div className="mx-auto max-w-5xl grid gap-12 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] items-center">
-          <EspacioFoto className="max-w-sm w-full mx-auto revelar" />
+          <EspacioFoto className="max-w-sm w-full mx-auto revelar cortina" />
           <div className="prosa revelar" style={{ ["--retardo" as string]: ".2s" }}>
             <h2 id="quien" className="titulo text-3xl mb-6">
               Quién es
@@ -57,7 +59,8 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
         </div>
       </section>
 
-      <section className="px-5 py-20 sm:py-28" aria-labelledby="envivo">
+      <Divisor />
+      <section className="px-5 pb-20 sm:pb-28" aria-labelledby="envivo">
         <div className="mx-auto max-w-3xl">
           <h2 id="envivo" className="titulo text-3xl mb-4 revelar">
             {enVivo.titulo}
@@ -91,8 +94,8 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
                 <Link href={`/libros#${l.id}`} className="fila group grid grid-cols-[3rem_1fr] sm:grid-cols-[4rem_1fr_auto] gap-x-4 py-7 items-baseline">
                   <span className="texto-2 text-xl">{l.numero}</span>
                   <span>
-                    <span className="block text-2xl transition-[letter-spacing] duration-700 group-hover:tracking-wide">{l.titulo}</span>
-                    <span className="texto-2 italic">{l.pregunta}</span>
+                    <span className="block texto-2 italic">{l.pregunta}</span>
+                    <span className="despues block text-2xl transition-[letter-spacing] duration-700 group-hover:tracking-wide">{l.titulo}</span>
                   </span>
                   <span className="col-start-2 sm:col-start-3 texto-2 text-sm mt-2 sm:mt-0">{l.estado}</span>
                 </Link>
@@ -102,7 +105,8 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
         </div>
       </section>
 
-      <section className="px-5 py-20 sm:py-28" aria-labelledby="mc">
+      <Divisor />
+      <section className="px-5 pb-20 sm:pb-28" aria-labelledby="mc">
         <div className="mx-auto max-w-3xl">
           <h2 id="mc" className="titulo text-3xl mb-6 revelar">
             {masterclass.titulo}

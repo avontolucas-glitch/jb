@@ -163,23 +163,76 @@ label.boton:has(input:focus-visible) { outline: 2px solid var(--texto); outline-
 label.boton:has(input:checked) { background: var(--texto); color: var(--fondo); }
 
 /* ───────── Umbral: cuadro de bienvenida al entrar ───────── */
+@property --apertura { syntax: "<percentage>"; inherits: false; initial-value: 0%; }
 .umbral {
   position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center; padding: 1rem;
   background: var(--negro-hondo); color: var(--crema);
   animation: aparece 1.4s var(--lento) both;
-  transition: opacity 1.1s var(--lento), visibility 0s linear 1.1s;
 }
 .umbral-caja {
-  width: 100%; max-width: 30rem; text-align: center; padding: 2.5rem 1.5rem 2.75rem;
+  position: relative; width: 100%; max-width: 30rem; text-align: center; padding: 2.5rem 1.5rem 2.75rem;
   border: 1px solid #2a2724; background: var(--negro);
-  transition: transform 1.1s var(--lento), filter 1.1s var(--lento), opacity 1.1s var(--lento);
+  transition: border-color .7s var(--lento), background-color .9s var(--lento);
 }
 .umbral-aviso { font-size: .82rem; line-height: 1.5; padding-bottom: 1.4rem; margin-bottom: 1.8rem; border-bottom: 1px solid #2a2724; }
-html.umbral-saliendo .umbral { opacity: 0; visibility: hidden; }
-html.umbral-saliendo .umbral-caja { transform: scale(1.03); filter: blur(4px); opacity: 0; }
+.umbral-caja > :not(.umbral-ojo) { transition: opacity .55s var(--lento), transform .55s var(--lento), border-color .55s; }
+.umbral-ojo { position: relative; z-index: 1; }
+
+/* Al entrar: los textos se apagan... */
+html.umbral-saliendo .umbral-caja { border-color: transparent; background-color: transparent; }
+html.umbral-saliendo .umbral-caja > :not(.umbral-ojo) { opacity: 0; transform: translateY(-8px); border-color: transparent; }
+/* ...el ojo se acerca hasta atravesar la pupila... */
+html.umbral-saliendo .umbral-ojo { transform: scale(7.5); opacity: 0; transition: transform 2.1s cubic-bezier(.6, 0, .2, 1) .15s, opacity 1.1s ease-in 1s; }
+/* ...un destello leve... */
+.umbral::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 50%, rgba(239, 233, 220, .28), transparent 38%); }
+html.umbral-saliendo .umbral::after { animation: destello 1.7s ease-out .3s both; }
+@keyframes destello { 0% { opacity: 0; transform: scale(.3); } 35% { opacity: 1; } 100% { opacity: 0; transform: scale(2.4); } }
+/* ...y la oscuridad se abre desde el centro, como un iris */
+html.umbral-saliendo .umbral {
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent var(--apertura), #000 calc(var(--apertura) + 12%));
+  mask-image: radial-gradient(circle at 50% 50%, transparent var(--apertura), #000 calc(var(--apertura) + 12%));
+  animation: iris 2s cubic-bezier(.7, 0, .3, 1) .45s both;
+}
+@keyframes iris { from { --apertura: 0%; } to { --apertura: 115%; } }
 html.umbral-visto .umbral, html:not(.js) .umbral { display: none; }
-html.js:not(.umbral-visto):not(.umbral-saliendo) body { overflow: hidden; }
+html.en-umbral body { overflow: hidden; }
+
+/* Mientras está la bienvenida, el sitio espera quieto: su secuencia empieza al entrar */
+html.en-umbral main *, html.en-umbral main *::before, html.en-umbral main *::after { animation-play-state: paused !important; }
+/* El sitio despierta detrás del iris; el menú llega al final */
+html.umbral-saliendo main { animation: despertar 2.6s var(--lento) .5s both; }
+@keyframes despertar { from { opacity: 0; filter: blur(10px); transform: scale(1.05); } to { opacity: 1; filter: none; transform: none; } }
+html.umbral-saliendo header { animation: aparece 1.4s var(--lento) 3.4s both; }
+
 html.js:not(.umbral-visto) .aviso-app { display: none; }
+/* El aviso de la app llega tarde, para no interrumpir el descubrimiento */
+.aviso-app { animation: aparece 1.2s var(--lento) 6s both; }
+
+/* ───────── Descubrir de a poco ───────── */
+
+/* Invitación a bajar: una línea con una gota de luz que cae */
+.bajar { position: absolute; left: 50%; bottom: 1.2rem; width: 1px; height: 3.2rem; background: linear-gradient(to bottom, transparent, rgba(239, 233, 220, .35)); overflow: hidden; animation: aparece 1.6s var(--lento) 4s both; transition: opacity .8s var(--lento); }
+.bajar::after { content: ""; position: absolute; left: -1px; width: 3px; height: 10px; border-radius: 2px; background: var(--crema); animation: gota 2.8s cubic-bezier(.6, 0, .4, 1) 4.5s infinite; opacity: 0; }
+@keyframes gota { 0% { top: -10px; opacity: 0; } 25% { opacity: .9; } 100% { top: 100%; opacity: 0; } }
+html.bajo .bajar { opacity: 0; }
+
+/* Ojo que se abre al llegar, entre secciones */
+.divisor { display: flex; align-items: center; justify-content: center; gap: 1.1rem; padding: 3.2rem 1.25rem; }
+.divisor .linea { flex: 0 1 7rem; height: 1px; background: var(--linea); }
+html.js .divisor .parpado { transform-box: fill-box; transform-origin: center; transform: scaleY(.06); transition: transform 1.3s var(--lento) .5s; }
+html.js .divisor .iris { opacity: 0; transition: opacity 1s var(--lento) 1.3s; }
+html.js .divisor.visto .parpado { transform: none; }
+html.js .divisor.visto .iris { opacity: 1; }
+
+/* Cortina: se descubre de arriba hacia abajo */
+html.js .cortina.revelar { clip-path: inset(0 0 100% 0); filter: none; transform: none; transition: clip-path 2s var(--lento), opacity 1.2s var(--lento); }
+html.js .cortina.revelar.visto { clip-path: inset(0 0 0 0); }
+
+/* Primero la pregunta, después la respuesta */
+html.js .revelar .despues { opacity: 0; filter: blur(4px); transition: opacity 1.3s var(--lento) .75s, filter 1.3s var(--lento) .75s; }
+html.js .revelar.visto .despues { opacity: 1; filter: none; }
+
 
 /* ───────── Atención: movimiento con sentido ───────── */
 
@@ -221,7 +274,9 @@ html.js h2.revelar.visto { letter-spacing: .01em; }
 
 @media (prefers-reduced-motion: reduce) {
   .tinta .letra, html.js .palabras .p { opacity: 1 !important; filter: none !important; transform: none !important; }
-  .estrellas, .halo-puntero, .avance { display: none; }
+  .estrellas, .halo-puntero, .avance, .bajar { display: none; }
+  html.js .divisor .parpado { transform: none; } html.js .divisor .iris, html.js .revelar .despues { opacity: 1; filter: none; }
+  html.js .cortina.revelar { clip-path: none; }
   html.js h2.revelar { letter-spacing: .01em; }
 }
 @media (pointer: coarse) { .halo-puntero { display: none; } }

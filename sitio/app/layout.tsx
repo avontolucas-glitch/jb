@@ -33,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "var h=document.documentElement;h.classList.add('js');try{if(sessionStorage.getItem('jb-umbral'))h.classList.add('umbral-visto')}catch(e){}",
+              "var h=document.documentElement;h.classList.add('js');try{h.classList.add(sessionStorage.getItem('jb-umbral')?'umbral-visto':'en-umbral')}catch(e){h.classList.add('umbral-visto')}",
           }}
         />
       </head>

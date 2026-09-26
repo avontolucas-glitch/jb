@@ -24,12 +24,16 @@ export default function Revelar() {
       { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
     );
     const observar = () => document.querySelectorAll(".revelar:not(.visto), .trazo:not(.visto)").forEach((el) => io.observe(el));
-    observar();
-    const mo = new MutationObserver(observar);
+    // Mientras está la bienvenida, nada se revela: el descubrimiento empieza al entrar.
+    const alAbrir = () => observar();
+    if (document.documentElement.classList.contains("en-umbral")) window.addEventListener("umbral:abierto", alAbrir, { once: true });
+    else observar();
+    const mo = new MutationObserver(() => !document.documentElement.classList.contains("en-umbral") && observar());
     mo.observe(document.body, { childList: true, subtree: true });
     return () => {
       io.disconnect();
       mo.disconnect();
+      window.removeEventListener("umbral:abierto", alAbrir);
     };
   }, [ruta]);
   return null;
