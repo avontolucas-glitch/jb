@@ -82,7 +82,7 @@ export const libros: Libro[] = [
     titulo: "La Receta de la Manifestación",
     pregunta: "¿Cómo funciona?",
     estado: "Próximamente",
-    descripcion: "El libro de la práctica. Reúne los mecanismos, los procesos y los ejercicios con los que Julián explica cómo se manifiesta, en seis capítulos: Dos formatos de la mente, El sentimiento crea la realidad, Conocedores del bien y el mal, Ahora mismo, La pesca y Cargar el estado.",
+    descripcion: "El libro de la práctica: cómo funciona. Reúne los mecanismos, los procesos y los ejercicios con los que Julián explica cómo se manifiesta.",
     epigrafe: citas.pesca,
   },
   {
@@ -91,7 +91,7 @@ export const libros: Libro[] = [
     titulo: "El Pensamiento es Tu Fe",
     pregunta: "¿Por qué funciona?",
     estado: "Próximamente",
-    descripcion: "El libro de los fundamentos: por qué funciona lo que la Receta enseña a hacer. Habla de la conciencia, del Verbo, de la fe y de la identidad a lo largo de siete capítulos: La palabra, Libertad interna, El Observador Eterno, Conversaciones sinceras, La inteligencia natural, Arquetipos y Atravesar el tiempo.",
+    descripcion: "El libro de los fundamentos: por qué funciona. La mirada que hay detrás de la práctica: la conciencia, el Verbo, la fe y la identidad.",
     epigrafe: citas.tiempo,
   },
   {
@@ -100,7 +100,7 @@ export const libros: Libro[] = [
     titulo: "Biografía",
     pregunta: "¿Quién lo descubrió?",
     estado: "Próximamente",
-    descripcion: "Julián sin filtros: la infancia, el padre, la fama y los dolores que lo llevaron a descubrir lo que hoy enseña. Cuatro capítulos para conocer a quien está detrás de la trilogía: Primera imagen, El reconocimiento, El desastre y Poner a prueba.",
+    descripcion: "El libro de quién lo descubrió: la historia de Julián, sin filtros, y el camino que lo llevó a lo que hoy enseña.",
     epigrafe: citas.observador,
   },
 ];

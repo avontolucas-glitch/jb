@@ -50,7 +50,7 @@ export default async function Libros() {
               )}
               <Ornamento className="mt-12" />
               <div className="mt-12 text-left prosa mx-auto">
-                <h3 className="firma texto-2 text-xs text-center mb-5 revelar">Índice</h3>
+                <h3 className="firma texto-2 text-xs text-center mb-5 revelar">Índice, en construcción</h3>
                 <ol data-testid={`indice-${l.id}`}>
                   <li aria-hidden="true" className="border-t borde trazo" />
                   {capitulos[l.id].map((c, i) => (

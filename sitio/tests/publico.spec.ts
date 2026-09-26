@@ -46,7 +46,7 @@ test("los tres libros figuran como Próximamente y con su descripción", async (
     await expect(page.getByTestId(`estado-${id}`)).toHaveText("Próximamente");
   }
   await expect(page.locator("#receta")).toContainText("El libro de la práctica");
-  await expect(page.locator("#biografia")).toContainText("Julián sin filtros");
+  await expect(page.locator("#biografia")).toContainText("la historia de Julián");
 });
 
 test("las conferencias en vivo son todas con entrada simbólica", async ({ page }) => {
