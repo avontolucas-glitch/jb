@@ -12,6 +12,7 @@ export default function Grabado({
   mira = false,
   halo = false,
   lento = false,
+  pasada = false,
   className = "",
 }: {
   src: string;
@@ -20,6 +21,8 @@ export default function Grabado({
   mira?: boolean;
   halo?: boolean;
   lento?: boolean;
+  /** Una segunda impresión corrida unos milímetros, como en una prensa manual. */
+  pasada?: boolean;
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -51,6 +54,10 @@ export default function Grabado({
     <div className={`relative mx-auto ${className}`} style={{ width: ancho, aspectRatio: "1 / 1" }}>
       {halo && <div className="halo" aria-hidden="true" />}
       <div ref={ref} className="relative h-full w-full will-change-transform">
+        {pasada && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={src} alt="" width={800} height={800} draggable={false} className={`fantasma-tinta estampa ${lento ? "estampa-lenta" : ""} h-full w-full select-none`} />
+        )}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}

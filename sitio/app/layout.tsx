@@ -38,6 +38,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen flex flex-col">
+        {/* Tinta de imprenta: bordes levemente comidos, como tipos sobre papel */}
+        <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+          <filter id="tinta-rugosa" x="-5%" y="-10%" width="110%" height="120%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="11" result="ruido" />
+            <feDisplacementMap in="SourceGraphic" in2="ruido" scale="1.8" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </svg>
         <Umbral />
         <a href="#contenido" className="salto">Saltar al contenido</a>
         <Encabezado />

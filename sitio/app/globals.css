@@ -280,3 +280,35 @@ html.js h2.revelar.visto { letter-spacing: .01em; }
   html.js h2.revelar { letter-spacing: .01em; }
 }
 @media (pointer: coarse) { .halo-puntero { display: none; } }
+
+/* ───────── Portada compuesta a mano ───────── */
+.portada { position: relative; overflow: hidden; }
+.imprenta-tipo { filter: url(#tinta-rugosa); text-shadow: 0 0 .5px rgba(239, 233, 220, .55); }
+
+/* Marcas de corte y registro */
+.marcas { position: absolute; inset: 0; pointer-events: none; color: var(--gris); opacity: .45; }
+.marcas svg { position: absolute; }
+.marca-corte.ai { top: 14px; left: 14px; }
+.marca-corte.ad { top: 14px; right: 14px; transform: scaleX(-1); }
+.marca-corte.bi { bottom: 14px; left: 14px; transform: scaleY(-1); }
+.marca-corte.bd { bottom: 14px; right: 14px; transform: scale(-1, -1); }
+.marca-registro.ar { top: 10px; left: calc(50% - 9px); }
+.marca-registro.ab { bottom: 10px; left: calc(50% - 9px); }
+@media (max-width: 639px) { .marca-registro { display: none; } }
+
+/* Trazo a mano que se dibuja */
+.trazo-mano { display: block; max-width: 100%; height: auto; overflow: visible; }
+.trazo-mano-dibujo { stroke-dasharray: 1; stroke-dashoffset: 1; animation: pluma 1.6s cubic-bezier(.5, 0, .3, 1) var(--retardo, 0s) forwards; }
+@keyframes pluma { to { stroke-dashoffset: 0; } }
+
+/* El grabado pegado a mano, con una segunda pasada corrida (como un mal registro) */
+.lamina { position: relative; transform: rotate(-1.1deg); }
+.lamina .fantasma-tinta { position: absolute; inset: 0; transform: translate(5px, 4px) rotate(.5deg); opacity: .13; pointer-events: none; }
+
+/* Marginalia vertical */
+.margen { writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: .28em; font-size: .78rem; }
+.folio { letter-spacing: .3em; font-size: .85rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .trazo-mano-dibujo { stroke-dashoffset: 0; }
+}
