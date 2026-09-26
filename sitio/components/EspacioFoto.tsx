@@ -9,7 +9,7 @@ export default function EspacioFoto({ texto = `Foto de ${sitio.nombreCorto}`, pr
       role="img"
       aria-label={`Espacio reservado: ${texto}`}
     >
-      <span className="text-sm">[{texto.toUpperCase()}]</span>
+      <span className="text-sm">({texto}, a definir)</span>
     </div>
   );
 }

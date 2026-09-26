@@ -9,6 +9,7 @@ import { usuarioActual } from "@/lib/auth";
 import { accesos } from "@/lib/access";
 import { producto } from "@/lib/payments";
 import { accionPagar } from "@/lib/acciones";
+import { ocupados } from "@/lib/sesiones";
 
 export const metadata: Metadata = { title: "Comprar", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -16,6 +17,7 @@ export const dynamic = "force-dynamic";
 function destino(id: string) {
   if (id === "masterclass") return { href: "/mi-espacio/masterclass", texto: "la masterclass" };
   if (id.startsWith("directo:")) return { href: `/mi-espacio/en-vivo/${id.split(":")[1]}`, texto: "la sala" };
+  if (id.startsWith("sesion:")) return { href: "/mi-espacio/sesiones", texto: "tus sesiones" };
   if (id.startsWith("libro:")) return { href: `/mi-espacio/biblioteca/${id.split(":")[1]}`, texto: "tu biblioteca" };
   return { href: "/mi-espacio/conferencias", texto: "mis conferencias" };
 }
@@ -28,6 +30,8 @@ export default async function Checkout({ params }: { params: Promise<{ producto:
   if (!u) redirect(`/ingresar?aviso=checkout&volver=/checkout/${id}`);
   const a = await accesos(u.id);
   const yaLoTiene = a.compras.some((c) => c.producto === p.id);
+  const esSesion = p.id.startsWith("sesion:");
+  const tomadoPorOtro = esSesion && !yaLoTiene && (await ocupados()).has(p.id.slice("sesion:".length));
   const ir = destino(p.id);
 
   return (
@@ -58,7 +62,14 @@ export default async function Checkout({ params }: { params: Promise<{ producto:
           </div>
         </dl>
 
-        {yaLoTiene ? (
+        {tomadoPorOtro ? (
+          <div className="mt-8" data-testid="horario-tomado">
+            <p>Ese horario ya está reservado.</p>
+            <Link href="/sesiones" className="boton boton-lleno mt-4">
+              Elegir otro horario
+            </Link>
+          </div>
+        ) : yaLoTiene ? (
           <div className="mt-8">
             <p>Ya lo compraste.</p>
             <Link href={ir.href} className="boton boton-lleno mt-4">
@@ -72,6 +83,15 @@ export default async function Checkout({ params }: { params: Promise<{ producto:
             <Formulario accion={accionPagar} boton="Pagar (simulado)" enviando="Procesando…">
               <input type="hidden" name="producto" value={id} />
               {p.aVoluntad && <MontoVoluntad moneda={p.moneda} {...p.aVoluntad} />}
+              {esSesion && (
+                <div>
+                  <label htmlFor="campo-nota" className="etiqueta">
+                    ¿Qué te gustaría trabajar en la sesión? (opcional)
+                  </label>
+                  <textarea id="campo-nota" name="nota" maxLength={1500} className="campo" />
+                  <p className="texto-2 text-sm mt-1">Lo lee solo Julián, antes del encuentro.</p>
+                </div>
+              )}
               <p className="border border-dashed borde p-4 texto-2 text-sm">
                 Pago de prueba: no se cobra nada. En la versión final acá se paga con el medio de pago elegido.
               </p>

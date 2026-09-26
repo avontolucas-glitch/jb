@@ -1,15 +1,15 @@
-import { MARCADOR, sitio } from "@/content/config";
+import { esMarcador } from "@/content/config";
 
-/** Muestra el texto; si es el marcador de Julián, lo destaca como pendiente. */
+/** Muestra el texto; si todavía es un marcador «(… a definir)», lo destaca como pendiente. */
 export default function Texto({ children, bloque = false }: { children: string; bloque?: boolean }) {
-  if (children === MARCADOR) {
+  if (esMarcador(children)) {
     return bloque ? (
       <p className="marcador-bloque" data-marcador>
-        {MARCADOR} <span className="texto-2">— lo escribe {sitio.nombreCorto}.</span>
+        {children}
       </p>
     ) : (
       <span className="marcador" data-marcador>
-        {MARCADOR}
+        {children}
       </span>
     );
   }

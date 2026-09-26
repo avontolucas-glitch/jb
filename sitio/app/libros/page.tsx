@@ -5,7 +5,9 @@ import Grabado from "@/components/Grabado";
 import Texto from "@/components/Marcador";
 import Epigrafe from "@/components/Epigrafe";
 import Ornamento from "@/components/Ornamento";
-import { libros, portadillas } from "@/content/config";
+import { capitulos, libros, portadillas } from "@/content/config";
+import { usuarioActual } from "@/lib/auth";
+import { accesos } from "@/lib/access";
 
 export const metadata: Metadata = { title: "Los libros" };
 
@@ -16,7 +18,9 @@ const identidad = {
   biografia: { superficie: "marino", grabado: "/grabados/biografia-ojo.webp", alt: "Grabado: el ojo que llora" },
 } as const;
 
-export default function Libros() {
+export default async function Libros() {
+  const u = await usuarioActual();
+  const mios = u ? (await accesos(u.id)).libros : [];
   return (
     <>
       <Apertura titulo="Los libros" bajada="Una trilogía: tres perspectivas de una misma verdad. Todavía no salieron." {...portadillas.libros} />
@@ -45,14 +49,39 @@ export default function Libros() {
                 </div>
               )}
               <Ornamento className="mt-12" />
-              <div className="mt-10 flex flex-col items-center gap-4 revelar">
-                <Link href={`/lista?interes=${l.id}`} className="boton">
-                  Avisame cuando salga
-                </Link>
-                <p className="texto-2 text-sm prosa">
-                  Impreso o digital: el digital se lee acá, en tu espacio, y cada libro impreso trae un código para leerlo también en digital.{" "}
+              <div className="mt-12 text-left prosa mx-auto">
+                <h3 className="firma texto-2 text-xs text-center mb-5 revelar">Índice</h3>
+                <ol data-testid={`indice-${l.id}`}>
+                  <li aria-hidden="true" className="border-t borde trazo" />
+                  {capitulos[l.id].map((c, i) => (
+                    <li key={c.n} className="border-b borde flex items-center gap-4 py-2.5 revelar" style={{ ["--retardo" as string]: `${i * 0.07}s` }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={`/emblemas/${c.emblema}.webp`} alt="" width={40} height={40} className={`w-8 h-8 ${l.id === "pensamiento" ? "invert opacity-80" : "opacity-85"}`} />
+                      <span className="texto-2 w-5 text-sm">{c.n}</span>
+                      <span className="text-lg">{c.titulo}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              <div className="mt-12 flex flex-col items-center gap-4 revelar">
+                <p className="prosa">Leelo online, acá o en la app, desde cualquier dispositivo.</p>
+                {mios.includes(l.id) ? (
+                  <Link href={`/mi-espacio/biblioteca/${l.id}`} className="boton boton-lleno" data-testid={`leer-${l.id}`}>
+                    Leer online
+                  </Link>
+                ) : (
+                  <Link href={`/checkout/libro-${l.id}`} className="boton boton-lleno" data-testid={`leer-${l.id}`}>
+                    Leer online (edición digital)
+                  </Link>
+                )}
+                <p className="texto-2 text-sm">
+                  ¿Tenés el libro impreso?{" "}
                   <Link href="/canjear" className="enlace">
-                    Canjear un código
+                    Cargá su código
+                  </Link>{" "}
+                  ·{" "}
+                  <Link href={`/lista?interes=${l.id}`} className="enlace">
+                    Avisame cuando salga
                   </Link>
                 </p>
               </div>

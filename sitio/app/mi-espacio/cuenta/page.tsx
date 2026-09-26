@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { miembro } from "@/lib/miembro";
 import { accionSalir } from "@/lib/acciones";
+import { horarioDesdeId } from "@/lib/sesiones";
 import { conferencias, enVivo, libros } from "@/content/config";
 
 const fecha = (iso: string) =>
@@ -8,6 +9,10 @@ const fecha = (iso: string) =>
 
 function nombreProducto(p: string) {
   if (p === "masterclass") return "Masterclass";
+  if (p.startsWith("sesion:")) {
+    const h = horarioDesdeId(p.slice("sesion:".length));
+    return h ? `Sesión privada · ${h.etiqueta}` : "Sesión privada";
+  }
   const l = libros.find((x) => `libro:${x.id}` === p);
   if (l) return `${l.titulo} · edición digital`;
   const d = enVivo.directos.find((x) => `directo:${x.id}` === p);

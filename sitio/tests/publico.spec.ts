@@ -8,6 +8,7 @@ const paginas = [
   "/conferencias/abierta-2026",
   "/masterclass",
   "/en-vivo",
+  "/masterclass/grabada",
   "/fragmentos",
   "/lista",
   "/ingresar",
@@ -17,6 +18,8 @@ const paginas = [
   "/legales/reembolsos",
   "/app",
   "/canjear",
+  "/sesiones",
+  "/arrepentimiento",
 ];
 
 test("todas las páginas públicas cargan, sin desbordar a lo ancho", async ({ page }) => {
@@ -42,7 +45,7 @@ test("los tres libros figuran como Próximamente y con marcador de texto", async
   for (const id of ["receta", "pensamiento", "biografia"]) {
     await expect(page.getByTestId(`estado-${id}`)).toHaveText("Próximamente");
   }
-  await expect(page.locator("[data-marcador]").first()).toContainText("[TEXTO DE JULIÁN]");
+  await expect(page.locator("[data-marcador]").first()).toContainText("a definir)");
 });
 
 test("inscripción a la conferencia abierta", async ({ page }) => {
@@ -81,4 +84,40 @@ sinAtajo("al entrar aparece el cuadro de bienvenida, una vez por visita", async 
   await expect(page.getByRole("heading", { name: "Los libros" })).toBeVisible();
   await page.goto("/");
   await expect(page.getByTestId("umbral")).toBeHidden();
+});
+
+test.describe("celular chico", () => {
+  test.use({ viewport: { width: 360, height: 740 } });
+  test("la barra de arriba entra entera y muestra Ingresar", async ({ page }) => {
+    for (const ruta of ["/", "/sesiones"]) {
+      await page.goto(ruta);
+      const ancho = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      expect(ancho, `${ruta} desborda`).toBeLessThanOrEqual(1);
+      await expect(page.getByTestId("cuenta-movil")).toBeVisible();
+    }
+  });
+});
+
+test("la masterclass es en vivo y los libros se leen online, separados", async ({ page }) => {
+  await page.goto("/en-vivo");
+  await expect(page).toHaveURL(/\/masterclass$/);
+  await expect(page.getByTestId("directo-semana-1")).toBeVisible();
+  await page.goto("/masterclass/grabada");
+  await expect(page.locator("main")).not.toContainText("El Sentimiento Crea la Realidad");
+  await page.goto("/libros");
+  await expect(page.getByTestId("indice-receta").locator("li:not([aria-hidden])")).toHaveCount(6);
+  await expect(page.getByTestId("leer-pensamiento")).toHaveAttribute("href", "/checkout/libro-pensamiento");
+});
+
+test("privacidad y reembolsos tienen texto, y el botón de arrepentimiento da un código", async ({ page }) => {
+  await page.goto("/legales/privacidad");
+  await expect(page.getByTestId("texto-legal")).toContainText("Ley 25.326");
+  await page.goto("/legales/reembolsos");
+  await expect(page.getByTestId("texto-legal")).toContainText("10 días corridos");
+  await page.getByRole("link", { name: "Botón de arrepentimiento" }).last().click();
+  await page.getByLabel("Nombre").fill("Ana");
+  await page.getByLabel("Mail de la compra").fill("ana@prueba.com");
+  await page.getByLabel("Qué compraste y cuándo").fill("Sesión privada del martes");
+  await page.getByRole("button", { name: "Pedir la cancelación" }).click();
+  await expect(page.getByTestId("mensaje-ok")).toContainText("ARR-");
 });

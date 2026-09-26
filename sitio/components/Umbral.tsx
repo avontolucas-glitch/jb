@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { umbral, sitio } from "@/content/config";
+import Estrellas from "./Estrellas";
+import { OjoFantasma } from "./Ojo";
 
 export const CLAVE_UMBRAL = "jb-umbral";
 
@@ -43,19 +45,23 @@ export default function Umbral() {
 
   return (
     <div className="umbral" role="dialog" aria-modal="true" aria-labelledby="umbral-titulo" data-testid="umbral">
+      <Estrellas />
+      <OjoFantasma />
       <div className="umbral-caja">
         <p className="umbral-aviso texto-2">{umbral.aviso}</p>
-        <div className="umbral-ojo mx-auto w-40 sm:w-48">
+        {/* El ojo es la puerta: al tocarlo se expande y te lleva adentro */}
+        <button ref={boton} type="button" onClick={entrar} className="umbral-ojo" aria-label={umbral.boton} data-sonido="cuenco">
+          <span className="halo" aria-hidden="true" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/grabados/observador-crema.webp" alt="" width={800} height={800} draggable={false} className="estampa w-full h-auto select-none" />
-        </div>
-        <h2 id="umbral-titulo" className="titulo text-3xl sm:text-4xl mt-6">
+          <img src="/grabados/observador-crema.webp" alt="" width={800} height={800} draggable={false} className="estampa estampa-lenta relative w-full h-auto select-none" />
+        </button>
+        <h2 id="umbral-titulo" className="titulo umbral-titulo">
           {umbral.bienvenida}
         </h2>
-        <p className="texto-2 mt-2">{sitio.nombre}</p>
-        <button ref={boton} type="button" onClick={entrar} className="boton boton-lleno mt-10 min-w-44">
-          {umbral.boton}
-        </button>
+        <p className="firma texto-2 text-xs mt-4 umbral-nombre">{sitio.nombre}</p>
+        <p className="umbral-indicacion texto-2" aria-hidden="true">
+          {umbral.indicacion}
+        </p>
       </div>
     </div>
   );

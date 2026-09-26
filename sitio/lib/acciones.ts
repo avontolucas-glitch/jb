@@ -10,6 +10,7 @@ import { accesos, type Progreso } from "./access";
 import { leer, escribir } from "./db";
 import { producto, pagarSimulado, montoElegido } from "./payments";
 import { canjear } from "./codigos";
+import { ocupados } from "./sesiones";
 import { conferencias, modulos } from "@/content/config";
 
 export type Estado = { error?: string; ok?: string } | null;
@@ -108,10 +109,22 @@ export async function accionPagar(_: Estado, f: FormData): Promise<Estado> {
   if (!p) return { error: "Ese producto no existe." };
   const m = montoElegido(p, txt(f, "monto"));
   if ("error" in m) return { error: m.error };
+  if (p.id.startsWith("sesion:")) {
+    const slot = p.id.slice("sesion:".length);
+    const quien = (await ocupados()).get(slot);
+    if (quien && quien !== u.id) return { error: "Ese horario se acaba de reservar. Elegí otro." };
+    const nota = txt(f, "nota").slice(0, 1500);
+    if (nota) {
+      const notas = await leer<{ usuario: string; horario: string; nota: string; fecha: string }[]>("notas_sesion");
+      notas.push({ usuario: u.id, horario: slot, nota, fecha: new Date().toISOString() });
+      await escribir("notas_sesion", notas);
+    }
+  }
   await pagarSimulado(u.id, p, m.monto);
   revalidatePath("/", "layout");
   if (p.id === "masterclass") redirect("/mi-espacio/masterclass?compra=ok");
   if (p.id.startsWith("directo:")) redirect(`/mi-espacio/en-vivo?compra=ok`);
+  if (p.id.startsWith("sesion:")) redirect("/mi-espacio/sesiones?compra=ok");
   if (p.id.startsWith("libro:")) redirect(`/mi-espacio/biblioteca/${p.id.split(":")[1]}?compra=ok`);
   redirect("/mi-espacio/conferencias?compra=ok");
 }
@@ -124,4 +137,19 @@ export async function accionCanjear(_: Estado, f: FormData): Promise<Estado> {
   if (!r.ok) return { error: r.error };
   revalidatePath("/", "layout");
   redirect(`/mi-espacio/biblioteca/${r.libro}?canje=ok`);
+}
+
+/** Botón de arrepentimiento: registra el pedido y devuelve un código de seguimiento. */
+export async function accionArrepentimiento(_: Estado, f: FormData): Promise<Estado> {
+  const nombre = txt(f, "nombre");
+  const email = txt(f, "email").toLowerCase();
+  const compra = txt(f, "compra").slice(0, 500);
+  if (nombre.length < 2) return { error: "Escribí tu nombre." };
+  if (!mailValido(email)) return { error: "Revisá el mail." };
+  if (compra.length < 3) return { error: "Contanos qué compraste." };
+  const codigo = `ARR-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+  const lista = await leer<{ codigo: string; nombre: string; email: string; compra: string; fecha: string }[]>("arrepentimientos");
+  lista.push({ codigo, nombre, email, compra, fecha: new Date().toISOString() });
+  await escribir("arrepentimientos", lista);
+  return { ok: `Recibimos tu pedido. Tu código de seguimiento es ${codigo}. Te escribimos a ${email}.` };
 }

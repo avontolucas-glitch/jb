@@ -20,6 +20,8 @@ const emblemas = [
   ["receta-5-cargar-el-estado", "Cargar el estado"],
   ["pensamiento-5-arquetipos", "Arquetipos"],
   ["pensamiento-6-atravesar-el-tiempo", "Atravesar el tiempo"],
+  ["tres-clavos", "Los tres clavos"],
+  ["surf", "El surf (próximo capítulo)"],
 ] as const;
 
 // [izquierda %, tamaño px, duración de subida s, retardo s, vaivén s]
@@ -29,6 +31,8 @@ const recorridos = [
   [7, 50, 150, -140, 18], [88, 28, 115, -6, 13], [46, 24, 160, -95, 21], [15, 34, 128, -62, 15],
   [93, 46, 138, -104, 17], [60, 22, 170, -20, 20], [5, 28, 112, -120, 12], [82, 34, 120, -84, 16],
   [30, 22, 165, -150, 22],
+  [50, 46, 132, -66, 18],
+  [70, 40, 146, -12, 16],
 ];
 
 export default function Flotantes() {

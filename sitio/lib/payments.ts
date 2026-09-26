@@ -14,6 +14,7 @@
 import { leer, escribir } from "./db";
 import type { Compra } from "./access";
 import { conferencias, enVivo, libros, precios } from "@/content/config";
+import { horarioDesdeId } from "./sesiones";
 
 export type Producto = {
   id: string;
@@ -34,6 +35,11 @@ export function producto(id: string): Producto | null {
     const c = conferencias.find((x) => x.id === cid && x.tipo === "privada");
     if (!c) return null;
     return { id: `conferencia:${cid}`, titulo: `Entrada · ${c.titulo}`, ...precios.conferenciaPrivada };
+  }
+  if (id.startsWith("sesion-")) {
+    const h = horarioDesdeId(id.slice("sesion-".length));
+    if (!h) return null;
+    return { id: `sesion:${h.id}`, titulo: `Sesión privada · ${h.etiqueta}`, ...precios.sesionPrivada };
   }
   if (id.startsWith("libro-")) {
     const lid = id.slice("libro-".length);

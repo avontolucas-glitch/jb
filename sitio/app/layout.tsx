@@ -9,6 +9,7 @@ import Revelar from "@/components/Revelar";
 import Umbral from "@/components/Umbral";
 import Atencion from "@/components/Atencion";
 import Flotantes from "@/components/Flotantes";
+import Sonidos from "@/components/Sonidos";
 import { sitio } from "@/content/config";
 
 const crimson = Crimson_Pro({ subsets: ["latin"], variable: "--font-crimson", display: "swap" });
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
         <Pie />
         <Flotantes />
+        <Sonidos />
         <InstalarApp />
         <RegistrarSW />
         <Revelar />

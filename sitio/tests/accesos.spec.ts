@@ -9,8 +9,8 @@ test("sin sesión, /mi-espacio lleva a /ingresar con aviso", async ({ page }) =>
 });
 
 test("sin sesión, el checkout pide cuenta", async ({ page }) => {
-  await page.goto("/masterclass");
-  await page.getByRole("link", { name: "Comprar la masterclass" }).first().click();
+  await page.goto("/masterclass/grabada");
+  await page.getByRole("link", { name: "Comprar la masterclass grabada" }).first().click();
   await expect(page).toHaveURL(/\/ingresar\?aviso=checkout/);
   await expect(page.getByTestId("aviso")).toContainText("Para comprar necesitás una cuenta");
 });
@@ -46,7 +46,8 @@ test("la cuenta demo sin compras ve el espacio vacío con camino para comprar", 
   await page.waitForURL("**/mi-espacio");
   const vacio = page.getByTestId("espacio-vacio");
   await expect(vacio).toBeVisible();
-  await expect(vacio.getByRole("link", { name: "La masterclass", exact: true })).toHaveAttribute("href", "/masterclass");
+  await expect(vacio.getByRole("link", { name: "La masterclass, con Julián en vivo" })).toHaveAttribute("href", "/masterclass");
+  await expect(vacio.getByRole("link", { name: "La masterclass grabada" })).toHaveAttribute("href", "/masterclass/grabada");
   for (const ruta of ["/mi-espacio/masterclass", "/mi-espacio/audios", "/mi-espacio/encuentro", "/mi-espacio/conferencias"]) {
     await page.goto(ruta);
     await expect(page.getByTestId("sin-acceso")).toBeVisible();
@@ -58,8 +59,8 @@ test("comprar la masterclass habilita masterclass, audios y encuentro (y no conf
   await page.goto("/mi-espacio/audios");
   await expect(page.getByTestId("sin-acceso")).toBeVisible();
 
-  await page.goto("/masterclass");
-  await page.getByRole("link", { name: "Comprar la masterclass" }).first().click();
+  await page.goto("/masterclass/grabada");
+  await page.getByRole("link", { name: "Comprar la masterclass grabada" }).first().click();
   await expect(page).toHaveURL(/\/checkout\/masterclass/);
   await page.getByRole("button", { name: "Pagar (simulado)" }).click();
   await page.waitForURL("**/mi-espacio/masterclass?compra=ok");
@@ -71,7 +72,7 @@ test("comprar la masterclass habilita masterclass, audios y encuentro (y no conf
   await page.getByTestId("marcar").click();
   await expect(page.getByTestId("marcar")).toHaveText("Desmarcar como visto");
   await page.getByTestId("siguiente").click();
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("El sentimiento crea la realidad");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Módulo II");
   await page.goto("/mi-espacio/masterclass");
   await expect(page.getByTestId("progreso")).toHaveText("1 de 8 módulos vistos");
 

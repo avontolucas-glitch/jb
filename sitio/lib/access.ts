@@ -4,6 +4,7 @@
  * - Entrada a una conferencia privada: solo esa conferencia.
  * - Directo en vivo (a voluntad): solo ese directo.
  * - Libro digital (comprado o con el código del libro impreso): leer ese libro.
+ * - Sesión privada: ese horario, con su link de videollamada.
  */
 import { leer } from "./db";
 
@@ -28,6 +29,7 @@ export async function accesos(uid: string) {
   const conferencias = mias.filter((c) => c.producto.startsWith("conferencia:")).map((c) => c.producto.split(":")[1]);
   const directos = mias.filter((c) => c.producto.startsWith("directo:")).map((c) => c.producto.split(":")[1]);
   const libros = mias.filter((c) => c.producto.startsWith("libro:")).map((c) => c.producto.split(":")[1]);
+  const sesiones = mias.filter((c) => c.producto.startsWith("sesion:")).map((c) => c.producto.slice("sesion:".length));
   return {
     masterclass,
     audios: masterclass,
@@ -35,6 +37,7 @@ export async function accesos(uid: string) {
     conferencias,
     directos,
     libros,
+    sesiones,
     algo: mias.length > 0,
     compras: mias,
   };

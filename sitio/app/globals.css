@@ -170,17 +170,30 @@ label.boton:has(input:checked) { background: var(--texto); color: var(--fondo); 
   animation: aparece 1.4s var(--lento) both;
 }
 .umbral-caja {
-  position: relative; width: 100%; max-width: 30rem; text-align: center; padding: 2.5rem 1.5rem 2.75rem;
-  border: 1px solid #2a2724; background: var(--negro);
-  transition: border-color .7s var(--lento), background-color .9s var(--lento);
+  position: relative; z-index: 1; width: 100%; max-width: 44rem; min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 4.5rem 1rem 3rem;
 }
-.umbral-aviso { font-size: .82rem; line-height: 1.5; padding-bottom: 1.4rem; margin-bottom: 1.8rem; border-bottom: 1px solid #2a2724; }
+.umbral-aviso { position: absolute; top: 1.4rem; left: 0; right: 0; margin: 0 auto; width: min(34rem, 88vw); font-size: .8rem; line-height: 1.5; letter-spacing: .02em; padding-bottom: .9rem; border-bottom: 1px solid #2a2724; animation: aparece 1.6s var(--lento) .6s both; }
+.umbral-ojo { position: relative; width: min(70vw, 46vh, 480px); aspect-ratio: 1 / 1; z-index: 1; display: block; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 50%; }
+.umbral-ojo img { transition: transform 1.2s var(--lento), filter 1.2s var(--lento); }
+.umbral-ojo:hover img, .umbral-ojo:focus-visible img { transform: scale(1.035); filter: drop-shadow(0 0 22px rgba(239, 233, 220, .22)); }
+.umbral-ojo:focus-visible { outline: 1px solid rgba(239, 233, 220, .5); outline-offset: 10px; }
+.umbral-ojo .halo { inset: 4%; }
+.umbral-indicacion { margin-top: 2.2rem; font-size: .9rem; letter-spacing: .24em; font-variant: small-caps; text-transform: lowercase; animation: aparece 1.6s var(--lento) 2.6s both, latido 3.6s ease-in-out 4.2s infinite; }
+@keyframes latido { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.umbral-titulo { font-size: clamp(2.2rem, 6vw, 4rem); margin-top: 1.8rem; animation: aparece 1.6s var(--lento) 1.6s both; }
+.umbral-nombre { animation: aparece 1.4s var(--lento) 2.1s both; }
+.umbral .fantasma { opacity: .025; animation: none; }
+
+
 .umbral-caja > :not(.umbral-ojo) { transition: opacity .55s var(--lento), transform .55s var(--lento), border-color .55s; }
 .umbral-ojo { position: relative; z-index: 1; }
 
 /* Al entrar: los textos se apagan... */
-html.umbral-saliendo .umbral-caja { border-color: transparent; background-color: transparent; }
-html.umbral-saliendo .umbral-caja > :not(.umbral-ojo) { opacity: 0; transform: translateY(-8px); border-color: transparent; }
+html.umbral-saliendo .umbral .estrellas, html.umbral-saliendo .umbral .fantasma { opacity: 0; transition: opacity .6s; }
+html.umbral-saliendo .umbral-caja > :not(.umbral-ojo):not(.umbral-aviso) { animation: desvanece .55s var(--lento) forwards; }
+html.umbral-saliendo .umbral-aviso { animation: desvanece-aviso .55s var(--lento) forwards; }
+@keyframes desvanece { to { opacity: 0; transform: translateY(-8px); } }
+@keyframes desvanece-aviso { to { opacity: 0; transform: translateY(-8px); } }
 /* ...el ojo se acerca hasta atravesar la pupila... */
 html.umbral-saliendo .umbral-ojo { transform: scale(7.5); opacity: 0; transition: transform 2.1s cubic-bezier(.6, 0, .2, 1) .15s, opacity 1.1s ease-in 1s; }
 /* ...un destello leve... */
@@ -324,7 +337,7 @@ html.en-umbral .flotantes { opacity: 0; }
 @keyframes sube { from { transform: translateY(108vh); } to { transform: translateY(-14vh); } }
 @keyframes vaiven { from { transform: translateX(-14px) rotate(-7deg); } to { transform: translateX(14px) rotate(7deg); } }
 @media (max-width: 767px) {
-  .flota:nth-child(n + 8) { display: none; }
+  .flota:nth-child(n + 8):not(:nth-last-child(-n + 2)) { display: none; }
   .flota { opacity: .11; }
 }
 @media (prefers-reduced-motion: reduce) { .flotantes { display: none; } }
@@ -337,3 +350,32 @@ h1.titulo { filter: url(#tinta-rugosa); }
 .pagina-libro { font-size: 1.12rem; line-height: 1.75; text-align: justify; hyphens: auto; }
 .capitular::first-letter { float: left; font-size: 3.6em; line-height: .82; padding: .06em .08em 0 0; }
 @media print { .sala { display: none !important; } }
+
+/* ───────── Calendario de sesiones ───────── */
+.cal-dia { position: relative; aspect-ratio: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .15rem; font-size: 1.02rem; border: 1px solid transparent; transition: background-color .5s var(--lento), border-color .5s var(--lento), color .5s var(--lento); }
+.cal-dia.vacio { color: var(--texto-2); opacity: .35; }
+.cal-dia.libre { border-color: var(--linea); cursor: pointer; }
+.cal-dia.libre:hover { border-color: var(--texto); }
+.cal-dia.lleno { color: var(--texto-2); cursor: pointer; }
+.cal-dia.elegido { background: var(--texto); color: var(--fondo); border-color: var(--texto); }
+.cal-marca { font-size: .55rem; line-height: 1; }
+.calendario .boton[disabled] { opacity: .25; }
+
+/* ───────── Menú con emblemas ───────── */
+.nav-enlace { position: relative; display: inline-flex; align-items: center; gap: .45rem; padding: .25rem 0; transition: color .5s var(--lento); cursor: pointer; }
+#menu-movil .nav-enlace { display: flex; }
+.nav-icono { position: relative; display: inline-flex; width: 1.35rem; height: 1.35rem; flex: none; opacity: .55; transition: opacity .6s var(--lento), transform .8s var(--lento); }
+#menu-movil .nav-icono { width: 1.7rem; height: 1.7rem; }
+.nav-icono img { width: 100%; height: 100%; }
+.nav-texto { background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size .6s var(--lento); padding-bottom: 1px; }
+.nav-enlace:hover .nav-icono { opacity: 1; transform: rotate(-6deg) scale(1.08); }
+.nav-enlace:hover .nav-texto, .nav-enlace.activo .nav-texto { background-size: 100% 1px; }
+.nav-enlace.activo .nav-icono { opacity: 1; }
+/* el golpe del sello y la onda de tinta */
+.nav-icono.golpe { animation: sello .75s var(--lento); opacity: 1; }
+.nav-icono.golpe::after { content: ""; position: absolute; inset: -30%; border-radius: 50%; border: 1px solid var(--crema); animation: onda .9s ease-out forwards; pointer-events: none; }
+@keyframes sello { 0% { transform: scale(1); } 22% { transform: scale(.68) rotate(-10deg); } 55% { transform: scale(1.22) rotate(5deg); filter: brightness(1.4); } 100% { transform: scale(1) rotate(0); } }
+@keyframes onda { from { opacity: .7; transform: scale(.4); } to { opacity: 0; transform: scale(1.9); } }
+/* el menú del celular se abre de a una línea */
+.menu-abre li { animation: aparece .6s var(--lento) both; animation-delay: calc(var(--i, 8) * 45ms); }
+@media (prefers-reduced-motion: reduce) { .nav-icono.golpe, .nav-icono.golpe::after, .menu-abre li { animation: none; } }

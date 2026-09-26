@@ -10,7 +10,7 @@ import { modulos } from "@/content/config";
 export default async function Modulo({ params }: { params: Promise<{ modulo: string }> }) {
   const { u, a } = await miembro();
   if (!a.masterclass)
-    return <SinAcceso que="La masterclass se habilita cuando la comprás." href="/masterclass" boton="Ver la masterclass" />;
+    return <SinAcceso que="La masterclass grabada se habilita cuando la comprás." href="/masterclass/grabada" boton="Ver la masterclass grabada" />;
   const { modulo } = await params;
   const i = modulos.findIndex((m) => m.id === modulo);
   if (i < 0) notFound();
@@ -27,6 +27,7 @@ export default async function Modulo({ params }: { params: Promise<{ modulo: str
         Módulo {i + 1} de {modulos.length}
       </p>
       <h1 className="titulo text-4xl mt-1">{m.titulo}</h1>
+      <p className="texto-2 italic mt-1">{m.tema}</p>
       <div
         className="marcador-bloque mt-8 flex flex-col items-center justify-center gap-3"
         style={{ aspectRatio: "16 / 9" }}
@@ -34,7 +35,7 @@ export default async function Modulo({ params }: { params: Promise<{ modulo: str
         aria-label={`Espacio para el video del módulo ${m.titulo}`}
       >
         <Ojo size={32} />
-        <span className="text-sm">[VIDEO DEL MÓDULO]</span>
+        <span className="text-sm">(Video del módulo, a definir)</span>
       </div>
       <form action={accionProgreso} className="mt-8 flex flex-wrap items-center gap-4">
         <input type="hidden" name="modulo" value={m.id} />

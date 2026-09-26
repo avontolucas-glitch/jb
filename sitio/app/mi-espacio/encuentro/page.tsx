@@ -11,7 +11,7 @@ const fecha = (iso: string) =>
 export default async function Encuentro() {
   const { u, a } = await miembro();
   if (!a.encuentro)
-    return <SinAcceso que="El encuentro de preguntas viene de regalo con la masterclass." href="/masterclass" boton="Ver la masterclass" />;
+    return <SinAcceso que="El encuentro de preguntas viene de regalo con la masterclass grabada." href="/masterclass/grabada" boton="Ver la masterclass grabada" />;
   const mias = (await leer<Pregunta[]>("preguntas")).filter((p) => p.usuario === u.id).reverse();
   return (
     <>

@@ -9,9 +9,10 @@ export default async function LayoutEspacio({ children }: { children: React.Reac
   const { a } = await miembro();
   const items = [
     { href: "/mi-espacio", texto: "Inicio" },
-    { href: "/mi-espacio/en-vivo", texto: "En vivo", bloqueado: a.directos.length === 0 },
-    { href: "/mi-espacio/masterclass", texto: "Masterclass", bloqueado: !a.masterclass },
+    { href: "/mi-espacio/en-vivo", texto: "Masterclass", bloqueado: a.directos.length === 0 },
+    { href: "/mi-espacio/sesiones", texto: "Sesiones", bloqueado: a.sesiones.length === 0 },
     { href: "/mi-espacio/biblioteca", texto: "Biblioteca", bloqueado: a.libros.length === 0 },
+    { href: "/mi-espacio/masterclass", texto: "Grabada", bloqueado: !a.masterclass },
     { href: "/mi-espacio/audios", texto: "Audios", bloqueado: !a.audios },
     { href: "/mi-espacio/conferencias", texto: "Conferencias", bloqueado: a.conferencias.length === 0 },
     { href: "/mi-espacio/encuentro", texto: "Encuentro", bloqueado: !a.encuentro },

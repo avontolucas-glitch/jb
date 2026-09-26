@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { miembro } from "@/lib/miembro";
 import Precio from "@/components/Precio";
-import { conferencias, encuentro, enVivo, libros, precios } from "@/content/config";
+import { conferencias, encuentro, enVivo, libros, precios, sesiones } from "@/content/config";
+import { horarioDesdeId } from "@/lib/sesiones";
 
 export default async function Espacio() {
   const { u, a } = await miembro();
@@ -17,19 +18,27 @@ export default async function Espacio() {
           <h2 className="text-2xl mt-12 mb-4">Por dónde empezar</h2>
           <ul className="border-t borde">
             <li className="border-b borde py-5">
-              <Link href="/en-vivo" className="text-xl enlace">
-                Un directo de la masterclass en vivo
+              <Link href="/masterclass" className="text-xl enlace">
+                La masterclass, con Julián en vivo
               </Link>
               <p className="texto-2 mt-1">
                 Una vez por semana. Pagás lo que quieras, desde {enVivo.moneda} {enVivo.minimo}.
               </p>
             </li>
             <li className="border-b borde py-5">
-              <Link href="/masterclass" className="text-xl enlace">
-                La masterclass
+              <Link href="/masterclass/grabada" className="text-xl enlace">
+                La masterclass grabada
               </Link>
               <p className="texto-2 mt-1">
                 Con los audios por tema y el encuentro de preguntas de regalo. <Precio {...precios.masterclass} />
+              </p>
+            </li>
+            <li className="border-b borde py-5">
+              <Link href="/sesiones" className="text-xl enlace">
+                Una sesión privada con Julián
+              </Link>
+              <p className="texto-2 mt-1">
+                Uno a uno, {sesiones.modalidad.toLowerCase()}. <Precio {...precios.sesionPrivada} />
               </p>
             </li>
             <li className="border-b borde py-5">
@@ -56,7 +65,7 @@ export default async function Espacio() {
               <>
                 <li className="border-b borde py-5">
                   <Link href="/mi-espacio/masterclass" className="text-xl enlace">
-                    Masterclass
+                    Masterclass grabada
                   </Link>
                   <p className="texto-2 mt-1">Seguí desde donde dejaste.</p>
                 </li>
@@ -73,6 +82,17 @@ export default async function Espacio() {
                 </li>
               </>
             )}
+            {a.sesiones.map((id) => {
+              const h = horarioDesdeId(id);
+              return h ? (
+                <li key={id} className="border-b borde py-5">
+                  <Link href="/mi-espacio/sesiones" className="text-xl enlace">
+                    Sesión privada
+                  </Link>
+                  <p className="texto-2 mt-1 first-letter:uppercase">{h.etiqueta}</p>
+                </li>
+              ) : null;
+            })}
             {libros
               .filter((l) => a.libros.includes(l.id))
               .map((l) => (

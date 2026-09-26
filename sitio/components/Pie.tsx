@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Ojo from "./Ojo";
 import { redes, sitio } from "@/content/config";
+import InterruptorSonido from "./InterruptorSonido";
 
 export default function Pie() {
   return (
@@ -15,12 +16,14 @@ export default function Pie() {
           <Link href="/legales/terminos" className="block hover:underline">Términos</Link>
           <Link href="/legales/privacidad" className="block hover:underline">Privacidad</Link>
           <Link href="/legales/reembolsos" className="block hover:underline">Reembolsos</Link>
+          <Link href="/arrepentimiento" className="block hover:underline">Botón de arrepentimiento</Link>
           <Link href="/app" className="block hover:underline">Instalar la app</Link>
+          <InterruptorSonido className="texto-2 pt-2" />
         </nav>
         <nav aria-label="Redes" className="text-sm space-y-2">
           {redes.map((r) => (
-            <a key={r.nombre} href={r.url} className="block hover:underline">
-              {r.nombre}
+            <a key={r.nombre} href={r.url} className="block hover:underline" target="_blank" rel="noopener noreferrer">
+              {r.nombre} <span className="texto-2">{r.usuario}</span>
             </a>
           ))}
         </nav>

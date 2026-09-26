@@ -3,13 +3,17 @@
  *  ÚNICO ARCHIVO PARA EDITAR PRECIOS, FECHAS Y TEXTOS DEL SITIO
  * ─────────────────────────────────────────────────────────────
  *  - Cambiá el texto entre comillas y guardá: el sitio se actualiza solo.
- *  - Donde dice MARCADOR va la voz de Julián: no se inventa, se reemplaza
- *    por lo que él escriba o dicte.
+ *  - Donde dice MARCADOR va un texto que todavía falta: no se inventa, se
+ *    reemplaza por el texto real (lo de Julián, siempre en sus palabras).
  *  - Los precios en USD están marcados como "a definir" (aDefinir: true).
  */
 
-/** Marcador visible para los textos que tiene que escribir Julián. */
-export const MARCADOR = "[TEXTO DE JULIÁN]";
+/** Marcadores visibles de lo que falta escribir (se reemplazan por el texto real). */
+export const MARCADOR = "(Texto a definir)";
+export const MARCADOR_JULIAN = "(Texto acerca de Julián, a definir)";
+export const MARCADOR_LIBRO = "(Texto acerca del libro, a definir)";
+/** Un texto es marcador si va entre paréntesis y termina en «a definir». */
+export const esMarcador = (t: string) => /^\(.*a definir\)$/.test(t);
 
 export const sitio = {
   nombre: "Julián Bermúdez",
@@ -31,13 +35,15 @@ export const citas = {
 export const precios = {
   /** Libro digital: se lee dentro del sitio. monto 0 = precio a definir. */
   libroDigital: { monto: 0, moneda: "USD", aDefinir: true },
+  /** Sesión privada 1 a 1 con Julián. monto 0 = precio a definir. */
+  sesionPrivada: { monto: 0, moneda: "USD", aDefinir: true },
   masterclass: { monto: 20, moneda: "USD", aDefinir: true },
   conferenciaPrivada: { monto: 3, moneda: "USD", aDefinir: true },
 };
 
 export const inicio = {
   bajada: "Conferencias, masterclass en vivo y una trilogía en camino.",
-  quienEs: MARCADOR, // Presentación de Julián, en sus palabras.
+  quienEs: MARCADOR_JULIAN, // Presentación de Julián.
   propuesta:
     "Lo esencial queda grabado en la masterclass. El vivo pasa a ser para responder, solo con quienes eligieron entrar.",
   propuestaDetalle: MARCADOR,
@@ -60,7 +66,7 @@ export const libros: Libro[] = [
     titulo: "La Receta de la Manifestación",
     pregunta: "¿Cómo funciona?",
     estado: "Próximamente",
-    descripcion: MARCADOR,
+    descripcion: MARCADOR_LIBRO,
     epigrafe: citas.pesca,
   },
   {
@@ -69,7 +75,7 @@ export const libros: Libro[] = [
     titulo: "El Pensamiento es Tu Fe",
     pregunta: "¿Por qué funciona?",
     estado: "Próximamente",
-    descripcion: MARCADOR,
+    descripcion: MARCADOR_LIBRO,
     epigrafe: citas.tiempo,
   },
   {
@@ -78,7 +84,7 @@ export const libros: Libro[] = [
     titulo: "Biografía",
     pregunta: "¿Quién lo descubrió?",
     estado: "Próximamente",
-    descripcion: MARCADOR,
+    descripcion: MARCADOR_LIBRO,
     epigrafe: citas.observador,
   },
 ];
@@ -123,28 +129,28 @@ export const conferencias: Conferencia[] = [
   },
 ];
 
-/** Temas provisorios: son títulos de capítulos de la trilogía. */
-export const modulos = [
-  { id: "dos-formatos", titulo: "Dos formatos de la mente", libro: "receta", duracion: "a definir" },
-  { id: "sentimiento", titulo: "El sentimiento crea la realidad", libro: "receta", duracion: "a definir" },
-  { id: "ahora-mismo", titulo: "Ahora mismo", libro: "receta", duracion: "a definir" },
-  { id: "la-pesca", titulo: "La pesca", libro: "receta", duracion: "a definir" },
-  { id: "la-palabra", titulo: "La palabra", libro: "pensamiento", duracion: "a definir" },
-  { id: "libertad-interna", titulo: "Libertad interna", libro: "pensamiento", duracion: "a definir" },
-  { id: "conversaciones", titulo: "Conversaciones sinceras", libro: "pensamiento", duracion: "a definir" },
-  { id: "atravesar-el-tiempo", titulo: "Atravesar el tiempo", libro: "pensamiento", duracion: "a definir" },
-] as const;
+/**
+ * Masterclass GRABADA: módulos en video. Los temas los define Julián
+ * (los capítulos de los libros van en Libros, para leer online).
+ */
+const ROMANOS = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
+export const modulos = ROMANOS.map((r, i) => ({
+  id: `modulo-${i + 1}`,
+  titulo: `Módulo ${r}`,
+  tema: "Tema a definir",
+  duracion: "a definir",
+}));
 
-export const audios = modulos.map((m) => ({
-  id: m.id,
-  titulo: m.titulo,
-  libro: m.libro,
+export const audios = modulos.map((m, i) => ({
+  id: `audio-${i + 1}`,
+  titulo: `Audio ${ROMANOS[i]}`,
+  tema: "Tema a definir",
   archivo: "/audio/muestra.wav", // audio de muestra (silencio)
 }));
 
 export const masterclass = {
   titulo: "Masterclass grabada",
-  bajada: "Lo esencial, grabado. Para verlo a tu ritmo y volver cuando lo necesites.",
+  bajada: "Para verla a tu ritmo y volver cuando la necesites.",
   descripcion: MARCADOR,
   incluye: [
     "La masterclass en video, en módulos.",
@@ -167,12 +173,12 @@ export const fragmentos = [
   { id: "f4", titulo: "Fragmento 4", tema: "La palabra" },
 ];
 
-/** Redes: reemplazá el # por el link real. */
+/** Redes. Las que tienen "#" no se muestran hasta tener su link real. */
 export const redes = [
-  { nombre: "Instagram", url: "#" },
-  { nombre: "YouTube", url: "#" },
-  { nombre: "TikTok", url: "#" },
-];
+  { nombre: "Instagram", usuario: "@coacher.julian", url: "https://www.instagram.com/coacher.julian/" },
+  { nombre: "YouTube", usuario: "@coacherjulian", url: "https://www.youtube.com/@coacherjulian" },
+  { nombre: "TikTok", usuario: "", url: "#" },
+].filter((r) => r.url !== "#");
 
 export const lista = {
   titulo: "Sumate a la lista",
@@ -184,8 +190,8 @@ export const lista = {
  * Precio a voluntad: cada persona elige cuánto pagar, desde `minimo`.
  */
 export const enVivo = {
-  titulo: "Masterclass en vivo",
-  bajada: "Un directo por semana. Se ve solo acá, en el sitio. Pagás lo que quieras, desde USD 1.",
+  titulo: "Masterclass",
+  bajada: "Julián en vivo, una vez por semana. Se ve solo acá, en el sitio. Pagás lo que quieras, desde USD 1.",
   descripcion: MARCADOR,
   frecuencia: "Una vez por semana",
   moneda: "USD",
@@ -205,6 +211,7 @@ export const umbral = {
     "Este es un espacio exclusivo. Queda prohibida toda reproducción o difusión de su contenido fuera de este espacio.",
   bienvenida: "Te damos la bienvenida",
   boton: "Entrar",
+  indicacion: "Tocá el ojo para entrar",
 };
 
 /**
@@ -215,14 +222,15 @@ const g = (src: string, alt: string, pie: string) => ({ src: `/grabados/${src}.w
 export const portadillas = {
   libros: { folio: "II" },
   conferencias: { folio: "III", grabado: g("la-palabra", "la pluma de La Palabra", "La Palabra · El Pensamiento es Tu Fe, cap. 0") },
-  masterclass: { folio: "IV", grabado: g("el-sentimiento", "el corazón con ojo y raíz", "El sentimiento crea la realidad · La Receta de la Manifestación, cap. 1") },
-  enVivo: { folio: "V", grabado: g("receta-ojo", "el ojo de luz y sombra", "Conocedores del bien y el mal · La Receta de la Manifestación, cap. 2") },
+  masterclass: { folio: "IV", grabado: g("cargar-el-estado", "la lámpara de aceite encendida", "Cargar el estado · La Receta de la Manifestación, cap. 5") },
+  grabada: { folio: "V", grabado: g("el-sentimiento", "el corazón con ojo y raíz", "El sentimiento crea la realidad · La Receta de la Manifestación, cap. 1") },
   fragmentos: { folio: "VI", grabado: g("atravesar-el-tiempo", "la espiral", "Atravesar el tiempo · El Pensamiento es Tu Fe, cap. 6") },
   lista: { folio: "VII", grabado: g("primera-imagen", "la semilla que germina", "Primera imagen · Biografía, cap. 0") },
   ingresar: { folio: "VIII", grabado: g("libertad-interna", "el corazón con cerradura", "Libertad interna · El Pensamiento es Tu Fe, cap. 1") },
   crearCuenta: { folio: "VIII", grabado: g("el-reconocimiento", "el corazón coronado", "El reconocimiento · Biografía, cap. 1") },
   canjear: { folio: "IX", grabado: g("ahora-mismo", "el reloj de arena", "Ahora mismo · La Receta de la Manifestación, cap. 3") },
-  app: { folio: "X", grabado: g("cargar-el-estado", "la lámpara de aceite", "Cargar el estado · La Receta de la Manifestación, cap. 5") },
+  sesiones: { folio: "XI", grabado: g("conversaciones-sinceras", "el fruto de Conversaciones Sinceras", "Conversaciones sinceras · El Pensamiento es Tu Fe, cap. 3") },
+  app: { folio: "X", grabado: g("receta-ojo", "el ojo de luz y sombra", "Conocedores del bien y el mal · La Receta de la Manifestación, cap. 2") },
 };
 
 /**
@@ -231,7 +239,7 @@ export const portadillas = {
  * libro impreso. Los capítulos son los de la trilogía; el texto se carga del
  * manuscrito final (en el prototipo, un marcador).
  */
-export const TEXTO_LIBRO = "[TEXTO DEL LIBRO: se carga del manuscrito final]";
+export const TEXTO_LIBRO = "(Texto del capítulo, a definir)";
 export const capitulos: Record<"receta" | "pensamiento" | "biografia", { n: number; titulo: string; emblema: string }[]> = {
   receta: [
     { n: 0, titulo: "Dos Formatos de la Mente", emblema: "receta-0-dos-formatos" },
@@ -256,4 +264,27 @@ export const capitulos: Record<"receta" | "pensamiento" | "biografia", { n: numb
     { n: 2, titulo: "El Desastre", emblema: "biografia-2-el-desastre" },
     { n: 3, titulo: "Poner a Prueba", emblema: "biografia-3-poner-a-prueba" },
   ],
+};
+
+/**
+ * SESIONES PRIVADAS: un encuentro 1 a 1 con Julián, por videollamada.
+ * Los horarios son de EJEMPLO (se generan para las próximas semanas):
+ * cambiá `dias` y `semanas`, o reemplazalos por la agenda real.
+ */
+export const sesiones = {
+  titulo: "Sesiones privadas",
+  bajada: "Un encuentro uno a uno con Julián, por videollamada.",
+  descripcion: MARCADOR,
+  duracion: "Duración a definir",
+  modalidad: "Por videollamada",
+  zonaHoraria: "hora de Argentina",
+  // día de la semana (0 = domingo) y hora, en hora de Argentina
+  dias: [
+    { dia: 2, hora: 18 },
+    { dia: 4, hora: 18 },
+    { dia: 6, hora: 11 },
+  ],
+  semanas: 3,
+  /** Link de la videollamada: solo lo ve quien reservó ese horario. */
+  linkSala: "https://ejemplo.invalid/sesion/",
 };

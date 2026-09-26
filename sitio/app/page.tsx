@@ -10,7 +10,7 @@ import EspacioFoto from "@/components/EspacioFoto";
 import Epigrafe from "@/components/Epigrafe";
 import Ornamento from "@/components/Ornamento";
 import Precio from "@/components/Precio";
-import { citas, conferencias, enVivo, inicio, libros, masterclass, precios, sitio } from "@/content/config";
+import { citas, conferencias, enVivo, inicio, libros, precios, sesiones, sitio } from "@/content/config";
 
 /** 2026 → MMXXVI, como en los colofones. */
 function romano(n: number) {
@@ -67,7 +67,7 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
               {inicio.bajada}
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 aparece" style={{ animationDelay: "3.7s" }}>
-              <Link href="/en-vivo" className="boton boton-lleno llamado">
+              <Link href="/masterclass" className="boton boton-lleno llamado">
                 Masterclass en vivo
               </Link>
               <Link href="/lista" className="enlace texto-2">
@@ -114,18 +114,36 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
               </li>
             ))}
           </ul>
-          <Link href="/en-vivo" className="boton mt-10 revelar">
+          <Link href="/masterclass" className="boton mt-10 revelar">
             Ver los directos
           </Link>
         </div>
       </section>
 
-      <section className="hondo px-5 py-20 sm:py-28 border-t borde" aria-labelledby="trilogia">
+      <section className="hondo px-5 py-20 sm:py-28 border-t borde" aria-labelledby="sesiones">
+        <div className="mx-auto max-w-3xl">
+          <h2 id="sesiones" className="titulo text-3xl mb-4 revelar">
+            {sesiones.titulo}
+          </h2>
+          <p className="text-xl prosa revelar">{sesiones.bajada}</p>
+          <div className="mt-10 flex flex-wrap items-center gap-5 revelar">
+            <Link href="/sesiones" className="boton">
+              Agendar una sesión
+            </Link>
+            <span className="texto-2">
+              <Precio {...precios.sesionPrivada} />
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <Divisor />
+      <section className="px-5 pb-20 sm:pb-28" aria-labelledby="trilogia">
         <div className="mx-auto max-w-3xl">
           <h2 id="trilogia" className="titulo text-3xl mb-2 revelar">
             La trilogía
           </h2>
-          <p className="texto-2 mb-10 revelar">Tres libros, tres preguntas sobre lo mismo.</p>
+          <p className="texto-2 mb-10 revelar">Tres libros, tres preguntas sobre lo mismo. Impresos, y para leer online acá o en la app.</p>
           <ol>
             <li aria-hidden="true" className="border-t borde trazo" />
             {libros.map((l, i) => (
@@ -141,35 +159,6 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
               </li>
             ))}
           </ol>
-        </div>
-      </section>
-
-      <Divisor />
-      <section className="px-5 pb-20 sm:pb-28" aria-labelledby="mc">
-        <div className="mx-auto max-w-3xl">
-          <h2 id="mc" className="titulo text-3xl mb-6 revelar">
-            {masterclass.titulo}
-          </h2>
-          <p className="text-xl prosa revelar">{inicio.propuesta}</p>
-          <div className="mt-6 prosa revelar">
-            <Texto bloque>{inicio.propuestaDetalle}</Texto>
-          </div>
-          <ul className="mt-8 space-y-2 prosa">
-            {masterclass.incluye.map((item, i) => (
-              <li key={item} className="flex gap-3 revelar" style={{ ["--retardo" as string]: `${i * 0.12}s` }}>
-                <span aria-hidden="true" className="texto-2">·</span>
-                {item}
-              </li>
-            ))}
-          </ul>
-          <div className="mt-10 flex flex-wrap items-center gap-5 revelar">
-            <Link href="/masterclass" className="boton">
-              Ver la masterclass
-            </Link>
-            <span className="texto-2">
-              <Precio {...precios.masterclass} />
-            </span>
-          </div>
         </div>
       </section>
 

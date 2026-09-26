@@ -4,7 +4,7 @@ test("reservar un directo a voluntad: respeta el mínimo y habilita solo ese dir
   const email = unico("vivo");
   await crearCuenta(page, email);
 
-  await page.goto("/en-vivo");
+  await page.goto("/masterclass");
   await page.getByTestId("directo-semana-1").getByRole("link", { name: "Reservar mi lugar" }).click();
   await expect(page).toHaveURL(/\/checkout\/directo-semana-1/);
 

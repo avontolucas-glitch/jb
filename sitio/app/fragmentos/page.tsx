@@ -20,7 +20,7 @@ export default function Fragmentos() {
                 aria-label={`Espacio para el video: ${f.titulo}`}
               >
                 <Ojo size={28} />
-                <span className="text-sm">[VIDEO]</span>
+                <span className="text-sm">(Video, a definir)</span>
               </div>
               <p className="mt-3 text-lg">{f.titulo}</p>
               <p className="texto-2 italic">{f.tema}</p>
@@ -33,8 +33,8 @@ export default function Fragmentos() {
           <h2 className="titulo text-3xl mb-8">En las redes</h2>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             {redes.map((r) => (
-              <a key={r.nombre} href={r.url} className="boton">
-                {r.nombre}
+              <a key={r.nombre} href={r.url} className="boton" target="_blank" rel="noopener noreferrer">
+                {r.nombre} · {r.usuario}
               </a>
             ))}
           </div>
