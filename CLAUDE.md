@@ -1,58 +1,85 @@
-# Trilogía Julian Bermúdez — Editorial ELVERBO
+# Trilogía Julián Bermúdez — Editorial ELVERBO
 
-Este repo es el compilado editorial de la obra oral de **Julian Bermúdez** (sin tilde en la "a" — regla permanente sobre el nombre de pila; "Bermúdez" sí conserva su tilde). Lucas compila cientos de horas de audio hablado en tres libros que son perspectivas distintas de una misma verdad y no deben repetirse innecesariamente.
+Este repo es el compilado editorial de la obra oral de **Julián Bermúdez**. El nombre se escribe **con tilde en la «a» de Julián y en la «ú» de Bermúdez**, en todo lugar (regla confirmada por Lucas en sept. 2026; reemplaza la regla vieja de «Julian» sin tilde que figura en la skill `trilogia-jb`). Lucas compila cientos de horas de audio hablado en tres libros que son perspectivas distintas de una misma verdad y no deben repetirse innecesariamente.
 
 ## La trilogía
 
 | Libro | Pregunta | Contenido | Diseño |
 |---|---|---|---|
-| **I — La Receta de la Manifestación** | ¿Cómo funciona? | mecanismos, procesos, ejercicios, técnicas | negro y blanco |
-| **II — El Pensamiento es Tu Fe** | ¿Por qué funciona? | filosofía, conciencia, Verbo, fe, identidad | blanco sobre negro |
-| **III — Biografía** | ¿Quién lo descubrió? | Julian sin filtros: infancia, padre, fama, dolores | azul oscuro #1C2B4D |
-
-**Sincronía**: un mismo audio puede alimentar más de un libro (mecanismo → Receta, reflexión → Pensamiento, experiencia que lo originó → Biografía). Los capítulos 0 de los tres libros hablan del origen, cada uno desde su ángulo, y abren con "En el principio" (eco de Génesis 1:1).
+| **I — La Receta de la Manifestación** | ¿Cómo funciona? | mecanismos, procesos, ejercicios, técnicas | páginas negras, tinta crema |
+| **II — El Pensamiento es Tu Fe** | ¿Por qué funciona? | filosofía, conciencia, Verbo, fe, identidad | páginas blancas; divisoria negra antes de cada capítulo |
+| **III — Biografía** | ¿Quién lo descubrió? | Julián sin filtros: infancia, padre, fama, dolores | páginas azul marino, tinta crema |
 
 ## Manuscritos (`manuscritos/`)
 
-- `Receta de La Manifestación (nueva versión).docx`
-- `El Pensamiento es Tu Fe (sincronizado).docx`
-- `La Biografía (sincronizada).docx`
-- `Hoja de Revisión para Julian.docx` — pasajes ambiguos que solo Julian puede confirmar; no se adivinan.
+Vigentes (edición integral, sept. 2026):
+- `Receta de La Manifestación (edición integral).docx`
+- `El Pensamiento es Tu Fe (edición integral).docx`
+- `La Biografía (edición integral).docx`
+- `Hoja de Revisión para Julián (2ª pasada).docx`: dudas que solo Julián puede confirmar o dictar.
+- `Registro de cambios - Edición integral.docx`: cada cambio con su antes, su ahora y el motivo.
+
+Versiones anteriores, que se conservan intactas: `(nueva versión)`, `(sincronizado)`, `(sincronizada)` y `Hoja de Revisión para Julian.docx` (1ª pasada).
+
+Además: `vista previa/` tiene los PDF de los libros (la vista previa usa TeX Gyre Pagella en lugar de Palatino), `diseño/grabados/` los grabados sueltos en alta resolución y `herramientas/` los scripts de construcción.
+
+## Sincronía capítulo a capítulo
+
+Cada número de capítulo habla de lo mismo desde las tres facetas. Los tres libros comparten la **orla** del grabado y el **motivo**; lo que cambia es el centro.
+
+| Cap. | Receta (cómo) | Pensamiento (por qué) | Biografía (quién) | Motivo / orla |
+|---|---|---|---|---|
+| 0 | Dos Formatos de la Mente (día y noche) | La Palabra (pluma) | Primera Imagen (semilla que germina) | la luz del principio / rayos |
+| 1 | El Sentimiento Crea la Realidad (corazón con ojo y raíz, homenaje a la xilografía de Neville) | Libertad Interna (corazón con cerradura) | El Reconocimiento (corazón coronado) | el corazón / vid florida |
+| 2 | Conocedores del Bien y el Mal (ojo de luz y sombra) | El Observador Eterno (ojo radiante) | El Desastre (ojo que llora) | el ojo / estrellas |
+| 3 | Ahora Mismo (reloj de arena) | Conversaciones Sinceras (fruto) | Poner a Prueba (luna de las noches) | el tiempo de la práctica / fases lunares |
+| 4 | La Pesca (pez) | La Inteligencia Natural (desierto) | — | océano y desierto / olas |
+| 5 | Cargar el Estado (lámpara de aceite) | Arquetipos (cruz) | — | la llama / llamas |
+| 6 | — | Atravesar el Tiempo (espiral) | — | espiral |
+
+Transiciones (antes del último capítulo): en Receta, la caña de pescar; en Pensamiento, la espiral; en Biografía, el ojo que llora.
+
+**Puentes que no se rompen sin consultar a Lucas:** el bloque del Ojo Observador, idéntico en Receta Cap. 2 y Pensamiento Cap. 2; la anécdota de Shelleyar, idéntica en Pensamiento Cap. 1 y Biografía Cap. 3; la plata de la mamá y el bullying (Biografía Cap. 2 ↔ Pensamiento Cap. 3, eco invisible); «una palabra tuya basta para sanarme» (Biografía Cap. 1) ↔ «yo buscaba esa palabra para sanarme» (Biografía Cap. 2); «mientras iban, fueron sanados» (Receta Cap. 3 ↔ epígrafe y cierre de Pensamiento Cap. 6). Las notas al margen apuntan a Receta Cap. 1 y 2 y a Pensamiento Cap. 1, 2 y 6; si se renumera algo, hay que revisarlas.
 
 ## Rol del editor (invisible)
 
-Nunca autor, nunca coautor. No se agregan enseñanzas, conceptos, ejemplos, analogías ni transiciones propias; no se completa una idea que Julian dejó abierta. Si algo no fue dicho por él, no existe para el libro. Ante la duda entre fidelidad y creatividad, siempre fidelidad.
+Nunca autor, nunca coautor. No se agregan enseñanzas, conceptos, ejemplos, analogías ni transiciones propias; no se completa una idea que Julián dejó abierta. Si algo no fue dicho por él, no existe para el libro. Ante la duda entre fidelidad y creatividad, siempre fidelidad.
 
-**Voz de Julian (innegociable):** no reescribir, no mejorar, no embellecer. Se preserva ritmo, repeticiones, autocorrecciones, muletillas con sentido, voseo argentino y su forma de construir ideas. Criterio: si Julian leyera el texto, tiene que poder decir "sí, eso es exactamente lo que dije".
+**Voz de Julián (innegociable):** no reescribir, no mejorar, no embellecer. Se preserva ritmo, repeticiones con sentido, autocorrecciones, voseo argentino y su forma de construir ideas. Se permite: corregir palabras mal transcriptas hacia lo que quiso decir (si es dudoso, va a la Hoja de Revisión), sacar muletillas de grabación dirigidas al oyente y arranques falsos, y ordenar la puntuación. No se suman signos que su habla no tiene (rayas de inciso y punto y coma innecesarios): así el texto sigue sonando a él.
 
 ## Flujo de trabajo
 
-**Modo 1 — Transcripción (por defecto):** solo corregir errores evidentes de reconocimiento de voz, puntuación, tildes y separación de párrafos. Prohibido cambiar palabras, resumir, interpretar, eliminar repeticiones, reordenar o completar frases. Lo dudoso se marca `[posible error de reconocimiento de voz — a confirmar]`, nunca se adivina.
+**Modo 1 — Transcripción (por defecto):** solo corregir errores evidentes de reconocimiento de voz, puntuación, tildes y separación de párrafos. Lo dudoso se marca `[posible error de reconocimiento de voz — a confirmar]`.
 
-**Flujo estándar para transcripciones nuevas (limpiar + insertar en un paso):** al pegar una transcripción nueva, limpiarla (Modo 1) e insertarla directamente en el/los libro(s) que corresponda según el ángulo (mecanismo→Receta, reflexión→Pensamiento, experiencia personal→Biografía), sacando antes el andamiaje de entrevista (preguntas leídas, "pasamos a la siguiente pregunta", comentarios de Julian sobre la grabación). Preferir ampliar un capítulo existente antes que abrir uno nuevo; un capítulo nuevo siempre se confirma con Lucas antes de crearlo. Si un pasaje depende de otro para tener sentido, duplicar el fragmento completo en los libros que corresponda en vez de partirlo.
+**Transcripciones nuevas (limpiar + insertar en un paso):** limpiarla e insertarla en el libro que corresponda (mecanismo → Receta, reflexión → Pensamiento, experiencia personal → Biografía), sacando antes el andamiaje de entrevista. Conviene ampliar un capítulo existente antes que abrir uno nuevo, y un capítulo nuevo se confirma siempre con Lucas. Si un pasaje depende de otro, se duplica completo.
 
-**Modo 2 — Edición:** solo se activa cuando Lucas escribe exactamente "ETAPA DE EDICIÓN" (o "Ahora sí, edición"). Ahí se puede dividir capítulos, ordenar ideas, detectar conceptos repetidos y relaciones entre libros, sugerir versículos y mejorar legibilidad — nunca cambiar el contenido en sí.
+**Modo 2 — Edición:** se activa con "ETAPA DE EDICIÓN" o con un pedido explícito de Lucas de trabajo editorial integral.
 
-## Puentes sincrónicos y decisiones estructurales ya tomadas
+## Sistema de diseño (base de imprenta)
 
-Antes de mover o duplicar contenido entre libros, no romper puentes ya decididos (ej. la anécdota "Shelleyar" duplicada a propósito en Pensamiento y Biografía; el bloque del Ojo Observador duplicado en Receta y Pensamiento). Ante cualquier eco fuerte detectado que no esté documentado, proponérselo a Lucas antes de tocar los manuscritos — es trabajo estructural, no entra en el flujo automático.
+- Trim 5.5×8.5" (7920×12240 twips), márgenes espejados: sup. 0.75", inf. 0.7", interior 0.75", exterior 0.55". Partición de palabras activada.
+- Cuerpo: Palatino Linotype 11 pt, interlineado 1,2, 7,5 pt entre párrafos, justificado.
+- Aperturas: grabado del capítulo en el fondo (arriba), espaciador de altura fija, «CAPÍTULO N» en 9,5 pt con tracking, título en 16,5 pt y epígrafe «…» en itálica con la cita en versalitas. Los epígrafes van en RVR1960; los no confirmados llevan `[versículo propuesto — a confirmar]`.
+- Encabezado: el emblema del capítulo arriba a la derecha (0.30"). Portada, copyright e índice van sin ícono; la transición lleva encabezado vacío.
+- «En el principio» en versalitas en cada Cap. 0. Cierre de capítulo con ◆ ◆ ◆ en el color de acento, siempre pegado al último párrafo.
+- Imprenta: Receta y Biografía tienen fondo de página completo oscuro, así que al exportar para imprimir hay que pedir sangrado (0.125").
 
-## Sistema de diseño compartido
+## Herramientas (`herramientas/`)
 
-- Formato 5.5×8.5"
-- "En el principio" en versalitas con tracking, firma sincrónica en cada Cap. 0
-- Ornamento de cierre de capítulo: ◆ ◆ ◆ en el color de acento del libro
-- Pies de página en versalitas
-- Receta: headers simples en blanco y negro
-- Pensamiento: página divisoria a página completa en negro con texto blanco antes de cada capítulo
-- Biografía: acento azul marino #1C2B4D
-- Versículos (RVR1960) al abrir cada capítulo, elegidos por resonancia simbólica (no por fama), siempre propuestos como pendientes de confirmación por Lucas hasta que él los apruebe
+- `engine.py` y `designs.py`: motor de grabado procedural y los dibujos de cada emblema.
+- `assets.py`: genera los fondos de página y los emblemas.
+- `edits_*.py`: la lista de correcciones por libro.
+- `phase_text.py`: aplica texto, estructura y sincronía.
+- `phase_design.py`: aplica maqueta, íconos, índice y ornamentos.
+- `make_docs.py`: genera el registro de cambios y la Hoja de Revisión.
+
+Las rutas de trabajo están fijadas a la sesión donde se crearon: para reusarlos hay que ajustarlas.
 
 ## Reglas de trabajo
 
-- Los textos de Julian son sagrados: ante cualquier duda, preguntar o marcar, nunca decidir por él.
-- No borrar ni sobrescribir manuscritos originales: crear versiones nuevas al lado.
+- Los textos de Julián son sagrados: ante cualquier duda, preguntar o marcar, nunca decidir por él.
+- No borrar ni sobrescribir manuscritos: las versiones nuevas van al lado de las anteriores.
 - Hablar en español rioplatense (voseo) con Lucas.
-- Al terminar una tarea, resumir en pocas líneas qué se hizo y qué archivos quedaron, sin recapitular cada paso.
+- Al terminar, resumir en pocas líneas qué se hizo y qué archivos quedaron.
 
-Para trabajo editorial de fondo (reestructuración entre libros, sistema completo de íconos, prompt maestro), consultar las skills `trilogia-jb` y `jb-expert` disponibles en el entorno.
+Para trabajo editorial de fondo, consultar también las skills `trilogia-jb` y `jb-expert`, pero la regla del nombre y el mapa de capítulos de este archivo tienen prioridad sobre lo que digan esas skills.
