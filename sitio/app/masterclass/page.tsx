@@ -6,16 +6,21 @@ import Ornamento from "@/components/Ornamento";
 import Epigrafe from "@/components/Epigrafe";
 import { usuarioActual } from "@/lib/auth";
 import { accesos } from "@/lib/access";
-import { citas, enVivo, masterclass, portadillas } from "@/content/config";
+import Precio from "@/components/Precio";
+import SubnavMasterclass from "@/components/SubnavMasterclass";
+import { citas, enVivo, masterclass, portadillas, precios } from "@/content/config";
 
 export const metadata: Metadata = { title: "Masterclass" };
 
 export default async function EnVivo() {
   const u = await usuarioActual();
-  const mios = u ? (await accesos(u.id)).directos : [];
+  const a = u ? await accesos(u.id) : null;
+  const mios = a?.directos ?? [];
+  const tieneGrabada = a?.masterclass ?? false;
   return (
     <>
       <Apertura titulo={enVivo.titulo} bajada={enVivo.bajada} {...portadillas.masterclass} />
+      <SubnavMasterclass actual="vivo" />
 
       <section className="hondo border-t borde px-5 py-16 sm:py-20">
         <div className="mx-auto max-w-3xl">
@@ -70,17 +75,43 @@ export default async function EnVivo() {
         </div>
       </section>
 
-      <section className="hondo border-t borde px-5 py-20 text-center">
+      <section className="hondo border-t borde px-5 py-16 sm:py-20" aria-labelledby="grabada" data-testid="bloque-grabada">
+        <div className="mx-auto max-w-3xl">
+          <p className="firma texto-2 text-xs revelar">También</p>
+          <h2 id="grabada" className="titulo text-3xl mt-2 mb-4 revelar">
+            {masterclass.titulo}
+          </h2>
+          <p className="text-xl prosa revelar">{masterclass.bajada}</p>
+          <ul className="mt-8 space-y-2 prosa">
+            {masterclass.incluye.map((item, i) => (
+              <li key={item} className="flex gap-3 revelar" style={{ ["--retardo" as string]: `${i * 0.1}s` }}>
+                <span aria-hidden="true" className="texto-2">·</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-10 flex flex-wrap items-center gap-5 revelar">
+            <Link href="/masterclass/grabada" className="boton">
+              Ver la masterclass grabada
+            </Link>
+            {tieneGrabada ? (
+              <Link href="/mi-espacio/masterclass" className="enlace texto-2">
+                Ya la tenés: ir a verla
+              </Link>
+            ) : (
+              <span className="texto-2">
+                <Precio {...precios.masterclass} />
+              </span>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-5 py-20 text-center border-t borde">
         <div className="revelar">
           <Epigrafe cita={citas.tiempo} />
         </div>
         <Ornamento className="mt-12" />
-        <p className="texto-2 mt-12 revelar">
-          ¿Preferís verla a tu ritmo?{" "}
-          <Link href="/masterclass/grabada" className="enlace">
-            {masterclass.titulo}
-          </Link>
-        </p>
       </section>
     </>
   );

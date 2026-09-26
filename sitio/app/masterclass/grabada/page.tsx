@@ -5,6 +5,7 @@ import Texto from "@/components/Marcador";
 import Precio from "@/components/Precio";
 import Epigrafe from "@/components/Epigrafe";
 import Ornamento from "@/components/Ornamento";
+import SubnavMasterclass from "@/components/SubnavMasterclass";
 import { usuarioActual } from "@/lib/auth";
 import { accesos } from "@/lib/access";
 import { citas, encuentro, masterclass, modulos, portadillas, precios } from "@/content/config";
@@ -33,6 +34,7 @@ export default async function Masterclass() {
           </span>
         </div>
       </Apertura>
+      <SubnavMasterclass actual="grabada" />
 
       <section className="hondo border-t borde px-5 py-16 sm:py-20">
         <div className="mx-auto max-w-3xl revelar">

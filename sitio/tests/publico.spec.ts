@@ -120,3 +120,12 @@ test("privacidad y reembolsos tienen texto, y el botón de arrepentimiento da un
   await page.getByRole("button", { name: "Pedir la cancelación" }).click();
   await expect(page.getByTestId("mensaje-ok")).toContainText("ARR-");
 });
+
+test("la masterclass grabada está dentro de la sección Masterclass", async ({ page }) => {
+  await page.goto("/masterclass");
+  await expect(page.getByTestId("subnav-masterclass").getByRole("link", { name: "En vivo" })).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("bloque-grabada")).toBeVisible();
+  await page.getByTestId("bloque-grabada").getByRole("link", { name: "Ver la masterclass grabada" }).click();
+  await expect(page).toHaveURL(/\/masterclass\/grabada$/);
+  await expect(page.getByTestId("subnav-masterclass").getByRole("link", { name: "Grabada" })).toHaveAttribute("aria-current", "page");
+});
