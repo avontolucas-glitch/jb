@@ -50,9 +50,12 @@ Todo está en **un solo archivo**: `content/config.ts`. Se abre con cualquier ed
 
 - **Precios:** en `precios` (masterclass USD 20 y conferencia privada USD 3, los dos "a definir"). Cuando estén confirmados, cambiá `aDefinir: true` por `aDefinir: false` y desaparece la aclaración.
 - **Fechas y lugares:** en `conferencias` y en `encuentro`.
-- **Textos de Julián:** donde dice `MARCADOR`, reemplazalo por el texto entre comillas. Ejemplo: `quienEs: "Acá va lo que escriba Julián",`
+- **Textos que faltan:** aparecen como «(Texto a definir)». Reemplazalos por el texto entre comillas en `content/config.ts`.
+- **Legales:** en `content/legales.ts` (privacidad y reembolsos ya tienen un borrador; revisalos con un abogado y completá los datos «a definir»).
 - **Redes:** en `redes`, cambiá el `#` por el link real.
-- **Masterclass en vivo:** en `enVivo`: los directos (fecha y tema), el mínimo (`minimo: 1`), los montos sugeridos (`sugeridos`) y el máximo por pago.
+- **Quién es Julián:** en `inicio.quienEs` y `inicio.trayectoria` (datos de fuentes públicas, a confirmar con él).
+- **Sesiones privadas:** en `sesiones` (días y horas de ejemplo, duración, link de la videollamada) y su precio en `precios.sesionPrivada`.
+- **Masterclass (Julián en vivo):** en `enVivo`: los directos (fecha y tema), el mínimo (`minimo: 1`), los montos sugeridos (`sugeridos`) y el máximo por pago.
 - **Cuadro de bienvenida:** en `umbral`: el aviso de espacio exclusivo, la bienvenida y el texto del botón. Aparece una vez por visita.
 - **Nombre:** en `sitio.nombre` y `sitio.nombreCorto` ("Julián Bermúdez", con tilde, como en los libros).
 

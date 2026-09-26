@@ -43,7 +43,23 @@ export const precios = {
 
 export const inicio = {
   bajada: "Conferencias, masterclass en vivo y una trilogía en camino.",
-  quienEs: MARCADOR_JULIAN, // Presentación de Julián.
+  /**
+   * Presentación de Julián en tercera persona, con datos de fuentes públicas
+   * (prensa y su canal). A confirmar con él antes de publicar.
+   */
+  quienEs: [
+    "Julián Bermúdez es chef y conferencista. En febrero de 2021 ganó la décima temporada de El Gran Premio de la Cocina, en eltrece, con un menú de autor en la final.",
+    "Ese mismo año fue el chef de «Ernestina y el otro país», el programa de Ernestina Pais en NET TV.",
+    "Hoy da conferencias y masterclass en vivo sobre la manifestación y la ley de asunción, en la línea de Neville Goddard, y compila su obra oral en una trilogía: La Receta de la Manifestación, El Pensamiento es Tu Fe y su Biografía.",
+  ],
+  quienEsNota: "Datos de fuentes públicas, a confirmar con Julián.",
+  trayectoria: [
+    { anio: 2021, hecho: "Campeón de El Gran Premio de la Cocina, décima temporada (eltrece)" },
+    { anio: 2021, hecho: "Chef de «Ernestina y el otro país» (NET TV)" },
+    { anio: 2024, hecho: "The Conference: cuatro conferencias en vivo" },
+    { anio: 2026, hecho: "Masterclass Reseteo" },
+    { anio: 2026, hecho: "La trilogía, en camino" },
+  ],
   propuesta:
     "Lo esencial queda grabado en la masterclass. El vivo pasa a ser para responder, solo con quienes eligieron entrar.",
   propuestaDetalle: MARCADOR,

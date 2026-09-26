@@ -5,7 +5,6 @@ import Estrellas from "@/components/Estrellas";
 import Divisor from "@/components/Divisor";
 import Trazo from "@/components/Trazo";
 import MarcasImprenta from "@/components/MarcasImprenta";
-import Texto from "@/components/Marcador";
 import EspacioFoto from "@/components/EspacioFoto";
 import Epigrafe from "@/components/Epigrafe";
 import Ornamento from "@/components/Ornamento";
@@ -93,7 +92,20 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
             <h2 id="quien" className="titulo text-3xl mb-6">
               Quién es
             </h2>
-            <Texto bloque>{inicio.quienEs}</Texto>
+            <div className="prosa space-y-4 text-lg" data-testid="quien-es">
+              {inicio.quienEs.map((p) => (
+                <p key={p}>{p}</p>
+              ))}
+            </div>
+            <ol className="mt-8 border-t borde">
+              {inicio.trayectoria.map((t, i) => (
+                <li key={t.hecho} className="border-b borde py-2.5 grid grid-cols-[3.5rem_1fr] gap-3 revelar" style={{ ["--retardo" as string]: `${i * 0.08}s` }}>
+                  <span className="texto-2 cifras">{t.anio}</span>
+                  <span>{t.hecho}</span>
+                </li>
+              ))}
+            </ol>
+            <p className="texto-2 text-xs mt-4 italic">{inicio.quienEsNota}</p>
           </div>
         </div>
       </section>

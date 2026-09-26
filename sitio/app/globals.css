@@ -379,3 +379,10 @@ h1.titulo { filter: url(#tinta-rugosa); }
 /* el menú del celular se abre de a una línea */
 .menu-abre li { animation: aparece .6s var(--lento) both; animation-delay: calc(var(--i, 8) * 45ms); }
 @media (prefers-reduced-motion: reduce) { .nav-icono.golpe, .nav-icono.golpe::after, .menu-abre li { animation: none; } }
+
+/* ───────── Tipografía fina ───────── */
+body { font-feature-settings: "liga" 1, "kern" 1; font-kerning: normal; }
+.cifras, .folio, .firma { font-variant-numeric: oldstyle-nums; }
+h1, h2, h3 { text-wrap: balance; }
+p, li { text-wrap: pretty; hanging-punctuation: first; }
+::selection { background: var(--crema); color: var(--negro); }
