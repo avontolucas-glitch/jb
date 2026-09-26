@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import Ojo from "@/components/Ojo";
+import Apertura from "@/components/Apertura";
+import { portadillas } from "@/content/config";
 import Formulario, { Campo } from "@/components/Formulario";
 import { accionCrearCuenta } from "@/lib/acciones";
 import { usuarioActual } from "@/lib/auth";
@@ -13,11 +14,10 @@ export default async function CrearCuenta({ searchParams }: { searchParams: Prom
   const destino = volverSeguro((await searchParams).volver);
   if (await usuarioActual()) redirect(destino);
   return (
-    <section className="px-5 py-16 sm:py-24">
-      <div className="mx-auto max-w-md">
-        <Ojo size={30} className="mb-6" />
-        <h1 className="titulo text-4xl mb-3">Crear cuenta</h1>
-        <p className="texto-2 mb-8">Con tu cuenta comprás y ves todo lo tuyo en un solo lugar.</p>
+    <>
+    <Apertura titulo="Crear cuenta" bajada="Con tu cuenta comprás y ves todo lo tuyo en un solo lugar." {...portadillas.crearCuenta} />
+    <section className="hondo border-t borde px-5 py-16 sm:py-20">
+      <div className="mx-auto max-w-md revelar">
         <Formulario accion={accionCrearCuenta} boton="Crear cuenta" enviando="Creando…">
           <input type="hidden" name="volver" value={destino} />
           <Campo nombre="nombre" etiqueta="Nombre" autoComplete="name" />
@@ -44,5 +44,6 @@ export default async function CrearCuenta({ searchParams }: { searchParams: Prom
         </p>
       </div>
     </section>
+    </>
   );
 }

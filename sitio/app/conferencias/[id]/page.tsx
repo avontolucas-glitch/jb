@@ -8,7 +8,7 @@ import Formulario, { Campo } from "@/components/Formulario";
 import { accionInscribir } from "@/lib/acciones";
 import { usuarioActual } from "@/lib/auth";
 import { accesos } from "@/lib/access";
-import { conferencias, precios } from "@/content/config";
+import { conferencias, portadillas, precios } from "@/content/config";
 
 type P = { params: Promise<{ id: string }> };
 
@@ -27,7 +27,7 @@ export default async function Conferencia({ params }: P) {
   if (c.tipo === "abierta") {
     return (
       <>
-        <Apertura titulo={c.titulo} bajada={`${c.fecha} · ${c.lugar}`} />
+        <Apertura titulo={c.titulo} bajada={`${c.fecha} · ${c.lugar}`} folio={portadillas.conferencias.folio} />
         <section className="hondo border-t borde px-5 py-16">
           <div className="mx-auto max-w-xl revelar">
             <p className="text-lg">{c.descripcion}</p>
@@ -46,7 +46,7 @@ export default async function Conferencia({ params }: P) {
   const tiene = u ? (await accesos(u.id)).conferencias.includes(c.id) : false;
   return (
     <>
-      <Apertura titulo={c.titulo} bajada={`${c.fecha} · ${c.lugar}`} />
+      <Apertura titulo={c.titulo} bajada={`${c.fecha} · ${c.lugar}`} folio={portadillas.conferencias.folio} />
       <section className="hondo border-t borde px-5 py-16">
         <div className="mx-auto max-w-xl revelar">
           <Texto bloque>{c.descripcion}</Texto>

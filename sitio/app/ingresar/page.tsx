@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import Ojo from "@/components/Ojo";
+import Apertura from "@/components/Apertura";
+import { portadillas } from "@/content/config";
 import Formulario, { Campo } from "@/components/Formulario";
 import { accionIngresar } from "@/lib/acciones";
 import { usuarioActual } from "@/lib/auth";
@@ -22,10 +23,10 @@ export default async function Ingresar({ searchParams }: P) {
   const destino = volverSeguro(volver);
   if (await usuarioActual()) redirect(destino);
   return (
-    <section className="px-5 py-16 sm:py-24">
-      <div className="mx-auto max-w-md">
-        <Ojo size={30} className="mb-6" />
-        <h1 className="titulo text-4xl mb-8">Ingresar</h1>
+    <>
+    <Apertura titulo="Ingresar" bajada="Tu espacio: lo que compraste, tus directos y tus lecturas." {...portadillas.ingresar} />
+    <section className="hondo border-t borde px-5 py-16 sm:py-20">
+      <div className="mx-auto max-w-md revelar">
         {aviso && avisos[aviso] && (
           <p role="alert" className="border borde p-4 mb-8" data-testid="aviso">
             {avisos[aviso]}
@@ -67,5 +68,6 @@ export default async function Ingresar({ searchParams }: P) {
         </aside>
       </div>
     </section>
+    </>
   );
 }

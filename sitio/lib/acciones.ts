@@ -9,6 +9,7 @@ import { crearCuenta, ingresar, cerrarSesion, usuarioActual } from "./auth";
 import { accesos, type Progreso } from "./access";
 import { leer, escribir } from "./db";
 import { producto, pagarSimulado, montoElegido } from "./payments";
+import { canjear } from "./codigos";
 import { conferencias, modulos } from "@/content/config";
 
 export type Estado = { error?: string; ok?: string } | null;
@@ -111,5 +112,16 @@ export async function accionPagar(_: Estado, f: FormData): Promise<Estado> {
   revalidatePath("/", "layout");
   if (p.id === "masterclass") redirect("/mi-espacio/masterclass?compra=ok");
   if (p.id.startsWith("directo:")) redirect(`/mi-espacio/en-vivo?compra=ok`);
+  if (p.id.startsWith("libro:")) redirect(`/mi-espacio/biblioteca/${p.id.split(":")[1]}?compra=ok`);
   redirect("/mi-espacio/conferencias?compra=ok");
+}
+
+/** Canjear el código del libro impreso por el libro digital. */
+export async function accionCanjear(_: Estado, f: FormData): Promise<Estado> {
+  const u = await usuarioActual();
+  if (!u) redirect(`/ingresar?aviso=canjear&volver=/canjear`);
+  const r = await canjear(u.id, txt(f, "codigo"));
+  if (!r.ok) return { error: r.error };
+  revalidatePath("/", "layout");
+  redirect(`/mi-espacio/biblioteca/${r.libro}?canje=ok`);
 }

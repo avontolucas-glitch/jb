@@ -13,7 +13,7 @@
  */
 import { leer, escribir } from "./db";
 import type { Compra } from "./access";
-import { conferencias, enVivo, precios } from "@/content/config";
+import { conferencias, enVivo, libros, precios } from "@/content/config";
 
 export type Producto = {
   id: string;
@@ -34,6 +34,12 @@ export function producto(id: string): Producto | null {
     const c = conferencias.find((x) => x.id === cid && x.tipo === "privada");
     if (!c) return null;
     return { id: `conferencia:${cid}`, titulo: `Entrada · ${c.titulo}`, ...precios.conferenciaPrivada };
+  }
+  if (id.startsWith("libro-")) {
+    const lid = id.slice("libro-".length);
+    const l = libros.find((x) => x.id === lid);
+    if (!l) return null;
+    return { id: `libro:${lid}`, titulo: `${l.titulo} · edición digital`, ...precios.libroDigital };
   }
   if (id.startsWith("directo-")) {
     const did = id.slice("directo-".length);

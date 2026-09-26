@@ -312,3 +312,28 @@ html.js h2.revelar.visto { letter-spacing: .01em; }
 @media (prefers-reduced-motion: reduce) {
   .trazo-mano-dibujo { stroke-dashoffset: 0; }
 }
+
+/* ───────── Emblemas de la trilogía que flotan ───────── */
+.flotantes { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; opacity: 1; transition: opacity 3s var(--lento) 1.5s; mix-blend-mode: screen; }
+html.en-umbral .flotantes { opacity: 0; }
+.flota { position: absolute; top: 0; opacity: .15; animation-name: sube; animation-timing-function: linear; animation-iteration-count: infinite; will-change: transform; }
+.flota:nth-child(3n) { opacity: .1; }
+.flota:nth-child(4n) { opacity: .19; }
+.flota img { width: 100%; height: 100%; }
+.vaiven { width: 100%; height: 100%; animation-name: vaiven; animation-timing-function: ease-in-out; animation-iteration-count: infinite; animation-direction: alternate; }
+@keyframes sube { from { transform: translateY(108vh); } to { transform: translateY(-14vh); } }
+@keyframes vaiven { from { transform: translateX(-14px) rotate(-7deg); } to { transform: translateX(14px) rotate(7deg); } }
+@media (max-width: 767px) {
+  .flota:nth-child(n + 8) { display: none; }
+  .flota { opacity: .11; }
+}
+@media (prefers-reduced-motion: reduce) { .flotantes { display: none; } }
+h1.titulo { filter: url(#tinta-rugosa); }
+
+/* ───────── Lector de los libros digitales ───────── */
+.marca-lector { position: absolute; inset: -2rem 0; overflow: hidden; pointer-events: none; display: flex; flex-direction: column; justify-content: space-around; opacity: .06; }
+.marca-lector span { display: block; transform: rotate(-24deg); white-space: nowrap; font-size: .8rem; letter-spacing: .12em; }
+.marca-lector span:nth-child(odd) { margin-left: 30%; }
+.pagina-libro { font-size: 1.12rem; line-height: 1.75; text-align: justify; hyphens: auto; }
+.capitular::first-letter { float: left; font-size: 3.6em; line-height: .82; padding: .06em .08em 0 0; }
+@media print { .sala { display: none !important; } }

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Apertura from "@/components/Apertura";
 import Texto from "@/components/Marcador";
 import Precio from "@/components/Precio";
-import { conferencias, precios } from "@/content/config";
+import { conferencias, portadillas, precios } from "@/content/config";
 
 export const metadata: Metadata = { title: "Conferencias" };
 
@@ -12,7 +12,7 @@ export default function Conferencias() {
   const privadas = conferencias.filter((c) => c.tipo === "privada");
   return (
     <>
-      <Apertura titulo="Conferencias" bajada="Una abierta por año, gratis. Y privadas, con entrada simbólica." />
+      <Apertura titulo="Conferencias" bajada="Una abierta por año, gratis. Y privadas, con entrada simbólica." {...portadillas.conferencias} />
       <section className="hondo border-t borde px-5 py-16 sm:py-20">
         <div className="mx-auto max-w-3xl revelar">
           <h2 className="titulo text-3xl mb-2">Abierta</h2>

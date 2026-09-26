@@ -1,12 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import Grabado from "@/components/Grabado";
+import Apertura from "@/components/Apertura";
 import Texto from "@/components/Marcador";
 import Ornamento from "@/components/Ornamento";
 import Epigrafe from "@/components/Epigrafe";
 import { usuarioActual } from "@/lib/auth";
 import { accesos } from "@/lib/access";
-import { citas, enVivo } from "@/content/config";
+import { citas, enVivo, portadillas } from "@/content/config";
 
 export const metadata: Metadata = { title: "Masterclass en vivo" };
 
@@ -15,15 +15,7 @@ export default async function EnVivo() {
   const mios = u ? (await accesos(u.id)).directos : [];
   return (
     <>
-      <section className="relative overflow-hidden px-5 pt-12 pb-16 sm:pt-16 sm:pb-24 text-center">
-        <Grabado src="/grabados/receta-ojo.webp" alt="Grabado: el ojo de luz y sombra" ancho="min(60vw, 260px)" halo />
-        <h1 className="titulo text-4xl sm:text-5xl mt-8 aparece" style={{ animationDelay: ".9s" }}>
-          {enVivo.titulo}
-        </h1>
-        <p className="texto-2 mt-5 text-lg sm:text-xl prosa mx-auto aparece" style={{ animationDelay: "1.3s" }}>
-          {enVivo.bajada}
-        </p>
-      </section>
+      <Apertura titulo={enVivo.titulo} bajada={enVivo.bajada} {...portadillas.enVivo} />
 
       <section className="hondo border-t borde px-5 py-16 sm:py-20">
         <div className="mx-auto max-w-3xl">

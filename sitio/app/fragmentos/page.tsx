@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Apertura from "@/components/Apertura";
 import Ojo from "@/components/Ojo";
-import { fragmentos, redes } from "@/content/config";
+import { fragmentos, portadillas, redes } from "@/content/config";
 
 export const metadata: Metadata = { title: "Fragmentos" };
 
 export default function Fragmentos() {
   return (
     <>
-      <Apertura titulo="Fragmentos" bajada="Pedazos de conferencias y charlas. Los completos están en las redes." />
+      <Apertura titulo="Fragmentos" bajada="Pedazos de conferencias y charlas. Los completos están en las redes." {...portadillas.fragmentos} />
       <section className="px-5 pb-20">
         <ul className="mx-auto max-w-5xl grid gap-8 sm:grid-cols-2 revelar">
           {fragmentos.map((f) => (

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 export default function NavEspacio({ items }: { items: { href: string; texto: string; bloqueado?: boolean }[] }) {
   const ruta = usePathname();
   return (
-    <nav aria-label="Tu espacio" className="border-b borde overflow-x-auto">
+    <nav aria-label="Tu espacio" className="relative border-b borde overflow-x-auto">
       <ul className="mx-auto max-w-5xl px-5 flex gap-6 whitespace-nowrap">
         {items.map((i) => {
           const actual = i.href === "/mi-espacio" ? ruta === i.href : ruta.startsWith(i.href);

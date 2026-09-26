@@ -3,7 +3,7 @@ import Apertura from "@/components/Apertura";
 import Formulario, { Campo } from "@/components/Formulario";
 import CanalContacto from "@/components/CanalContacto";
 import { accionLista } from "@/lib/acciones";
-import { lista } from "@/content/config";
+import { lista, portadillas } from "@/content/config";
 
 export const metadata: Metadata = { title: "Sumate a la lista" };
 
@@ -11,7 +11,7 @@ export default async function Lista({ searchParams }: { searchParams: Promise<{ 
   const { interes } = await searchParams;
   return (
     <>
-      <Apertura titulo={lista.titulo} bajada={lista.bajada} />
+      <Apertura titulo={lista.titulo} bajada={lista.bajada} {...portadillas.lista} />
       <section className="hondo border-t borde px-5 py-16">
         <div className="mx-auto max-w-xl revelar">
           <Formulario accion={accionLista} boton="Sumarme" ocultarAlTerminar>

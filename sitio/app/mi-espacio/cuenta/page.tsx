@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { miembro } from "@/lib/miembro";
 import { accionSalir } from "@/lib/acciones";
-import { conferencias, enVivo } from "@/content/config";
+import { conferencias, enVivo, libros } from "@/content/config";
 
 const fecha = (iso: string) =>
   new Date(iso).toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" });
 
 function nombreProducto(p: string) {
   if (p === "masterclass") return "Masterclass";
+  const l = libros.find((x) => `libro:${x.id}` === p);
+  if (l) return `${l.titulo} · edición digital`;
   const d = enVivo.directos.find((x) => `directo:${x.id}` === p);
   if (d) return `En vivo · ${d.titulo}`;
   const c = conferencias.find((x) => `conferencia:${x.id}` === p);
@@ -41,7 +43,7 @@ export default async function Cuenta() {
             <li key={c.id} className="border-b borde py-4 flex flex-col sm:flex-row sm:justify-between gap-1">
               <span>{nombreProducto(c.producto)}</span>
               <span className="texto-2 text-sm">
-                {c.moneda} {c.monto} · {fecha(c.fecha)} · {c.medio === "simulado" ? "pago de prueba" : c.medio}
+                {c.moneda} {c.monto} · {fecha(c.fecha)} · {c.medio === "simulado" ? "pago de prueba" : c.medio === "codigo" ? "código del libro impreso" : c.medio}
               </span>
             </li>
           ))}

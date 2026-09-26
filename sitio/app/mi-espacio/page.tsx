@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { miembro } from "@/lib/miembro";
 import Precio from "@/components/Precio";
-import { conferencias, encuentro, enVivo, precios } from "@/content/config";
+import { conferencias, encuentro, enVivo, libros, precios } from "@/content/config";
 
 export default async function Espacio() {
   const { u, a } = await miembro();
@@ -31,6 +31,12 @@ export default async function Espacio() {
               <p className="texto-2 mt-1">
                 Con los audios por tema y el encuentro de preguntas de regalo. <Precio {...precios.masterclass} />
               </p>
+            </li>
+            <li className="border-b borde py-5">
+              <Link href="/canjear" className="text-xl enlace">
+                ¿Tenés un libro impreso?
+              </Link>
+              <p className="texto-2 mt-1">Cargá su código y leelo también acá.</p>
             </li>
             <li className="border-b borde py-5">
               <Link href="/conferencias" className="text-xl enlace">
@@ -67,6 +73,16 @@ export default async function Espacio() {
                 </li>
               </>
             )}
+            {libros
+              .filter((l) => a.libros.includes(l.id))
+              .map((l) => (
+                <li key={l.id} className="border-b borde py-5">
+                  <Link href={`/mi-espacio/biblioteca/${l.id}`} className="text-xl enlace">
+                    {l.titulo}
+                  </Link>
+                  <p className="texto-2 mt-1">Para leer en la biblioteca</p>
+                </li>
+              ))}
             {directos.map((d) => (
               <li key={d.id} className="border-b borde py-5">
                 <Link href={`/mi-espacio/en-vivo/${d.id}`} prefetch={false} className="text-xl enlace">

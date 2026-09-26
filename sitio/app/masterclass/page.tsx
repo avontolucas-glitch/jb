@@ -7,7 +7,7 @@ import Epigrafe from "@/components/Epigrafe";
 import Ornamento from "@/components/Ornamento";
 import { usuarioActual } from "@/lib/auth";
 import { accesos } from "@/lib/access";
-import { citas, encuentro, libros, masterclass, modulos, precios } from "@/content/config";
+import { citas, encuentro, libros, masterclass, modulos, portadillas, precios } from "@/content/config";
 
 export const metadata: Metadata = { title: "Masterclass" };
 
@@ -25,8 +25,8 @@ export default async function Masterclass() {
   );
   return (
     <>
-      <Apertura titulo={masterclass.titulo} bajada={masterclass.bajada}>
-        <div className="mt-10 flex flex-col items-center gap-3">
+      <Apertura titulo={masterclass.titulo} bajada={masterclass.bajada} {...portadillas.masterclass}>
+        <div className="mt-10 flex flex-wrap items-center gap-5">
           {accion}
           <span className="texto-2">
             <Precio {...precios.masterclass} />

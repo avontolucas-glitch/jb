@@ -3,6 +3,7 @@
  * - Masterclass: masterclass, audios y encuentro de preguntas.
  * - Entrada a una conferencia privada: solo esa conferencia.
  * - Directo en vivo (a voluntad): solo ese directo.
+ * - Libro digital (comprado o con el código del libro impreso): leer ese libro.
  */
 import { leer } from "./db";
 
@@ -13,7 +14,7 @@ export type Compra = {
   monto: number;
   moneda: string;
   fecha: string;
-  medio: string; // "simulado" (en producción: "mercadopago" | "hotmart")
+  medio: string; // "simulado" | "codigo" (en producción: "mercadopago" | "paypal" | ...)
 };
 
 export async function comprasDe(uid: string) {
@@ -26,12 +27,14 @@ export async function accesos(uid: string) {
   const masterclass = mias.some((c) => c.producto === "masterclass");
   const conferencias = mias.filter((c) => c.producto.startsWith("conferencia:")).map((c) => c.producto.split(":")[1]);
   const directos = mias.filter((c) => c.producto.startsWith("directo:")).map((c) => c.producto.split(":")[1]);
+  const libros = mias.filter((c) => c.producto.startsWith("libro:")).map((c) => c.producto.split(":")[1]);
   return {
     masterclass,
     audios: masterclass,
     encuentro: masterclass,
     conferencias,
     directos,
+    libros,
     algo: mias.length > 0,
     compras: mias,
   };

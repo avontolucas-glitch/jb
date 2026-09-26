@@ -84,18 +84,34 @@ Un directo por semana, a voluntad desde USD 1. Quien reserva entra a su sala en 
 - **Marca de agua con el mail** de quien mira, que se mueve por la imagen: si alguien filma la pantalla, se sabe quién fue.
 - **Sin descarga, sin botón derecho, sin arrastrar** dentro de la sala.
 
-Lo que falta es la transmisión real: un servicio de video con **DRM** (cifrado Widevine / FairPlay / PlayReady). Ver la sección 8.
+Lo que falta es la transmisión real: un servicio de video con **DRM** (cifrado Widevine / FairPlay / PlayReady). Ver la sección 9.
 
-## 6. Pruebas automáticas
+## 6. Los libros, también digitales
+
+Idea de Lucas (anotada y ya armada en el prototipo):
+
+- **Quien compra la versión digital** la tiene en **Mi espacio → Biblioteca** y la lee ahí, como la masterclass: capítulo por capítulo, con el grabado de cada uno y los colores de cada libro (Receta en negro, Pensamiento en blanco, Biografía en azul marino).
+- **Quien compra el libro impreso** encuentra en la primera página un **código único**. Lo carga en **julianbermudez.com/canjear** (el libro trae un QR que lleva ahí) y el digital queda en su cuenta.
+- Cada código sirve **una sola vez y para una sola cuenta**. Códigos de prueba: `REC-7K3M-Q9TD-4HXA`, `PEN-4TQ8-HX2K-9MWB`, `BIO-9VEH-5KMT-2QZR` (se pueden usar una vez cada uno).
+- El lector no deja copiar ni seleccionar el texto y lleva el mail de quien lee como marca de agua.
+
+**¿Es factible? Sí.** Es el mismo sistema de accesos que ya usa el sitio. Para producción hace falta:
+
+1. **Códigos distintos en cada ejemplar.** La imprenta los imprime como "datos variables" (cada libro con el suyo) o se pegan como sticker o tarjeta raspable. `lib/codigos.ts` ya genera lotes (`generarLote`) para mandar a la imprenta.
+2. **Límite de intentos** al canjear, para que nadie pruebe códigos al azar.
+3. **El texto del libro** cargado desde el manuscrito final (hoy dice `[TEXTO DEL LIBRO…]`).
+4. Aceptar que, como con cualquier libro digital, una captura de pantalla siempre es posible: la marca de agua con el mail dice de quién era.
+
+## 7. Pruebas automáticas
 
 ```
 npm run build
 npm test
 ```
 
-Recorren solos, en tamaño celular y computadora: el cuadro de bienvenida, el aviso al entrar sin sesión, crear cuenta, ingresar y cerrar sesión, la cuenta sin compras, la compra de la masterclass (con progreso y preguntas), la compra de una entrada privada (y que no habilite nada más), la reserva de un directo a voluntad (con el mínimo), la marca de agua, la sala en una sola pantalla, los formularios públicos, que ninguna página se desborde en el celular, y la app instalable. Usan datos de prueba aparte: no tocan los del prototipo.
+Recorren solos, en tamaño celular y computadora: el cuadro de bienvenida, el aviso al entrar sin sesión, crear cuenta, ingresar y cerrar sesión, la cuenta sin compras, la compra de la masterclass (con progreso y preguntas), la compra de una entrada privada (y que no habilite nada más), la reserva de un directo a voluntad (con el mínimo), la marca de agua, la sala en una sola pantalla, el canje del código del libro (una sola vez), la compra y lectura del libro digital, los formularios públicos, que ninguna página se desborde en el celular, y la app instalable. Usan datos de prueba aparte: no tocan los del prototipo.
 
-## 7. Subirlo para tener un link y mostrarlo
+## 8. Subirlo para tener un link y mostrarlo
 
 La forma más simple es **Vercel** (tiene plan gratis):
 
@@ -109,7 +125,7 @@ Cada vez que se sube un cambio al repositorio, el link se actualiza solo.
 
 Importante para la demo: en Vercel las cuentas y compras nuevas se guardan en un espacio temporal y pueden borrarse cada tanto. Las dos cuentas de prueba siempre están. Para que no se borre nada, se puede usar un servidor propio (Render, Railway o un VPS) con disco: ahí se corre `npm install`, `npm run build` y `npm start`, y se define `DATA_DIR` con una carpeta que se conserve.
 
-## 8. Qué falta para que funcione de verdad
+## 9. Qué falta para que funcione de verdad
 
 Este prototipo **no está listo para producción**. Falta:
 
@@ -136,6 +152,7 @@ Este prototipo **no está listo para producción**. Falta:
 | `lib/payments.ts` | Compra (simulada) y precio a voluntad, con notas de Mercado Pago y Hotmart |
 | `lib/streaming.ts`, `lib/salas.ts` | Permiso firmado y pantalla única de los directos |
 | `lib/access.ts` | Quién puede ver qué |
+| `lib/codigos.ts` | Códigos únicos de los libros impresos |
 | `data/` | Cuentas y compras de prueba |
 | `public/sw.js` | Lo que hace que la app funcione sin internet |
 | `tests/` | Pruebas automáticas |

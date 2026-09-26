@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Apertura from "@/components/Apertura";
 import { sitio } from "@/content/config";
 
 const paginas = {
@@ -20,12 +21,10 @@ export default async function Legal({ params }: P) {
   const p = paginas[(await params).slug as Slug];
   if (!p) notFound();
   return (
+    <>
+    <Apertura titulo={p.titulo} bajada={`${sitio.dominio} · Borrador del prototipo: el texto legal lo redacta un profesional antes de publicar.`} />
     <section className="hondo border-t borde px-5 py-16 sm:py-24">
       <article className="mx-auto max-w-2xl revelar">
-        <h1 className="titulo text-4xl">{p.titulo}</h1>
-        <p className="texto-2 mt-3">
-          {sitio.dominio} · Borrador del prototipo: el texto legal lo redacta un profesional antes de publicar.
-        </p>
         {p.partes.map((parte) => (
           <section key={parte} className="mt-10">
             <h2 className="text-2xl mb-3">{parte}</h2>
@@ -34,5 +33,6 @@ export default async function Legal({ params }: P) {
         ))}
       </article>
     </section>
+    </>
   );
 }

@@ -16,6 +16,7 @@ const paginas = [
   "/legales/privacidad",
   "/legales/reembolsos",
   "/app",
+  "/canjear",
 ];
 
 test("todas las páginas públicas cargan, sin desbordar a lo ancho", async ({ page }) => {

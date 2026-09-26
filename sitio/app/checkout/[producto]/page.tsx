@@ -16,6 +16,7 @@ export const dynamic = "force-dynamic";
 function destino(id: string) {
   if (id === "masterclass") return { href: "/mi-espacio/masterclass", texto: "la masterclass" };
   if (id.startsWith("directo:")) return { href: `/mi-espacio/en-vivo/${id.split(":")[1]}`, texto: "la sala" };
+  if (id.startsWith("libro:")) return { href: `/mi-espacio/biblioteca/${id.split(":")[1]}`, texto: "tu biblioteca" };
   return { href: "/mi-espacio/conferencias", texto: "mis conferencias" };
 }
 

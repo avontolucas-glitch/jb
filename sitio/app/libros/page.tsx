@@ -1,11 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import Ojo from "@/components/Ojo";
+import Apertura from "@/components/Apertura";
 import Grabado from "@/components/Grabado";
 import Texto from "@/components/Marcador";
 import Epigrafe from "@/components/Epigrafe";
 import Ornamento from "@/components/Ornamento";
-import { libros } from "@/content/config";
+import { libros, portadillas } from "@/content/config";
 
 export const metadata: Metadata = { title: "Los libros" };
 
@@ -19,13 +19,7 @@ const identidad = {
 export default function Libros() {
   return (
     <>
-      <section className="px-5 pt-16 pb-14 sm:pt-24 text-center">
-        <Ojo size={30} className="mx-auto mb-6 aparece" />
-        <h1 className="titulo text-4xl sm:text-5xl aparece">Los libros</h1>
-        <p className="texto-2 mt-5 text-lg prosa mx-auto aparece" style={{ animationDelay: ".3s" }}>
-          Una trilogía: tres perspectivas de una misma verdad. Todavía no salieron.
-        </p>
-      </section>
+      <Apertura titulo="Los libros" bajada="Una trilogía: tres perspectivas de una misma verdad. Todavía no salieron." {...portadillas.libros} />
       {libros.map((l) => {
         const id = identidad[l.id];
         return (
@@ -51,9 +45,17 @@ export default function Libros() {
                 </div>
               )}
               <Ornamento className="mt-12" />
-              <Link href={`/lista?interes=${l.id}`} className="boton mt-10 revelar">
-                Avisame cuando salga
-              </Link>
+              <div className="mt-10 flex flex-col items-center gap-4 revelar">
+                <Link href={`/lista?interes=${l.id}`} className="boton">
+                  Avisame cuando salga
+                </Link>
+                <p className="texto-2 text-sm prosa">
+                  Impreso o digital: el digital se lee acá, en tu espacio, y cada libro impreso trae un código para leerlo también en digital.{" "}
+                  <Link href="/canjear" className="enlace">
+                    Canjear un código
+                  </Link>
+                </p>
+              </div>
             </div>
           </section>
         );

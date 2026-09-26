@@ -116,3 +116,14 @@ test("el link de una conferencia privada no aparece en ninguna página pública"
     expect(await page.content()).not.toContain("ejemplo.invalid/sala");
   }
 });
+
+test("el área de miembros no se desborda a lo ancho en el celular", async ({ page }) => {
+  await page.goto("/ingresar");
+  await page.getByRole("button", { name: "Entrar como sincompras@demo.com" }).click();
+  await page.waitForURL("**/mi-espacio");
+  for (const ruta of ["/mi-espacio", "/mi-espacio/biblioteca", "/mi-espacio/cuenta", "/mi-espacio/en-vivo"]) {
+    await page.goto(ruta);
+    const ancho = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(ancho, `${ruta} desborda`).toBeLessThanOrEqual(1);
+  }
+});

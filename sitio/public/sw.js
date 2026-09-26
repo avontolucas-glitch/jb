@@ -1,9 +1,9 @@
 /* Service worker del prototipo.
    - Guarda solo lo público, para abrir rápido y mostrar "Sin conexión".
    - NUNCA guarda el área de miembros, el checkout ni las respuestas del servidor privado. */
-const VERSION = "jb-v1";
+const VERSION = "jb-v2";
 const PRECARGA = ["/sin-conexion", "/icons/icon-192.png", "/icons/icon-512.png"];
-const PRIVADO = ["/mi-espacio", "/checkout", "/api", "/ingresar", "/crear-cuenta"];
+const PRIVADO = ["/mi-espacio", "/checkout", "/api", "/ingresar", "/crear-cuenta", "/canjear"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(PRECARGA)).then(() => self.skipWaiting()));

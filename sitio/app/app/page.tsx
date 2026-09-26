@@ -3,6 +3,7 @@ import Apertura from "@/components/Apertura";
 import BotonInstalar from "@/components/BotonInstalar";
 import { IconoCompartir } from "@/components/InstalarApp";
 import type { Plataforma } from "@/lib/plataforma";
+import { portadillas } from "@/content/config";
 
 export const metadata: Metadata = { title: "Instalar la app" };
 
@@ -64,6 +65,7 @@ export default function App() {
   return (
     <>
       <Apertura
+        {...portadillas.app}
         titulo="Instalar la app"
         bajada="El sitio se puede instalar como una app en el teléfono, la tablet o la computadora. No ocupa casi lugar y se abre directo, sin pasar por el navegador."
       />
