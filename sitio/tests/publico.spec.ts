@@ -40,12 +40,13 @@ test("el sitio no menciona inteligencia artificial ni usa emojis", async ({ page
   }
 });
 
-test("los tres libros figuran como Próximamente y con marcador de texto", async ({ page }) => {
+test("los tres libros figuran como Próximamente y con su descripción", async ({ page }) => {
   await page.goto("/libros");
   for (const id of ["receta", "pensamiento", "biografia"]) {
     await expect(page.getByTestId(`estado-${id}`)).toHaveText("Próximamente");
   }
-  await expect(page.locator("[data-marcador]").first()).toContainText("a definir)");
+  await expect(page.locator("#receta")).toContainText("El libro de la práctica");
+  await expect(page.locator("#biografia")).toContainText("Julián sin filtros");
 });
 
 test("las conferencias en vivo son todas con entrada simbólica", async ({ page }) => {
