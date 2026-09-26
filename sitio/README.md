@@ -91,7 +91,7 @@ Lo que falta es la transmisión real: un servicio de video con **DRM** (cifrado 
 Idea de Lucas (anotada y ya armada en el prototipo):
 
 - **Quien compra la versión digital** la tiene en **Mi espacio → Biblioteca** y la lee ahí, como la masterclass: capítulo por capítulo, con el grabado de cada uno y los colores de cada libro (Receta en negro, Pensamiento en blanco, Biografía en azul marino).
-- **Quien compra el libro impreso** encuentra en la primera página un **código único**. Lo carga en **julianbermudez.com/canjear** (el libro trae un QR que lleva ahí) y el digital queda en su cuenta.
+- **Quien compra el libro impreso** encuentra en la última página un **código único**. Lo carga en **julianbermudez.com/canjear** (el libro trae un QR que lleva ahí) y el digital queda en su cuenta.
 - Cada código sirve **una sola vez y para una sola cuenta**. Códigos de prueba: `REC-7K3M-Q9TD-4HXA`, `PEN-4TQ8-HX2K-9MWB`, `BIO-9VEH-5KMT-2QZR` (se pueden usar una vez cada uno).
 - El lector no deja copiar ni seleccionar el texto y lleva el mail de quien lee como marca de agua.
 

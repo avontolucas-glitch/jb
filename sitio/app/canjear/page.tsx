@@ -16,7 +16,7 @@ export default async function Canjear({ searchParams }: { searchParams: Promise<
     <>
       <Apertura
         titulo="Tu libro, también digital"
-        bajada="Cada libro impreso trae en su primera página un código único. Cargalo acá y el libro queda para leer en tu espacio."
+        bajada="Cada libro impreso trae en su última página un código único y un QR para llegar hasta acá. Cargá el código y el libro queda para leer en tu espacio."
         {...portadillas.canjear}
       />
       <section className="hondo border-t borde px-5 py-16 sm:py-20">

@@ -29,7 +29,7 @@ export function generarLote(libro: string, cantidad: number): Codigo[] {
 
 export async function canjear(uid: string, texto: string): Promise<{ ok: true; libro: string } | { ok: false; error: string }> {
   const buscado = normalizar(texto);
-  if (buscado.length < 10) return { ok: false, error: "Revisá el código: está en la primera página del libro." };
+  if (buscado.length < 10) return { ok: false, error: "Revisá el código: está en la última página del libro." };
   const codigos = await leer<Codigo[]>("codigos");
   const c = codigos.find((x) => normalizar(x.codigo) === buscado);
   if (!c) return { ok: false, error: "Ese código no existe. Revisalo letra por letra." };
