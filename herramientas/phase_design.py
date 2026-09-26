@@ -422,6 +422,89 @@ def design(b):
         blk.append(para(f'{num}  ·  {tit}',ppr(after=40,keep=True),rpr(size=20 if cur_ else 18,color=mn if cur_ else mu,track=70)))
         blk.append(para(sub_,ppr(after=380,keep=True),rpr(size=17,color=mu,i=True,track=20)))
     for x in blk: toc_head.addprevious(x)
+    # ---------- notas de puente con el emblema del capítulo al que apuntan
+    KEYOF={'Receta':'R','El Pensamiento es Tu Fe':'P','Biografía':'B'}
+    def inline_doc(rid,did,inch):
+        sz=int(inch*EMU)
+        x=(f'<w:r xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+           f'<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{sz}" cy="{sz}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{did}" name="Puente{did}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="{did}" name="Puente{did}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{rid}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{sz}" cy="{sz}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>')
+        return etree.fromstring(x)
+    xrid={}
+    def xemb(key):
+        if key not in xrid: xrid[key]=P.media(f'{AS}/x_{b}_{key}.png',f'puente_{key}.png')
+        return xrid[key]
+    did=9900
+    for p in paras(body):
+        m=re.search(r'(Receta|El Pensamiento es Tu Fe|Biografía), Capítulo (\d+)\.$',ptext(p).strip())
+        if not m or len(ptext(p))>220: continue
+        key=KEYOF[m.group(1)]+m.group(2)
+        firstr=[r for r in p.findall(W+'r') if r.find(W+'t') is not None][0]
+        im_=inline_doc(xemb(key),did,0.26); did+=1
+        br=el('w:r'); sub(br,'w:br')
+        firstr.addprevious(im_); firstr.addprevious(br)
+        pp=p.find(W+'pPr'); spc=pp.find(W+'spacing')
+        if spc is None:
+            spc=el('w:spacing'); pp.find(W+'jc').addprevious(spc)
+        spc.set(q('w:before'),'200'); spc.set(q('w:after'),'260')
+        LOGD.append(('diseño',f'nota de puente con emblema {key}'))
+    # ---------- mapa de la trilogía (sección final, encabezado limpio) y colofón
+    orns=[p for p in paras(body) if ptext(p).strip()=='◆ ◆ ◆']
+    lastorn=orns[-1]
+    e=lastorn.getnext()
+    while e is not None and e.tag==W+'p' and not ptext(e).strip() and e.find('.//'+W+'drawing') is None:
+        nx=e.getnext(); e.getparent().remove(e); e=nx
+    final=body.find(W+'sectPr')
+    chap_sect=copy.deepcopy(final)
+    refs=chap_sect.findall(W+'headerReference')+chap_sect.findall(W+'footerReference')
+    t_=el('w:type',val='continuous'); refs[-1].addnext(t_)
+    for x in chap_sect.findall(W+'cols'): chap_sect.remove(x)
+    lastorn.find(W+'pPr').append(chap_sect)
+    for hr in final.findall(W+'headerReference'): hr.set(q('r:id'),hdr_empty)
+    T={'R':['DOS FORMATOS DE LA MENTE','EL SENTIMIENTO CREA LA REALIDAD','CONOCEDORES DEL BIEN Y EL MAL','AHORA MISMO','LA PESCA','CARGAR EL ESTADO'],
+       'P':['LA PALABRA','LIBERTAD INTERNA','EL OBSERVADOR ETERNO','CONVERSACIONES SINCERAS','LA INTELIGENCIA NATURAL','ARQUETIPOS','ATRAVESAR EL TIEMPO'],
+       'B':['PRIMERA IMAGEN','EL RECONOCIMIENTO','EL DESASTRE','PONER A PRUEBA']}
+    mine={'receta':'R','pensamiento':'P','biografia':'B'}[b]
+    mn=C['main'] if b!='pensamiento' else '2B2B2B'; mu=C['muted']
+    anchor=lastorn
+    def add(x):
+        nonlocal_anchor[0].addnext(x); nonlocal_anchor[0]=x
+    nonlocal_anchor=[anchor]
+    add(para('LA TRILOGÍA, CAPÍTULO A CAPÍTULO',ppr(before=1300,after=100,pb=True,keep=True),rpr(size=18,color=mu,track=60)))
+    add(para('Cada número de capítulo es la misma imagen vista desde otra faceta.',ppr(after=60,keep=True),rpr(size=17,color=mu,i=True)))
+    add(para('◆',ppr(after=300,keep=True),rpr(size=14,color=mu)))
+    ns='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"'
+    def cellxml(w,inner): return f'<w:tc><w:tcPr><w:tcW w:w="{w}" w:type="dxa"/><w:vAlign w:val="top"/></w:tcPr>{inner}</w:tc>'
+    def ptxt(text,size,color,track=40,i=False,after=0):
+        return (f'<w:p><w:pPr><w:spacing w:before="0" w:after="{after}" w:line="220" w:lineRule="auto"/><w:jc w:val="center"/></w:pPr>'
+                f'<w:r><w:rPr><w:rFonts w:ascii="Palatino Linotype" w:hAnsi="Palatino Linotype" w:cs="Palatino Linotype"/>'+('<w:i/>' if i else '')+f'<w:color w:val="{color}"/><w:spacing w:val="{track}"/><w:sz w:val="{size}"/><w:szCs w:val="{size}"/><w:lang w:val="es-AR"/></w:rPr><w:t xml:space="preserve">{html_esc(text)}</w:t></w:r></w:p>')
+    rows=''
+    hdr=''.join(cellxml(1848,ptxt(n_,13,mn if k_==mine else mu,20,after=120)) for k_,n_ in [('R','RECETA'),('P','PENSAMIENTO'),('B','BIOGRAFÍA')])
+    rows+=f'<w:tr><w:trPr><w:cantSplit/></w:trPr>{cellxml(504,ptxt("",14,mu))}{hdr}</w:tr>'
+    imgcells=[]
+    for n in range(7):
+        cells=[cellxml(504,ptxt(str(n),22,mu,0))]
+        for k_ in 'RPB':
+            if n<len(T[k_]):
+                key=f'{k_}{n}'; rid=xemb(key)
+                img=etree.tostring(inline_doc(rid,did,0.36)).decode(); did+=1
+                img=re.sub(r' xmlns:\w+="[^"]*"','',img)
+                inner=(f'<w:p><w:pPr><w:spacing w:before="0" w:after="40"/><w:jc w:val="center"/></w:pPr>{img}</w:p>'
+                       +ptxt(T[k_][n],13,mn if k_==mine else mu,30,after=180))
+            else: inner=ptxt('·',16,mu,0)
+            cells.append(cellxml(1848,inner))
+        rows+=f'<w:tr><w:trPr><w:cantSplit/></w:trPr>{"".join(cells)}</w:tr>'
+    tbl=(f'<w:tbl xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+         '<w:tblPr><w:tblW w:w="6048" w:type="dxa"/><w:jc w:val="center"/><w:tblBorders><w:top w:val="nil"/><w:left w:val="nil"/><w:bottom w:val="nil"/><w:right w:val="nil"/><w:insideH w:val="nil"/><w:insideV w:val="nil"/></w:tblBorders><w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="40" w:type="dxa"/><w:right w:w="40" w:type="dxa"/></w:tblCellMar><w:tblLook w:val="0000" w:firstRow="0" w:lastRow="0" w:firstColumn="0" w:lastColumn="0" w:noHBand="1" w:noVBand="1"/></w:tblPr>'
+         '<w:tblGrid><w:gridCol w:w="504"/><w:gridCol w:w="1848"/><w:gridCol w:w="1848"/><w:gridCol w:w="1848"/></w:tblGrid>'+rows+'</w:tbl>')
+    add(etree.fromstring(tbl))
+    add(para('',ppr(after=0),rpr(size=8)))
+    col=[('◆',14,False,500,False),
+         ('Este libro se terminó de componer en septiembre de 2026, en tipografía Palatino, para ELVERBO EDITORIAL.',17,True,160,False),
+         ('Los grabados que abren cada capítulo comparten orla y motivo en los tres libros de la trilogía: el mismo número de capítulo, la misma imagen, vista desde otra faceta de Julián Bermúdez.',17,True,160,False),
+         ('Buenos Aires, Argentina',15,False,0,False)]
+    for k,(tx,sz,it,aft,_) in enumerate(col):
+        add(para(tx,ppr(before=(3000 if k==0 else 0),after=aft,pb=(k==0),keep=True,indL=700,indR=700),rpr(size=sz,color=mu,i=it,track=(0 if k else 20))))
+    LOGD.append(('diseño','mapa de la trilogía y colofón al final'))
     P.save()
     # ---------- limpieza de medios viejos sin referencia
     doc=open(f'{P.d}/word/document.xml',encoding='utf8').read()

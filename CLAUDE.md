@@ -61,17 +61,18 @@ Nunca autor, nunca coautor. No se agregan enseñanzas, conceptos, ejemplos, anal
 - Cuerpo: Palatino Linotype 11 pt, interlineado 1,2, 7,5 pt entre párrafos, justificado.
 - Aperturas: grabado del capítulo en el fondo (arriba), espaciador de altura fija, «CAPÍTULO N» en 9,5 pt con tracking, título en 16,5 pt y epígrafe «…» en itálica con la cita en versalitas. Los epígrafes van en RVR1960; los no confirmados llevan `[versículo propuesto — a confirmar]`.
 - Encabezado: el emblema del capítulo arriba a la derecha (0.30"). Portada, copyright e índice van sin ícono; la transición lleva encabezado vacío.
-- Letra capital de 3 líneas en cada apertura. Titulillos: página par = título del libro con emblema a la izquierda; impar = título del capítulo con emblema a la derecha. Folios «· N ·» centrados. Copyright en Palatino 8 pt en el tono del libro. Página «La trilogía» antes del índice.
+- Letra capital de 3 líneas en cada apertura. Titulillos: página par = título del libro con emblema a la izquierda; impar = título del capítulo con emblema a la derecha. Folios «· N ·» centrados. Copyright en Palatino 8 pt en el tono del libro. Página «La trilogía» antes del índice. Al final de cada libro: «La trilogía, capítulo a capítulo» (tabla con los grabados de los tres libros, sección con encabezado vacío) y colofón. Las notas de puente llevan arriba el emblema del capítulo al que remiten.
 - «En el principio» en versalitas en cada Cap. 0. Cierre de capítulo con ◆ ◆ ◆ en el color de acento, siempre pegado al último párrafo.
 - Imprenta: Receta y Biografía tienen fondo de página completo oscuro, así que al exportar para imprimir hay que pedir sangrado (0.125").
 
 ## Herramientas (`herramientas/`)
 
-- `engine.py` y `designs.py`: motor de grabado procedural y los dibujos de cada emblema.
+- `engine.py` y `designs.py`: motor de grabado procedural (estampa de linóleo: marcas de desbaste, tinta despareja con vetas de rodillo, bordes aplastados, leve giro del taco) y los dibujos de cada emblema.
 - `assets.py`: genera los fondos de página y los emblemas.
 - `edits_*.py`: la lista de correcciones por libro.
 - `phase_text.py`: aplica texto, estructura y sincronía.
 - `phase_design.py`: aplica maqueta, íconos, índice y ornamentos.
+- `cross_emblems.py`: emblemas de los tres libros en la tinta de cada uno (mapa y notas de puente).
 - `covers.py`: genera las tapas y contratapas.
 - `make_docs.py`: genera el registro de cambios y la Hoja de Revisión.
 

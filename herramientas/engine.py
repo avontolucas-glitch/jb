@@ -100,49 +100,75 @@ class Ink:
                 f'<rect width="1000" height="1000" fill="#fff"/>{body}</svg>')
 
 def carve(ink, px=1400, seed=1, grain=0.55, bite=0.5):
+    """Estampa de linóleo: temblor, bordes comidos, marcas de gubia, tinta despareja y leve giro del taco."""
+    from PIL import ImageDraw
     png=cairosvg.svg2png(bytestring=ink.svg().encode(), output_width=px, output_height=px)
     g=np.asarray(Image.open(io.BytesIO(png)).convert('L')).astype(np.float32)/255.0
-    rng=np.random.default_rng(seed); H,W=g.shape
-    # 1) ondulación orgánica (warp de baja frecuencia)
+    rng=np.random.default_rng(seed); H,W=g.shape; k=px/1000
     def smooth_noise(scale, amp):
-        n=rng.standard_normal((H//scale+2, W//scale+2)).astype(np.float32)
+        n=rng.standard_normal((max(2,H//scale)+2, max(2,W//scale)+2)).astype(np.float32)
         im=Image.fromarray(((n-n.min())/(np.ptp(n)+1e-6)*255).astype(np.uint8)).resize((W,H),Image.BICUBIC)
-        a=np.asarray(im).astype(np.float32)/255.0-0.5
-        return a*2*amp
-    dx=smooth_noise(80,3.0*px/1000)+smooth_noise(25,0.8*px/1000); dy=smooth_noise(80,3.0*px/1000)+smooth_noise(25,0.8*px/1000)
+        return (np.asarray(im).astype(np.float32)/255.0-0.5)*2*amp
+    framed=getattr(ink,'framed',False)
+    # 1) marcas de desbaste: crestas curvas que la gubia deja en el fondo (solo en tacos con marco)
+    if framed:
+        mk=Image.new('L',(W,H),255); dr=ImageDraw.Draw(mk)
+        inkmask=g<0.5
+        dist_img=Image.fromarray((inkmask*255).astype(np.uint8)).filter(ImageFilter.MaxFilter(int(28*k)|1))
+        near=np.asarray(dist_img)>0
+        n_marks=int(160*grain)
+        for _ in range(n_marks*6):
+            if n_marks<=0: break
+            x=rng.uniform(0.11,0.89)*W; y=rng.uniform(0.11,0.89)*H
+            xi,yi=int(x),int(y)
+            if inkmask[yi,xi] or near[yi,xi]: continue
+            # agrupadas: varias crestas paralelas cortas
+            ang=rng.normal(0.3,0.5); L=rng.uniform(12,34)*k; curv=rng.uniform(-0.6,0.6)
+            for j in range(rng.integers(1,4)):
+                ox=-np.sin(ang)*j*7*k; oy=np.cos(ang)*j*7*k
+                pts=[(x+ox+t*L*np.cos(ang+curv*t), y+oy+t*L*np.sin(ang+curv*t)) for t in np.linspace(0,1,8)]
+                dr.line(pts,fill=0,width=max(1,int(rng.uniform(1.2,2.4)*k)))
+            n_marks-=1
+        g=np.minimum(g,np.asarray(mk).astype(np.float32)/255.0)
+    # 2) temblor orgánico + leve giro del taco
+    dx=smooth_noise(80,3.0*k)+smooth_noise(25,0.9*k); dy=smooth_noise(80,3.0*k)+smooth_noise(25,0.9*k)
     yy,xx=np.mgrid[0:H,0:W]
     sx=np.clip((xx+dx).astype(int),0,W-1); sy=np.clip((yy+dy).astype(int),0,H-1)
     g=g[sy,sx]
-    # 2) borde comido por la tinta: blur + umbral con ruido fino
-    gb=np.asarray(Image.fromarray((g*255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(px/650))).astype(np.float32)/255
-    fine=smooth_noise(3,0.5)+smooth_noise(9,0.35)
-    ink_mask=(gb+fine*0.36*bite) < 0.5
-    # 3) grano de madera: vetas horizontales finas que se "saltean" en la tinta
-    streak=smooth_noise(2,1.0)
-    streak=np.asarray(Image.fromarray(((streak-streak.min())/(np.ptp(streak)+1e-6)*255).astype(np.uint8)).resize((W//14,H),Image.BILINEAR).resize((W,H),Image.BILINEAR)).astype(np.float32)/255
-    speck=rng.random((H,W))
-    gaps=(streak>0.80+0.12*(1-grain)) & (speck<0.55*grain)
-    dots=speck<0.0022*grain
-    ink_mask &= ~(gaps|dots)
-    # 4) rayones de gubia / veta dentro de la tinta, y restos de madera fuera
-    from PIL import ImageDraw
-    sc=Image.new('L',(W,H),0); dr=ImageDraw.Draw(sc)
+    rot=float(rng.uniform(-0.7,0.7)) if framed else float(rng.uniform(-1.5,1.5))
+    g=np.asarray(Image.fromarray((g*255).astype(np.uint8)).rotate(rot,resample=Image.BICUBIC,fillcolor=255)).astype(np.float32)/255
+    # 3) borde comido por la tinta y aplastado por la prensa
+    gb=np.asarray(Image.fromarray((g*255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(px/600))).astype(np.float32)/255
+    fine=smooth_noise(3,0.5)+smooth_noise(9,0.4)
+    squash=smooth_noise(60,0.06)
+    ink_mask=(gb+fine*0.38*bite-squash) < 0.5
+    # 4) veta y rayones de la madera dentro de la tinta; restos fuera
+    sc=Image.new('L',(W,H),0); d2=ImageDraw.Draw(sc)
     for _ in range(int(px*0.9*grain)):
-        x=rng.uniform(0,W); y=rng.uniform(0,H); L=rng.uniform(6,34)*px/1000*1.6
+        x=rng.uniform(0,W); y=rng.uniform(0,H); L=rng.uniform(6,34)*k*1.6
         a=rng.normal(0,0.18); w=max(1,int(rng.choice([1,1,1,2])*px/1400))
-        dr.line([(x,y),(x+L*np.cos(a),y+L*np.sin(a))],fill=255,width=w)
-    sc=np.asarray(sc)>0
-    ink_mask &= ~sc
+        d2.line([(x,y),(x+L*np.cos(a),y+L*np.sin(a))],fill=255,width=w)
+    ink_mask &= ~(np.asarray(sc)>0)
     left=Image.new('L',(W,H),0); dl=ImageDraw.Draw(left)
     for _ in range(int(px*0.22*grain)):
-        x=rng.uniform(0,W); y=rng.uniform(0,H); r=rng.uniform(0.6,2.2)*px/1000*1.4
+        x=rng.uniform(0,W); y=rng.uniform(0,H); r=rng.uniform(0.6,2.2)*k*1.4
         if rng.random()<0.5: dl.ellipse([x-r,y-r,x+r,y+r],fill=255)
         else:
-            L=rng.uniform(5,18)*px/1000*1.5; a=rng.normal(0,0.3); dl.line([(x,y),(x+L*np.cos(a),y+L*np.sin(a))],fill=255,width=max(1,int(px/1200)))
+            L=rng.uniform(5,18)*k*1.5; a=rng.normal(0,0.3); dl.line([(x,y),(x+L*np.cos(a),y+L*np.sin(a))],fill=255,width=max(1,int(px/1200)))
     near=np.asarray(Image.fromarray((ink_mask*255).astype(np.uint8)).filter(ImageFilter.MaxFilter(int(px/60)|1)))>0
     ink_mask |= (np.asarray(left)>0) & near
-    m=Image.fromarray((ink_mask*255).astype(np.uint8)).filter(ImageFilter.MedianFilter(3))
-    return m  # L: 255 = tinta
+    ink_mask=np.asarray(Image.fromarray((ink_mask*255).astype(np.uint8)).filter(ImageFilter.MedianFilter(3)))>0
+    # 5) tinta despareja: el rodillo carga menos en algunas zonas, con poros finos
+    dens=0.86+smooth_noise(140,0.10)+smooth_noise(35,0.05)
+    pores=(rng.random((H,W))<0.012*grain)
+    sn=rng.standard_normal((max(2,H//18),max(2,W//160))).astype(np.float32)
+    sn=np.asarray(Image.fromarray(((sn-sn.min())/(np.ptp(sn)+1e-6)*255).astype(np.uint8)).resize((W,H),Image.BICUBIC)).astype(np.float32)/255
+    starve=sn>0.70
+    alpha=np.where(ink_mask, np.clip(dens,0.55,1.0),0.0)
+    alpha=np.where(ink_mask & starve & (rng.random((H,W))<0.28),alpha*0.55,alpha)
+    alpha=np.where(ink_mask & pores,alpha*0.2,alpha)
+    a=Image.fromarray((alpha*255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.6))
+    return a  # L: opacidad de la tinta
 
 def to_rgba(mask, color, size=None, opacity=1.0):
     if size: mask=mask.resize((size,size), Image.LANCZOS)

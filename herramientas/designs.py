@@ -355,6 +355,7 @@ EMB={'R0':(E_R0,0),'R1':(E_R1,1),'R2':(E_R2,2),'R3':(E_R3,3),'R4':(E_R4,4),'R5':
 def build(key, framed=True, seed=None):
     fn,chap=EMB[key]
     ink=Ink(seed if seed is not None else hash(key)%1000)
+    ink.framed=framed
     if framed:
         frame(ink); border(ink,chap); fn(ink,1.08)
     else:
