@@ -28,10 +28,7 @@ export default function Pie() {
           ))}
         </nav>
       </div>
-      <p className="text-center text-xs texto-2 italic mt-12 prosa mx-auto">
-        Compuesto en Palatino, con los grabados de la trilogía.
-      </p>
-      <p className="firma text-center text-xs texto-2 mt-3">
+      <p className="firma text-center text-xs texto-2 mt-12">
         {sitio.nombre} · {sitio.editorial} · {sitio.anio}
       </p>
     </footer>
