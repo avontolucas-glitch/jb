@@ -62,8 +62,8 @@ export default function InstalarApp() {
 
   if (!visible) return null;
   return (
-    <div role="dialog" aria-label="Instalar la app" data-testid="aviso-app" data-plataforma={plataforma} className="fixed inset-x-0 bottom-0 z-50 p-3 sm:p-5 pointer-events-none">
-      <div className="claro pointer-events-auto mx-auto max-w-md border borde p-4 sm:p-5 shadow-none">
+    <div role="dialog" aria-label="Instalar la app" data-testid="aviso-app" data-plataforma={plataforma} className="aviso-app fixed inset-x-0 bottom-0 z-50 p-3 sm:p-5 pointer-events-none">
+      <div className="hondo pointer-events-auto mx-auto max-w-md border borde p-4 sm:p-5 shadow-none">
         <div className="flex items-start gap-3">
           <Ojo size={26} className="shrink-0 mt-0.5" />
           <div className="flex-1 text-[0.98rem] leading-snug">

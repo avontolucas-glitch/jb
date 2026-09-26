@@ -34,8 +34,8 @@ export default async function Masterclass() {
         </div>
       </Apertura>
 
-      <section className="claro px-5 py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl">
+      <section className="hondo border-t borde px-5 py-16 sm:py-20">
+        <div className="mx-auto max-w-3xl revelar">
           <div className="prosa">
             <Texto bloque>{masterclass.descripcion}</Texto>
           </div>
@@ -51,7 +51,7 @@ export default async function Masterclass() {
       </section>
 
       <section className="px-5 py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-3xl revelar">
           <h2 className="titulo text-3xl mb-2">Los temas</h2>
           <p className="texto-2 mb-8">Provisorios: son capítulos de la trilogía.</p>
           {(["receta", "pensamiento"] as const).map((lid) => {
@@ -74,8 +74,8 @@ export default async function Masterclass() {
         </div>
       </section>
 
-      <section className="claro px-5 py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl">
+      <section className="hondo border-t borde px-5 py-16 sm:py-20">
+        <div className="mx-auto max-w-3xl revelar">
           <h2 className="titulo text-3xl mb-6">El encuentro de preguntas</h2>
           <p className="prosa text-lg">{encuentro.explicacion}</p>
           <p className="texto-2 mt-4">
@@ -85,7 +85,9 @@ export default async function Masterclass() {
       </section>
 
       <section className="px-5 py-20 text-center">
-        <Epigrafe cita={citas.pesca} />
+        <div className="revelar">
+          <Epigrafe cita={citas.pesca} />
+        </div>
         <Ornamento className="mt-12" />
         <div className="mt-12 flex flex-col items-center gap-3">
           {accion}
@@ -94,6 +96,12 @@ export default async function Masterclass() {
               Política de reembolsos
             </Link>
           </span>
+          <p className="texto-2 mt-10">
+            ¿Buscás los directos de cada semana?{" "}
+            <Link href="/en-vivo" className="enlace">
+              Masterclass en vivo
+            </Link>
+          </p>
         </div>
       </section>
     </>

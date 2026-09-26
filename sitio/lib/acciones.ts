@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 import { crearCuenta, ingresar, cerrarSesion, usuarioActual } from "./auth";
 import { accesos, type Progreso } from "./access";
 import { leer, escribir } from "./db";
-import { producto, pagarSimulado } from "./payments";
+import { producto, pagarSimulado, montoElegido } from "./payments";
 import { conferencias, modulos } from "@/content/config";
 
 export type Estado = { error?: string; ok?: string } | null;
@@ -99,13 +99,17 @@ export async function accionPregunta(_: Estado, f: FormData): Promise<Estado> {
 }
 
 /** Checkout simulado: registra la compra y lleva a lo que se habilitó. */
-export async function accionPagar(f: FormData) {
+export async function accionPagar(_: Estado, f: FormData): Promise<Estado> {
   const u = await usuarioActual();
   const id = txt(f, "producto");
   if (!u) redirect(`/ingresar?aviso=checkout&volver=/checkout/${encodeURIComponent(id)}`);
   const p = producto(id);
-  if (!p) redirect("/");
-  await pagarSimulado(u.id, p);
+  if (!p) return { error: "Ese producto no existe." };
+  const m = montoElegido(p, txt(f, "monto"));
+  if ("error" in m) return { error: m.error };
+  await pagarSimulado(u.id, p, m.monto);
   revalidatePath("/", "layout");
-  redirect(p.id === "masterclass" ? "/mi-espacio/masterclass?compra=ok" : "/mi-espacio/conferencias?compra=ok");
+  if (p.id === "masterclass") redirect("/mi-espacio/masterclass?compra=ok");
+  if (p.id.startsWith("directo:")) redirect(`/mi-espacio/en-vivo?compra=ok`);
+  redirect("/mi-espacio/conferencias?compra=ok");
 }

@@ -1,5 +1,4 @@
-import { test, expect } from "@playwright/test";
-import { crearCuenta, ingresar, cerrarSesion, unico } from "./ayuda";
+import { test, expect, crearCuenta, ingresar, cerrarSesion, unico } from "./ayuda";
 
 test("sin sesión, /mi-espacio lleva a /ingresar con aviso", async ({ page }) => {
   for (const ruta of ["/mi-espacio", "/mi-espacio/masterclass", "/mi-espacio/cuenta"]) {
@@ -47,7 +46,7 @@ test("la cuenta demo sin compras ve el espacio vacío con camino para comprar", 
   await page.waitForURL("**/mi-espacio");
   const vacio = page.getByTestId("espacio-vacio");
   await expect(vacio).toBeVisible();
-  await expect(vacio.getByRole("link", { name: "La masterclass" })).toHaveAttribute("href", "/masterclass");
+  await expect(vacio.getByRole("link", { name: "La masterclass", exact: true })).toHaveAttribute("href", "/masterclass");
   for (const ruta of ["/mi-espacio/masterclass", "/mi-espacio/audios", "/mi-espacio/encuentro", "/mi-espacio/conferencias"]) {
     await page.goto(ruta);
     await expect(page.getByTestId("sin-acceso")).toBeVisible();

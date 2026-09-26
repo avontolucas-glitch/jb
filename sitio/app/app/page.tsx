@@ -67,13 +67,13 @@ export default function App() {
         titulo="Instalar la app"
         bajada="El sitio se puede instalar como una app en el teléfono, la tablet o la computadora. No ocupa casi lugar y se abre directo, sin pasar por el navegador."
       />
-      <section className="claro px-5 py-14">
-        <div className="mx-auto max-w-2xl">
+      <section className="hondo border-t borde px-5 py-14">
+        <div className="mx-auto max-w-2xl revelar">
           <BotonInstalar nombres={nombres} />
         </div>
       </section>
       <section className="px-5 py-14">
-        <div className="mx-auto max-w-2xl space-y-12">
+        <div className="mx-auto max-w-2xl space-y-12 revelar">
           {sistemas.map((s) => (
             <article key={s.id} id={`so-${s.id}`} className="border-l borde pl-5 data-[actual=si]:border-l-2 data-[actual=si]:border-current">
               <h2 className="titulo text-2xl mb-4">{s.titulo}</h2>

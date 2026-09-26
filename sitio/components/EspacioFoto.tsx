@@ -1,6 +1,6 @@
 import { sitio } from "@/content/config";
 
-/** Espacio reservado para una foto real de Julian (no se usan imágenes de stock). */
+/** Espacio reservado para una foto real de Julián (no se usan imágenes de stock). */
 export default function EspacioFoto({ texto = `Foto de ${sitio.nombreCorto}`, proporcion = "4 / 5", className = "" }: { texto?: string; proporcion?: string; className?: string }) {
   return (
     <div

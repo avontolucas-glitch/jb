@@ -2,13 +2,14 @@
  * Quién ve qué.
  * - Masterclass: masterclass, audios y encuentro de preguntas.
  * - Entrada a una conferencia privada: solo esa conferencia.
+ * - Directo en vivo (a voluntad): solo ese directo.
  */
 import { leer } from "./db";
 
 export type Compra = {
   id: string;
   usuario: string;
-  producto: string; // "masterclass" | "conferencia:<id>"
+  producto: string; // "masterclass" | "conferencia:<id>" | "directo:<id>"
   monto: number;
   moneda: string;
   fecha: string;
@@ -24,11 +25,13 @@ export async function accesos(uid: string) {
   const mias = await comprasDe(uid);
   const masterclass = mias.some((c) => c.producto === "masterclass");
   const conferencias = mias.filter((c) => c.producto.startsWith("conferencia:")).map((c) => c.producto.split(":")[1]);
+  const directos = mias.filter((c) => c.producto.startsWith("directo:")).map((c) => c.producto.split(":")[1]);
   return {
     masterclass,
     audios: masterclass,
     encuentro: masterclass,
     conferencias,
+    directos,
     algo: mias.length > 0,
     compras: mias,
   };

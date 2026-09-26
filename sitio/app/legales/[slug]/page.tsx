@@ -20,8 +20,8 @@ export default async function Legal({ params }: P) {
   const p = paginas[(await params).slug as Slug];
   if (!p) notFound();
   return (
-    <section className="claro px-5 py-16 sm:py-24">
-      <article className="mx-auto max-w-2xl">
+    <section className="hondo border-t borde px-5 py-16 sm:py-24">
+      <article className="mx-auto max-w-2xl revelar">
         <h1 className="titulo text-4xl">{p.titulo}</h1>
         <p className="texto-2 mt-3">
           {sitio.dominio} · Borrador del prototipo: el texto legal lo redacta un profesional antes de publicar.

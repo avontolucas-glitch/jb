@@ -4,7 +4,7 @@ import { redes, sitio } from "@/content/config";
 
 export default function Pie() {
   return (
-    <footer className="oscuro border-t borde px-5 pt-12 pb-10">
+    <footer className="hondo border-t borde px-5 pt-12 pb-10">
       <div className="mx-auto max-w-6xl grid gap-10 sm:grid-cols-3">
         <div>
           <Ojo size={24} />

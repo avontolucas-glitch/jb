@@ -12,8 +12,8 @@ export default async function Lista({ searchParams }: { searchParams: Promise<{ 
   return (
     <>
       <Apertura titulo={lista.titulo} bajada={lista.bajada} />
-      <section className="claro px-5 py-16">
-        <div className="mx-auto max-w-xl">
+      <section className="hondo border-t borde px-5 py-16">
+        <div className="mx-auto max-w-xl revelar">
           <Formulario accion={accionLista} boton="Sumarme" ocultarAlTerminar>
             <input type="hidden" name="interes" value={interes ?? "general"} />
             <Campo nombre="nombre" etiqueta="Nombre" autoComplete="given-name" requerido={false} />

@@ -10,7 +10,7 @@ export default function Fragmentos() {
     <>
       <Apertura titulo="Fragmentos" bajada="Pedazos de conferencias y charlas. Los completos están en las redes." />
       <section className="px-5 pb-20">
-        <ul className="mx-auto max-w-5xl grid gap-8 sm:grid-cols-2">
+        <ul className="mx-auto max-w-5xl grid gap-8 sm:grid-cols-2 revelar">
           {fragmentos.map((f) => (
             <li key={f.id}>
               <div
@@ -28,8 +28,8 @@ export default function Fragmentos() {
           ))}
         </ul>
       </section>
-      <section className="claro px-5 py-16">
-        <div className="mx-auto max-w-3xl text-center">
+      <section className="hondo border-t borde px-5 py-16">
+        <div className="mx-auto max-w-3xl text-center revelar">
           <h2 className="titulo text-3xl mb-8">En las redes</h2>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             {redes.map((r) => (

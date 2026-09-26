@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { miembro } from "@/lib/miembro";
 import { accionSalir } from "@/lib/acciones";
-import { conferencias } from "@/content/config";
+import { conferencias, enVivo } from "@/content/config";
 
 const fecha = (iso: string) =>
   new Date(iso).toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" });
 
 function nombreProducto(p: string) {
   if (p === "masterclass") return "Masterclass";
+  const d = enVivo.directos.find((x) => `directo:${x.id}` === p);
+  if (d) return `En vivo · ${d.titulo}`;
   const c = conferencias.find((x) => `conferencia:${x.id}` === p);
   return c ? `Entrada · ${c.titulo}` : p;
 }

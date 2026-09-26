@@ -3,31 +3,35 @@
 /* ───────── Tokens del sistema de la trilogía ─────────
    Cambiar un color o una tipografía acá lo cambia en todo el sitio. */
 :root {
-  --negro: #0b0b0b;
-  --negro-suave: #161616;
-  --blanco: #f7f5f0;
-  --blanco-puro: #ffffff;
-  --gris: #8c877d;          /* texto secundario sobre negro */
-  --gris-claro: #d9d4c9;    /* líneas sobre negro */
+  /* Como en los libros: tinta crema sobre negro */
+  --negro: #0a0a0a;
+  --negro-hondo: #050505;
+  --negro-suave: #141414;
+  --crema: #efe9dc;         /* la tinta de la Receta y la Biografía */
+  --blanco: #f7f5f0;        /* las páginas del Pensamiento */
+  --gris: #8f897d;          /* texto secundario sobre negro */
+  --gris-claro: #d9d4c9;
   --gris-tinta: #5b574f;    /* texto secundario sobre blanco */
-  --linea-clara: #d8d3c8;   /* líneas sobre blanco */
+  --linea-clara: #d8d3c8;
   --marino: #1c2b4d;
   --marino-profundo: #0f243e;
   --marino-claro: #a9b8d0;
 
   --fondo: var(--negro);
-  --texto: var(--blanco);
+  --texto: var(--crema);
   --texto-2: var(--gris);
-  --linea: #2a2a2a;
+  --linea: #262422;
 
   --serif: "Palatino Linotype", Palatino, "Book Antiqua", var(--font-crimson), "Crimson Pro", Georgia, serif;
   --ancho-texto: 34rem;
+  --lento: cubic-bezier(.22, .61, .36, 1);
 }
 
 @theme inline {
   --color-negro: var(--negro);
   --color-negro-suave: var(--negro-suave);
   --color-blanco: var(--blanco);
+  --color-crema: var(--crema);
   --color-gris: var(--gris);
   --color-gris-claro: var(--gris-claro);
   --color-gris-tinta: var(--gris-tinta);
@@ -50,8 +54,9 @@ body {
 
 /* Superficie clara (manual, Receta): negro sobre blanco */
 .claro { --fondo: var(--blanco); --texto: var(--negro); --texto-2: var(--gris-tinta); --linea: var(--linea-clara); background: var(--fondo); color: var(--texto); }
-.oscuro { --fondo: var(--negro); --texto: var(--blanco); --texto-2: var(--gris); --linea: #2a2a2a; background: var(--fondo); color: var(--texto); }
-.marino { --fondo: var(--marino-profundo); --texto: var(--blanco); --texto-2: var(--marino-claro); --linea: #2b3f63; background: var(--fondo); color: var(--texto); }
+.oscuro { --fondo: var(--negro); --texto: var(--crema); --texto-2: var(--gris); --linea: #262422; background: var(--fondo); color: var(--texto); }
+.hondo { --fondo: var(--negro-hondo); --texto: var(--crema); --texto-2: var(--gris); --linea: #221f1c; background: var(--fondo); color: var(--texto); }
+.marino { --fondo: var(--marino-profundo); --texto: var(--crema); --texto-2: var(--marino-claro); --linea: #2b3f63; background: var(--fondo); color: var(--texto); }
 
 .texto-2 { color: var(--texto-2); }
 .borde { border-color: var(--linea); }
@@ -67,14 +72,14 @@ body {
 .boton {
   display: inline-block; padding: 0.7rem 1.4rem; border: 1px solid var(--texto);
   color: var(--texto); background: transparent; font-size: 1rem; letter-spacing: 0.03em;
-  transition: background-color .2s, color .2s; cursor: pointer; text-align: center;
+  transition: background-color .6s var(--lento), color .6s var(--lento), letter-spacing .6s var(--lento); cursor: pointer; text-align: center;
 }
-.boton:hover { background: var(--texto); color: var(--fondo); }
+.boton:hover { background: var(--texto); color: var(--fondo); letter-spacing: 0.06em; }
 .boton-lleno { background: var(--texto); color: var(--fondo); }
 .boton-lleno:hover { background: transparent; color: var(--texto); }
 .boton[disabled] { opacity: .45; cursor: not-allowed; }
-.enlace { text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
-.enlace:hover { text-decoration-thickness: 2px; }
+.enlace { text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat; padding-bottom: 1px; transition: background-size .6s var(--lento); }
+.enlace:hover { background-size: 35% 1px; }
 
 /* Campos */
 .campo { width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--linea); padding: 0.6rem 0.1rem; color: var(--texto); font: inherit; border-radius: 0; }
@@ -89,17 +94,134 @@ textarea.campo:focus { border-color: var(--texto); }
 
 /* Foco visible con teclado */
 :focus-visible { outline: 2px solid var(--texto); outline-offset: 3px; }
-.salto { position: absolute; left: -999px; top: 0.5rem; background: var(--blanco); color: var(--negro); padding: .5rem 1rem; z-index: 50; }
+.salto { position: absolute; left: -999px; top: 0.5rem; background: var(--crema); color: var(--negro); padding: .5rem 1rem; z-index: 50; }
 .salto:focus { left: 0.5rem; }
 
-/* Ojo fantasma de las aperturas */
-.fantasma { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; opacity: 0.055; overflow: hidden; }
+/* ───────── Movimiento ─────────
+   Todo lento y leve. Con "reducir movimiento" activado, nada se mueve. */
 
-.aparece { animation: aparece .7s ease both; }
+/* Ojo fantasma de las aperturas: respira muy despacio */
+.fantasma { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; opacity: 0.05; overflow: hidden; animation: respira 11s ease-in-out infinite; }
+@keyframes respira { 0%, 100% { opacity: 0.04; transform: scale(1); } 50% { opacity: 0.075; transform: scale(1.015); } }
+
+/* Grano de impresión sobre todo el sitio, como el papel de los libros */
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 60; opacity: 0.07;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+}
+
+/* Entrada de cada página */
+.entrada { animation: aparece 0.9s var(--lento) both; }
+.aparece { animation: aparece 1.1s var(--lento) both; }
 @keyframes aparece { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* Revelado al bajar: los bloques emergen de la oscuridad */
+html.js .revelar { opacity: 0; transform: translateY(14px); filter: blur(3px); transition: opacity 1.4s var(--lento), transform 1.4s var(--lento), filter 1.4s var(--lento); transition-delay: var(--retardo, 0s); }
+html.js .revelar.visto { opacity: 1; transform: none; filter: none; }
+
+/* Líneas que se trazan de izquierda a derecha */
+html.js .trazo { transform: scaleX(0); transform-origin: left; transition: transform 1.8s var(--lento); transition-delay: var(--retardo, 0s); }
+html.js .trazo.visto { transform: scaleX(1); }
+
+/* ◆ ◆ ◆ que se encienden de a uno */
+.ornamento span { display: inline-block; }
+html.js .ornamento.revelar span { opacity: 0; transition: opacity 1.2s var(--lento); }
+html.js .ornamento.visto span { opacity: 1; }
+html.js .ornamento.visto span:nth-child(2) { transition-delay: .35s; }
+html.js .ornamento.visto span:nth-child(3) { transition-delay: .7s; }
+
+/* El grabado se estampa: la tinta se abre desde la pupila */
+@property --revelado { syntax: "<percentage>"; inherits: false; initial-value: 0%; }
+.estampa {
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 var(--revelado), transparent calc(var(--revelado) + 18%));
+  mask-image: radial-gradient(circle at 50% 50%, #000 var(--revelado), transparent calc(var(--revelado) + 18%));
+  animation: estampa 3.2s var(--lento) .2s both;
+}
+@keyframes estampa { from { --revelado: 0%; opacity: .2; } to { --revelado: 90%; opacity: 1; } }
+.estampa-lenta { animation-duration: 4.5s; }
+
+/* Halo que late detrás del ojo grande */
+.halo { position: absolute; inset: 12%; border-radius: 50%; background: radial-gradient(closest-side, rgba(239, 233, 220, .09), transparent 70%); animation: halo 9s ease-in-out infinite; pointer-events: none; }
+@keyframes halo { 0%, 100% { opacity: .5; transform: scale(.96); } 50% { opacity: 1; transform: scale(1.04); } }
+
+/* El ojo del encabezado parpadea de vez en cuando */
+.parpadea > * { transform-box: fill-box; transform-origin: center; animation: parpadeo 13s ease-in-out infinite; }
+@keyframes parpadeo { 0%, 94%, 100% { transform: scaleY(1); } 95.5% { transform: scaleY(0.08); } 97% { transform: scaleY(1); } }
+
+/* Sala de los directos: no se selecciona ni se arrastra nada */
+.sala { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.marca-agua { position: absolute; pointer-events: none; font-size: .8rem; letter-spacing: .08em; opacity: .28; transition: top 2.5s var(--lento), left 2.5s var(--lento); white-space: nowrap; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  html.js .revelar, html.js .trazo, html.js .ornamento.revelar span { opacity: 1 !important; transform: none !important; filter: none !important; }
+  .estampa { -webkit-mask-image: none; mask-image: none; }
 }
 
 /* Radios con forma de botón: el foco se ve en la etiqueta */
 label.boton:has(input:focus-visible) { outline: 2px solid var(--texto); outline-offset: 3px; }
+label.boton:has(input:checked) { background: var(--texto); color: var(--fondo); }
+
+/* ───────── Umbral: cuadro de bienvenida al entrar ───────── */
+.umbral {
+  position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center; padding: 1rem;
+  background: var(--negro-hondo); color: var(--crema);
+  animation: aparece 1.4s var(--lento) both;
+  transition: opacity 1.1s var(--lento), visibility 0s linear 1.1s;
+}
+.umbral-caja {
+  width: 100%; max-width: 30rem; text-align: center; padding: 2.5rem 1.5rem 2.75rem;
+  border: 1px solid #2a2724; background: var(--negro);
+  transition: transform 1.1s var(--lento), filter 1.1s var(--lento), opacity 1.1s var(--lento);
+}
+.umbral-aviso { font-size: .82rem; line-height: 1.5; padding-bottom: 1.4rem; margin-bottom: 1.8rem; border-bottom: 1px solid #2a2724; }
+html.umbral-saliendo .umbral { opacity: 0; visibility: hidden; }
+html.umbral-saliendo .umbral-caja { transform: scale(1.03); filter: blur(4px); opacity: 0; }
+html.umbral-visto .umbral, html:not(.js) .umbral { display: none; }
+html.js:not(.umbral-visto):not(.umbral-saliendo) body { overflow: hidden; }
+html.js:not(.umbral-visto) .aviso-app { display: none; }
+
+/* ───────── Atención: movimiento con sentido ───────── */
+
+/* Línea de avance: crece al bajar */
+.avance { position: fixed; top: 0; left: 0; right: 0; height: 1px; background: var(--crema); opacity: .55; transform-origin: left; transform: scaleX(0); z-index: 45; pointer-events: none; }
+
+/* Halo tenue que acompaña al puntero en la oscuridad */
+.halo-puntero { position: fixed; left: 0; top: 0; width: 600px; height: 600px; border-radius: 50%; pointer-events: none; z-index: 1; opacity: 0; transition: opacity 1.2s var(--lento);
+  background: radial-gradient(closest-side, rgba(239, 233, 220, .045), transparent 72%); }
+main, header, footer { position: relative; z-index: 2; }
+header { z-index: 40; }
+
+/* Botón principal: se acerca al puntero y "respira" para señalar el camino */
+.boton-lleno { transition: background-color .6s var(--lento), color .6s var(--lento), letter-spacing .6s var(--lento), transform .5s var(--lento); }
+.llamado { animation: llamado 6s ease-in-out 3s infinite; }
+@keyframes llamado { 0%, 80%, 100% { box-shadow: 0 0 0 0 rgba(239, 233, 220, 0); } 88% { box-shadow: 0 0 0 7px rgba(239, 233, 220, .12); } 96% { box-shadow: 0 0 0 14px rgba(239, 233, 220, 0); } }
+
+/* Título que se escribe con tinta, letra por letra */
+.tinta .letra { display: inline-block; animation: letra 1.1s var(--lento) both; }
+@keyframes letra { from { opacity: 0; filter: blur(8px); transform: translateY(.18em); } to { opacity: 1; filter: none; transform: none; } }
+
+/* Palabras del epígrafe, de a una */
+html.js .palabras .p { display: inline-block; opacity: 0; filter: blur(3px); transform: translateY(4px); transition: opacity 1s var(--lento), filter 1s var(--lento), transform 1s var(--lento); transition-delay: calc(var(--i) * 85ms); }
+html.js .visto .palabras .p, html.js .palabras.visto .p { opacity: 1; filter: none; transform: none; }
+
+/* Títulos de sección que se enfocan al aparecer */
+html.js h2.revelar { letter-spacing: .12em; transition: opacity 1.4s var(--lento), transform 1.4s var(--lento), filter 1.4s var(--lento), letter-spacing 1.8s var(--lento); }
+html.js h2.revelar.visto { letter-spacing: .01em; }
+
+/* Estrellas que titilan */
+.estrellas { position: absolute; inset: 0; pointer-events: none; }
+.estrellas span { position: absolute; background: var(--crema); clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); opacity: 0; animation: titila 7.5s ease-in-out infinite; }
+@keyframes titila { 0%, 100% { opacity: 0; transform: scale(.6); } 45% { opacity: .5; transform: scale(1); } 55% { opacity: .35; } }
+
+/* Filas de listas: al pasar, se corren apenas y aparece un trazo */
+.fila { position: relative; transition: transform .7s var(--lento); }
+.fila::before { content: ""; position: absolute; left: -1.25rem; top: 50%; width: 0; height: 1px; background: currentColor; transition: width .7s var(--lento); }
+@media (hover: hover) { .fila:hover { transform: translateX(6px); } .fila:hover::before { width: .8rem; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tinta .letra, html.js .palabras .p { opacity: 1 !important; filter: none !important; transform: none !important; }
+  .estrellas, .halo-puntero, .avance { display: none; }
+  html.js h2.revelar { letter-spacing: .01em; }
+}
+@media (pointer: coarse) { .halo-puntero { display: none; } }

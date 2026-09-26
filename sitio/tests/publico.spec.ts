@@ -1,4 +1,5 @@
-import { test, expect } from "@playwright/test";
+import { test as sinAtajo } from "@playwright/test";
+import { test, expect } from "./ayuda";
 
 const paginas = [
   "/",
@@ -6,6 +7,7 @@ const paginas = [
   "/conferencias",
   "/conferencias/abierta-2026",
   "/masterclass",
+  "/en-vivo",
   "/fragmentos",
   "/lista",
   "/ingresar",
@@ -39,7 +41,7 @@ test("los tres libros figuran como Próximamente y con marcador de texto", async
   for (const id of ["receta", "pensamiento", "biografia"]) {
     await expect(page.getByTestId(`estado-${id}`)).toHaveText("Próximamente");
   }
-  await expect(page.locator("[data-marcador]").first()).toContainText("[TEXTO DE JULIAN]");
+  await expect(page.locator("[data-marcador]").first()).toContainText("[TEXTO DE JULIÁN]");
 });
 
 test("inscripción a la conferencia abierta", async ({ page }) => {
@@ -59,4 +61,18 @@ test("sumarse a la lista por WhatsApp o por mail", async ({ page }) => {
   await page.getByLabel(/número de WhatsApp/).fill("+54 9 11 5555 1234");
   await page.getByRole("button", { name: "Sumarme" }).click();
   await expect(page.getByTestId("mensaje-ok")).toContainText("WhatsApp");
+});
+
+sinAtajo("al entrar aparece el cuadro de bienvenida, una vez por visita", async ({ page }) => {
+  await page.goto("/libros");
+  const umbral = page.getByTestId("umbral");
+  await expect(umbral).toBeVisible();
+  await expect(umbral).toContainText("espacio exclusivo");
+  await expect(umbral).toContainText("prohibida toda reproducción o difusión");
+  await expect(page.getByRole("button", { name: "Entrar" })).toBeFocused();
+  await page.getByRole("button", { name: "Entrar" }).click();
+  await expect(umbral).toBeHidden();
+  await expect(page.getByRole("heading", { name: "Los libros" })).toBeVisible();
+  await page.goto("/");
+  await expect(page.getByTestId("umbral")).toBeHidden();
 });

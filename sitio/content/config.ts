@@ -3,24 +3,24 @@
  *  ÚNICO ARCHIVO PARA EDITAR PRECIOS, FECHAS Y TEXTOS DEL SITIO
  * ─────────────────────────────────────────────────────────────
  *  - Cambiá el texto entre comillas y guardá: el sitio se actualiza solo.
- *  - Donde dice MARCADOR va la voz de Julian: no se inventa, se reemplaza
+ *  - Donde dice MARCADOR va la voz de Julián: no se inventa, se reemplaza
  *    por lo que él escriba o dicte.
  *  - Los precios en USD están marcados como "a definir" (aDefinir: true).
  */
 
-/** Marcador visible para los textos que tiene que escribir Julian. */
-export const MARCADOR = "[TEXTO DE JULIAN]";
+/** Marcador visible para los textos que tiene que escribir Julián. */
+export const MARCADOR = "[TEXTO DE JULIÁN]";
 
 export const sitio = {
-  nombre: "Julian Bermúdez",
-  nombreCorto: "Julian",
+  nombre: "Julián Bermúdez",
+  nombreCorto: "Julián",
   dominio: "julianbermudez.com",
-  descripcion: "Conferencias, masterclass y la trilogía de Julian Bermúdez.",
+  descripcion: "Conferencias, masterclass en vivo y la trilogía de Julián Bermúdez.",
   editorial: "ELVERBO",
   anio: 2026,
 };
 
-/** Las únicas citas textuales de Julian que usa el sitio (epígrafes). */
+/** Las únicas citas textuales de Julián que usa el sitio (epígrafes). */
 export const citas = {
   pesca: "No podés pescar una ballena con las herramientas para pescar un dorado.",
   tiempo: "Logré atravesar el tiempo con éxito.",
@@ -34,8 +34,8 @@ export const precios = {
 };
 
 export const inicio = {
-  bajada: "Conferencias, una masterclass y una trilogía en camino.",
-  quienEs: MARCADOR, // Presentación de Julian, en sus palabras.
+  bajada: "Conferencias, masterclass en vivo y una trilogía en camino.",
+  quienEs: MARCADOR, // Presentación de Julián, en sus palabras.
   propuesta:
     "Lo esencial queda grabado en la masterclass. El vivo pasa a ser para responder, solo con quienes eligieron entrar.",
   propuestaDetalle: MARCADOR,
@@ -141,7 +141,7 @@ export const audios = modulos.map((m) => ({
 }));
 
 export const masterclass = {
-  titulo: "Masterclass",
+  titulo: "Masterclass grabada",
   bajada: "Lo esencial, grabado. Para verlo a tu ritmo y volver cuando lo necesites.",
   descripcion: MARCADOR,
   incluye: [
@@ -175,4 +175,32 @@ export const redes = [
 export const lista = {
   titulo: "Sumate a la lista",
   bajada: "Un aviso cuando salga cada libro, cuando se abra una conferencia o una nueva tanda de la masterclass. Nada más.",
+};
+
+/**
+ * MASTERCLASS EN VIVO: un directo por semana, que se ve solo en el sitio.
+ * Precio a voluntad: cada persona elige cuánto pagar, desde `minimo`.
+ */
+export const enVivo = {
+  titulo: "Masterclass en vivo",
+  bajada: "Un directo por semana. Se ve solo acá, en el sitio. Pagás lo que quieras, desde USD 1.",
+  descripcion: MARCADOR,
+  frecuencia: "Una vez por semana",
+  moneda: "USD",
+  minimo: 1,
+  maximo: 500,
+  sugeridos: [1, 3, 5, 10],
+  directos: [
+    { id: "semana-1", titulo: "Directo · semana 1", fecha: "Fecha a definir", tema: "Tema a definir" },
+    { id: "semana-2", titulo: "Directo · semana 2", fecha: "Fecha a definir", tema: "Tema a definir" },
+    { id: "semana-3", titulo: "Directo · semana 3", fecha: "Fecha a definir", tema: "Tema a definir" },
+  ],
+};
+
+/** Cuadro de bienvenida que aparece al entrar al sitio (una vez por visita). */
+export const umbral = {
+  aviso:
+    "Este es un espacio exclusivo. Queda prohibida toda reproducción o difusión de su contenido fuera de este espacio.",
+  bienvenida: "Te damos la bienvenida",
+  boton: "Entrar",
 };

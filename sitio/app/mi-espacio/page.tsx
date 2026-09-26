@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { miembro } from "@/lib/miembro";
 import Precio from "@/components/Precio";
-import { conferencias, encuentro, precios } from "@/content/config";
+import { conferencias, encuentro, enVivo, precios } from "@/content/config";
 
 export default async function Espacio() {
   const { u, a } = await miembro();
   const nombre = u.nombre.replace(/\s*\(demo\)$/, "");
   const mias = conferencias.filter((c) => a.conferencias.includes(c.id));
+  const directos = enVivo.directos.filter((d) => a.directos.includes(d.id));
   return (
     <>
       <h1 className="titulo text-4xl">Hola, {nombre}.</h1>
@@ -15,6 +16,14 @@ export default async function Espacio() {
           <p className="texto-2 text-lg mt-4">Todavía no tenés nada acá. Cuando compres algo, aparece en este lugar.</p>
           <h2 className="text-2xl mt-12 mb-4">Por dónde empezar</h2>
           <ul className="border-t borde">
+            <li className="border-b borde py-5">
+              <Link href="/en-vivo" className="text-xl enlace">
+                Un directo de la masterclass en vivo
+              </Link>
+              <p className="texto-2 mt-1">
+                Una vez por semana. Pagás lo que quieras, desde {enVivo.moneda} {enVivo.minimo}.
+              </p>
+            </li>
             <li className="border-b borde py-5">
               <Link href="/masterclass" className="text-xl enlace">
                 La masterclass
@@ -58,6 +67,14 @@ export default async function Espacio() {
                 </li>
               </>
             )}
+            {directos.map((d) => (
+              <li key={d.id} className="border-b borde py-5">
+                <Link href={`/mi-espacio/en-vivo/${d.id}`} prefetch={false} className="text-xl enlace">
+                  {d.titulo}
+                </Link>
+                <p className="texto-2 mt-1">En vivo · {d.fecha}</p>
+              </li>
+            ))}
             {mias.map((c) => (
               <li key={c.id} className="border-b borde py-5">
                 <Link href="/mi-espacio/conferencias" className="text-xl enlace">

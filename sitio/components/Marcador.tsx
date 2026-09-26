@@ -1,6 +1,6 @@
 import { MARCADOR, sitio } from "@/content/config";
 
-/** Muestra el texto; si es el marcador de Julian, lo destaca como pendiente. */
+/** Muestra el texto; si es el marcador de Julián, lo destaca como pendiente. */
 export default function Texto({ children, bloque = false }: { children: string; bloque?: boolean }) {
   if (children === MARCADOR) {
     return bloque ? (

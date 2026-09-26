@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./ayuda";
 
 test("el manifiesto de la app es válido e instalable", async ({ request }) => {
   const r = await request.get("/manifest.webmanifest");

@@ -1,4 +1,17 @@
-import { expect, type Page } from "@playwright/test";
+import { test as base, expect, type Page } from "@playwright/test";
+
+/** En las pruebas se entra directo, salteando el cuadro de bienvenida (se prueba aparte). */
+export const test = base.extend({
+  context: async ({ context }, use) => {
+    await context.addInitScript(() => {
+      try {
+        sessionStorage.setItem("jb-umbral", "1");
+      } catch {}
+    });
+    await use(context);
+  },
+});
+export { expect };
 
 export const unico = (p: string) => `${p}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@prueba.com`;
 

@@ -28,8 +28,8 @@ export default async function Conferencia({ params }: P) {
     return (
       <>
         <Apertura titulo={c.titulo} bajada={`${c.fecha} · ${c.lugar}`} />
-        <section className="claro px-5 py-16">
-          <div className="mx-auto max-w-xl">
+        <section className="hondo border-t borde px-5 py-16">
+          <div className="mx-auto max-w-xl revelar">
             <p className="text-lg">{c.descripcion}</p>
             <h2 className="titulo text-2xl mt-12 mb-6">Inscripción</h2>
             <Formulario accion={accionInscribir} boton="Inscribirme" ocultarAlTerminar>
@@ -47,8 +47,8 @@ export default async function Conferencia({ params }: P) {
   return (
     <>
       <Apertura titulo={c.titulo} bajada={`${c.fecha} · ${c.lugar}`} />
-      <section className="claro px-5 py-16">
-        <div className="mx-auto max-w-xl">
+      <section className="hondo border-t borde px-5 py-16">
+        <div className="mx-auto max-w-xl revelar">
           <Texto bloque>{c.descripcion}</Texto>
           <p className="mt-8 text-lg">
             Entrada: <Precio {...precios.conferenciaPrivada} />

@@ -13,8 +13,8 @@ export default function Conferencias() {
   return (
     <>
       <Apertura titulo="Conferencias" bajada="Una abierta por año, gratis. Y privadas, con entrada simbólica." />
-      <section className="claro px-5 py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl">
+      <section className="hondo border-t borde px-5 py-16 sm:py-20">
+        <div className="mx-auto max-w-3xl revelar">
           <h2 className="titulo text-3xl mb-2">Abierta</h2>
           <p className="texto-2 mb-8">Gratis. Solo hace falta inscribirse.</p>
           {abiertas.map((c) => (
@@ -32,7 +32,7 @@ export default function Conferencias() {
         </div>
       </section>
       <section className="px-5 py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-3xl revelar">
           <h2 className="titulo text-3xl mb-2">Privadas</h2>
           <p className="texto-2 mb-8">
             Entrada simbólica de <Precio {...precios.conferenciaPrivada} />. Para comprarla necesitás una cuenta; el link
