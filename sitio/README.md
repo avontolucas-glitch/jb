@@ -50,7 +50,7 @@ Todo está en **un solo archivo**: `content/config.ts`. Se abre con cualquier ed
 
 - **Precios:** en `precios` (masterclass USD 20 y conferencia privada USD 3, los dos "a definir"). Cuando estén confirmados, cambiá `aDefinir: true` por `aDefinir: false` y desaparece la aclaración.
 - **Fechas y lugares:** en `conferencias` y en `encuentro`.
-- **Textos de Julian:** donde dice `MARCADOR`, reemplazalo por el texto entre comillas. Ejemplo: `quienEs: "Acá va lo que escriba Julian",`
+- **Textos de Julián:** donde dice `MARCADOR`, reemplazalo por el texto entre comillas. Ejemplo: `quienEs: "Acá va lo que escriba Julián",`
 - **Redes:** en `redes`, cambiá el `#` por el link real.
 - **Masterclass en vivo:** en `enVivo`: los directos (fecha y tema), el mínimo (`minimo: 1`), los montos sugeridos (`sugeridos`) y el máximo por pago.
 - **Cuadro de bienvenida:** en `umbral`: el aviso de espacio exclusivo, la bienvenida y el texto del botón. Aparece una vez por visita.
