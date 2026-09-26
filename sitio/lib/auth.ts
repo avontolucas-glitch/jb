@@ -8,7 +8,7 @@
  * mismas funciones: usuarioActual, ingresar, crearCuenta, cerrarSesion.
  */
 import { cookies } from "next/headers";
-import { leer, escribir } from "./db";
+import { leer, leerSemilla, escribir } from "./db";
 import { COOKIE_SESION, DURACION_SEGUNDOS, firmar, verificar } from "./session";
 
 export type Usuario = {
@@ -19,7 +19,12 @@ export type Usuario = {
   hash: string;
   creado: string;
   demo?: boolean;
+  /** Cuenta de Julián: administra la agenda de la Masterclass 1 a 1. */
+  admin?: boolean;
 };
+
+/** Solo la cuenta marcada como admin en data/usuarios.json (nunca algo que mande el navegador). */
+export const esAdmin = (u: Usuario | null | undefined): boolean => u?.admin === true;
 
 const enc = new TextEncoder();
 
@@ -37,9 +42,18 @@ function normalizar(email: string) {
   return email.trim().toLowerCase();
 }
 
+/**
+ * Las cuentas guardadas más las cuentas demo de la semilla que falten (así una
+ * cuenta demo nueva, como la de Julián, aparece aunque ya haya datos guardados).
+ */
+export async function usuarios(): Promise<Usuario[]> {
+  const guardados = await leer<Usuario[]>("usuarios");
+  const demos = (await leerSemilla<Usuario[]>("usuarios", [])).filter((d) => d.demo && !guardados.some((g) => g.id === d.id));
+  return [...guardados, ...demos];
+}
+
 export async function buscarPorEmail(email: string) {
-  const usuarios = await leer<Usuario[]>("usuarios");
-  return usuarios.find((u) => u.email === normalizar(email)) ?? null;
+  return (await usuarios()).find((u) => u.email === normalizar(email)) ?? null;
 }
 
 async function abrirSesion(uid: string) {
@@ -72,8 +86,8 @@ export async function crearCuenta(
   if (nombre.length < 2) return { ok: false, error: "Escribí tu nombre." };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, error: "Revisá el mail." };
   if (clave.length < 8) return { ok: false, error: "La clave tiene que tener al menos 8 caracteres." };
-  const usuarios = await leer<Usuario[]>("usuarios");
-  if (usuarios.some((u) => u.email === email)) return { ok: false, error: "Ya hay una cuenta con ese mail." };
+  if ((await usuarios()).some((u) => u.email === email)) return { ok: false, error: "Ya hay una cuenta con ese mail." };
+  const guardados = await leer<Usuario[]>("usuarios");
   const sal = crypto.randomUUID();
   const nuevo: Usuario = {
     id: crypto.randomUUID(),
@@ -83,8 +97,8 @@ export async function crearCuenta(
     hash: await hashClave(clave, sal),
     creado: new Date().toISOString(),
   };
-  usuarios.push(nuevo);
-  await escribir("usuarios", usuarios);
+  guardados.push(nuevo);
+  await escribir("usuarios", guardados);
   await abrirSesion(nuevo.id);
   return { ok: true };
 }
@@ -96,6 +110,5 @@ export async function cerrarSesion() {
 export async function usuarioActual(): Promise<Usuario | null> {
   const s = await verificar((await cookies()).get(COOKIE_SESION)?.value);
   if (!s) return null;
-  const usuarios = await leer<Usuario[]>("usuarios");
-  return usuarios.find((u) => u.id === s.uid) ?? null;
+  return (await usuarios()).find((u) => u.id === s.uid) ?? null;
 }

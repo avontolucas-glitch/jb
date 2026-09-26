@@ -16,5 +16,15 @@
     "hash": "a12021672d6ee519180f259b89c6df6ff225a2fdd0200eab19779270ab9ab837",
     "creado": "2026-09-01T00:00:00.000Z",
     "demo": true
+  },
+  {
+    "id": "demo-julian",
+    "nombre": "Julián (demo)",
+    "email": "julian@demo.com",
+    "sal": "sal-demo-julian",
+    "hash": "5375fd4a3aaa698d854cdea3330ac453de19db494da8d3c38976b13adb497f1a",
+    "creado": "2026-09-01T00:00:00.000Z",
+    "demo": true,
+    "admin": true
   }
 ]

@@ -42,6 +42,15 @@ export async function leer<T>(nombre: string): Promise<T> {
   }
 }
 
+/** Lee el archivo semilla de data/ tal como viene en el repositorio (sin los cambios del prototipo). */
+export async function leerSemilla<T>(nombre: string, porDefecto: T): Promise<T> {
+  try {
+    return JSON.parse(await fs.readFile(path.join(SEMILLA, `${nombre}.json`), "utf8")) as T;
+  } catch {
+    return porDefecto;
+  }
+}
+
 export async function escribir<T>(nombre: string, datos: T): Promise<void> {
   const dir = await carpeta();
   await fs.writeFile(path.join(dir, `${nombre}.json`), JSON.stringify(datos, null, 2));

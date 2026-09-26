@@ -35,7 +35,7 @@ export const citas = {
 export const precios = {
   /** Libro digital: se lee dentro del sitio. monto 0 = precio a definir. */
   libroDigital: { monto: 0, moneda: "USD", aDefinir: true },
-  /** Sesión privada 1 a 1 con Julián. monto 0 = precio a definir. */
+  /** Masterclass 1 a 1 con Julián. monto 0 = precio a definir. */
   sesionPrivada: { monto: 0, moneda: "USD", aDefinir: true },
   masterclass: { monto: 20, moneda: "USD", aDefinir: true },
   conferenciaPrivada: { monto: 3, moneda: "USD", aDefinir: true },
@@ -275,15 +275,20 @@ export const capitulos: Record<"receta" | "pensamiento" | "biografia", { n: numb
 };
 
 /**
- * SESIONES PRIVADAS: un encuentro 1 a 1 con Julián, por videollamada.
- * Los horarios son de EJEMPLO (se generan para las próximas semanas):
- * cambiá `dias` y `semanas`, o reemplazalos por la agenda real.
+ * MASTERCLASS 1 A 1: un encuentro uno a uno con Julián, por videollamada
+ * (antes «Sesiones privadas»).
+ * La agenda tiene dos partes:
+ *  - la base semanal de acá (`dias`, repetida las próximas `semanas`);
+ *  - lo que Julián carga desde su panel (Mi espacio → Agenda): horarios extra
+ *    y horarios bloqueados, guardados en data/agenda.json.
  */
 export const sesiones = {
-  titulo: "Sesiones privadas",
+  titulo: "Masterclass 1 a 1",
   bajada: "Un encuentro uno a uno con Julián, por videollamada.",
   descripcion: MARCADOR,
   duracion: "Duración a definir",
+  /** Duración que se usa en el calendario del teléfono (.ics), en minutos. */
+  duracionMinutos: 60,
   modalidad: "Por videollamada",
   zonaHoraria: "hora de Argentina",
   // día de la semana (0 = domingo) y hora, en hora de Argentina
