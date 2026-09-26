@@ -107,7 +107,7 @@ export const libros: Libro[] = [
 
 export type Conferencia = {
   id: string;
-  tipo: "abierta" | "privada";
+  tipo: "privada"; // todas en vivo, con entrada simbólica obligatoria
   titulo: string;
   fecha: string; // texto libre: "a definir" o "Sábado 14 de marzo, 19 h"
   lugar: string;
@@ -118,17 +118,9 @@ export type Conferencia = {
 
 export const conferencias: Conferencia[] = [
   {
-    id: "abierta-2026",
-    tipo: "abierta",
-    titulo: "Conferencia abierta anual",
-    fecha: "Fecha a definir",
-    lugar: "Lugar a definir",
-    descripcion: "Una vez por año, abierta y gratuita. Solo hace falta inscribirse.",
-  },
-  {
     id: "privada-1",
     tipo: "privada",
-    titulo: "Conferencia privada I",
+    titulo: "Conferencia I",
     fecha: "Fecha a definir",
     lugar: "En línea",
     descripcion: MARCADOR,
@@ -137,7 +129,7 @@ export const conferencias: Conferencia[] = [
   {
     id: "privada-2",
     tipo: "privada",
-    titulo: "Conferencia privada II",
+    titulo: "Conferencia II",
     fecha: "Fecha a definir",
     lugar: "En línea",
     descripcion: MARCADOR,

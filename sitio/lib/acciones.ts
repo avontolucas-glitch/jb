@@ -11,7 +11,7 @@ import { leer, escribir } from "./db";
 import { producto, pagarSimulado, montoElegido } from "./payments";
 import { canjear } from "./codigos";
 import { ocupados } from "./sesiones";
-import { conferencias, modulos } from "@/content/config";
+import { modulos } from "@/content/config";
 
 export type Estado = { error?: string; ok?: string } | null;
 
@@ -38,21 +38,6 @@ export async function accionCrearCuenta(_: Estado, f: FormData): Promise<Estado>
 export async function accionSalir() {
   await cerrarSesion();
   redirect("/?sesion=cerrada");
-}
-
-export async function accionInscribir(_: Estado, f: FormData): Promise<Estado> {
-  const conferencia = txt(f, "conferencia");
-  const nombre = txt(f, "nombre");
-  const email = txt(f, "email").toLowerCase();
-  if (!conferencias.some((c) => c.id === conferencia && c.tipo === "abierta")) return { error: "Esa conferencia no existe." };
-  if (nombre.length < 2) return { error: "Escribí tu nombre." };
-  if (!mailValido(email)) return { error: "Revisá el mail." };
-  const lista = await leer<{ id: string; conferencia: string; nombre: string; email: string; fecha: string }[]>("inscripciones");
-  if (!lista.some((i) => i.conferencia === conferencia && i.email === email)) {
-    lista.push({ id: crypto.randomUUID(), conferencia, nombre, email, fecha: new Date().toISOString() });
-    await escribir("inscripciones", lista);
-  }
-  return { ok: `Listo, ${nombre}. Quedaste inscripto. Te vamos a escribir a ${email} con la fecha y el lugar.` };
 }
 
 export async function accionLista(_: Estado, f: FormData): Promise<Estado> {

@@ -187,7 +187,7 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
                   {c.titulo}
                 </Link>
                 <span className="texto-2 text-sm">
-                  {c.tipo === "abierta" ? "Gratis, con inscripción" : "Entrada simbólica"} · {c.fecha}
+                  Entrada simbólica · {c.fecha}
                 </span>
               </li>
             ))}

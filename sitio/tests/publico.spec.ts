@@ -5,7 +5,7 @@ const paginas = [
   "/",
   "/libros",
   "/conferencias",
-  "/conferencias/abierta-2026",
+  "/conferencias/privada-1",
   "/masterclass",
   "/en-vivo",
   "/masterclass/grabada",
@@ -48,12 +48,11 @@ test("los tres libros figuran como Próximamente y con marcador de texto", async
   await expect(page.locator("[data-marcador]").first()).toContainText("a definir)");
 });
 
-test("inscripción a la conferencia abierta", async ({ page }) => {
+test("las conferencias en vivo son todas con entrada simbólica", async ({ page }) => {
+  await page.goto("/conferencias");
+  await expect(page.locator("main")).not.toContainText(/gratis|abierta/i);
   await page.goto("/conferencias/abierta-2026");
-  await page.getByLabel("Nombre").fill("Sofía");
-  await page.getByLabel("Mail").fill("sofia@prueba.com");
-  await page.getByRole("button", { name: "Inscribirme" }).click();
-  await expect(page.getByTestId("mensaje-ok")).toContainText("Quedaste inscripto");
+  await expect(page.getByRole("heading", { name: "Esta página no existe" })).toBeVisible();
 });
 
 test("sumarse a la lista por WhatsApp o por mail", async ({ page }) => {

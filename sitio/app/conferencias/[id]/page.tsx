@@ -4,8 +4,6 @@ import type { Metadata } from "next";
 import Apertura from "@/components/Apertura";
 import Texto from "@/components/Marcador";
 import Precio from "@/components/Precio";
-import Formulario, { Campo } from "@/components/Formulario";
-import { accionInscribir } from "@/lib/acciones";
 import { usuarioActual } from "@/lib/auth";
 import { accesos } from "@/lib/access";
 import { conferencias, portadillas, precios } from "@/content/config";
@@ -23,25 +21,6 @@ export default async function Conferencia({ params }: P) {
   const c = conferencias.find((x) => x.id === id);
   if (!c) notFound();
   const u = await usuarioActual();
-
-  if (c.tipo === "abierta") {
-    return (
-      <>
-        <Apertura titulo={c.titulo} bajada={`${c.fecha} · ${c.lugar}`} folio={portadillas.conferencias.folio} />
-        <section className="hondo border-t borde px-5 py-16">
-          <div className="mx-auto max-w-xl revelar">
-            <p className="text-lg">{c.descripcion}</p>
-            <h2 className="titulo text-2xl mt-12 mb-6">Inscripción</h2>
-            <Formulario accion={accionInscribir} boton="Inscribirme" ocultarAlTerminar>
-              <input type="hidden" name="conferencia" value={c.id} />
-              <Campo nombre="nombre" etiqueta="Nombre" autoComplete="name" />
-              <Campo nombre="email" etiqueta="Mail" tipo="email" autoComplete="email" />
-            </Formulario>
-          </div>
-        </section>
-      </>
-    );
-  }
 
   const tiene = u ? (await accesos(u.id)).conferencias.includes(c.id) : false;
   return (
