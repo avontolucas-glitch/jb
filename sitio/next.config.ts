@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Los datos de prueba (cuentas demo, compras, códigos de los libros) se leen
+  // del disco: hay que avisarle a Next que los suba con el sitio (Vercel).
+  outputFileTracingIncludes: { "/**": ["./data/*.json"] },
   async headers() {
     return [
       {
