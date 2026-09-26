@@ -1,0 +1,30 @@
+import { defineConfig, devices } from "@playwright/test";
+import { existsSync } from "fs";
+import os from "os";
+import path from "path";
+
+const PUERTO = 3200;
+// Datos de prueba en una carpeta temporal nueva: las pruebas no tocan los datos del prototipo.
+const DATA_DIR = path.join(os.tmpdir(), `jb-pruebas-${Date.now()}`);
+// En algunos entornos el navegador viene preinstalado en otra ruta.
+const chromeLocal = "/opt/pw-browsers/chromium";
+const lanzar = existsSync(chromeLocal) ? { executablePath: chromeLocal } : {};
+
+export default defineConfig({
+  testDir: "./tests",
+  workers: 1,
+  timeout: 45_000,
+  reporter: [["list"]],
+  use: { baseURL: `http://localhost:${PUERTO}`, locale: "es-AR" },
+  projects: [
+    { name: "celular", use: { ...devices["Pixel 7"], launchOptions: lanzar } },
+    { name: "computadora", use: { ...devices["Desktop Chrome"], launchOptions: lanzar } },
+  ],
+  webServer: {
+    command: `npm run start -- -p ${PUERTO}`,
+    url: `http://localhost:${PUERTO}`,
+    reuseExistingServer: false,
+    env: { DATA_DIR },
+    timeout: 60_000,
+  },
+});

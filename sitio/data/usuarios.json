@@ -1,0 +1,20 @@
+[
+  {
+    "id": "demo-sin-compras",
+    "nombre": "Ana (demo)",
+    "email": "sincompras@demo.com",
+    "sal": "sal-demo-1",
+    "hash": "f4bdc8e90b26055734823ed779f3ded815140596c828a63fbfbf3e8fe25e2231",
+    "creado": "2026-09-01T00:00:00.000Z",
+    "demo": true
+  },
+  {
+    "id": "demo-comprador",
+    "nombre": "Martín (demo)",
+    "email": "comprador@demo.com",
+    "sal": "sal-demo-2",
+    "hash": "a12021672d6ee519180f259b89c6df6ff225a2fdd0200eab19779270ab9ab837",
+    "creado": "2026-09-01T00:00:00.000Z",
+    "demo": true
+  }
+]

@@ -1,0 +1,11 @@
+[
+  {
+    "id": "c-demo-1",
+    "usuario": "demo-comprador",
+    "producto": "masterclass",
+    "monto": 20,
+    "moneda": "USD",
+    "fecha": "2026-09-01T00:00:00.000Z",
+    "medio": "simulado"
+  }
+]

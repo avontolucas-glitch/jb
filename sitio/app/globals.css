@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+/* ───────── Tokens del sistema de la trilogía ─────────
+   Cambiar un color o una tipografía acá lo cambia en todo el sitio. */
+:root {
+  --negro: #0b0b0b;
+  --negro-suave: #161616;
+  --blanco: #f7f5f0;
+  --blanco-puro: #ffffff;
+  --gris: #8c877d;          /* texto secundario sobre negro */
+  --gris-claro: #d9d4c9;    /* líneas sobre negro */
+  --gris-tinta: #5b574f;    /* texto secundario sobre blanco */
+  --linea-clara: #d8d3c8;   /* líneas sobre blanco */
+  --marino: #1c2b4d;
+  --marino-profundo: #0f243e;
+  --marino-claro: #a9b8d0;
+
+  --fondo: var(--negro);
+  --texto: var(--blanco);
+  --texto-2: var(--gris);
+  --linea: #2a2a2a;
+
+  --serif: "Palatino Linotype", Palatino, "Book Antiqua", var(--font-crimson), "Crimson Pro", Georgia, serif;
+  --ancho-texto: 34rem;
+}
+
+@theme inline {
+  --color-negro: var(--negro);
+  --color-negro-suave: var(--negro-suave);
+  --color-blanco: var(--blanco);
+  --color-gris: var(--gris);
+  --color-gris-claro: var(--gris-claro);
+  --color-gris-tinta: var(--gris-tinta);
+  --color-marino: var(--marino);
+  --color-marino-profundo: var(--marino-profundo);
+  --color-marino-claro: var(--marino-claro);
+  --font-serif: var(--serif);
+}
+
+html { background: var(--fondo); color-scheme: dark; }
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Superficie clara (manual, Receta): negro sobre blanco */
+.claro { --fondo: var(--blanco); --texto: var(--negro); --texto-2: var(--gris-tinta); --linea: var(--linea-clara); background: var(--fondo); color: var(--texto); }
+.oscuro { --fondo: var(--negro); --texto: var(--blanco); --texto-2: var(--gris); --linea: #2a2a2a; background: var(--fondo); color: var(--texto); }
+.marino { --fondo: var(--marino-profundo); --texto: var(--blanco); --texto-2: var(--marino-claro); --linea: #2b3f63; background: var(--fondo); color: var(--texto); }
+
+.texto-2 { color: var(--texto-2); }
+.borde { border-color: var(--linea); }
+
+/* Firmas y pie: versalitas con espaciado amplio (solo ahí) */
+.firma { font-variant: small-caps; letter-spacing: 0.22em; text-transform: lowercase; }
+
+.titulo { font-weight: 400; letter-spacing: 0.01em; line-height: 1.15; }
+.prosa { max-width: var(--ancho-texto); }
+.prosa p + p { margin-top: 1em; }
+
+/* Botones sobrios: rectángulo, línea fina, sin sombra ni flecha */
+.boton {
+  display: inline-block; padding: 0.7rem 1.4rem; border: 1px solid var(--texto);
+  color: var(--texto); background: transparent; font-size: 1rem; letter-spacing: 0.03em;
+  transition: background-color .2s, color .2s; cursor: pointer; text-align: center;
+}
+.boton:hover { background: var(--texto); color: var(--fondo); }
+.boton-lleno { background: var(--texto); color: var(--fondo); }
+.boton-lleno:hover { background: transparent; color: var(--texto); }
+.boton[disabled] { opacity: .45; cursor: not-allowed; }
+.enlace { text-decoration: underline; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+.enlace:hover { text-decoration-thickness: 2px; }
+
+/* Campos */
+.campo { width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--linea); padding: 0.6rem 0.1rem; color: var(--texto); font: inherit; border-radius: 0; }
+.campo:focus { outline: none; border-bottom-color: var(--texto); }
+textarea.campo { border: 1px solid var(--linea); padding: 0.7rem; min-height: 7rem; }
+textarea.campo:focus { border-color: var(--texto); }
+.etiqueta { display: block; font-size: 0.95rem; color: var(--texto-2); margin-bottom: 0.2rem; }
+
+/* Marcadores de contenido pendiente */
+.marcador { border: 1px dashed currentColor; padding: 0.15em 0.45em; font-size: 0.9em; opacity: 0.75; white-space: nowrap; }
+.marcador-bloque { border: 1px dashed var(--linea); padding: 1rem 1.2rem; color: var(--texto-2); }
+
+/* Foco visible con teclado */
+:focus-visible { outline: 2px solid var(--texto); outline-offset: 3px; }
+.salto { position: absolute; left: -999px; top: 0.5rem; background: var(--blanco); color: var(--negro); padding: .5rem 1rem; z-index: 50; }
+.salto:focus { left: 0.5rem; }
+
+/* Ojo fantasma de las aperturas */
+.fantasma { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; opacity: 0.055; overflow: hidden; }
+
+.aparece { animation: aparece .7s ease both; }
+@keyframes aparece { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* Radios con forma de botón: el foco se ve en la etiqueta */
+label.boton:has(input:focus-visible) { outline: 2px solid var(--texto); outline-offset: 3px; }

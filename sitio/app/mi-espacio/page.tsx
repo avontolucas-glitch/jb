@@ -1,0 +1,83 @@
+import Link from "next/link";
+import { miembro } from "@/lib/miembro";
+import Precio from "@/components/Precio";
+import { conferencias, encuentro, precios } from "@/content/config";
+
+export default async function Espacio() {
+  const { u, a } = await miembro();
+  const nombre = u.nombre.replace(/\s*\(demo\)$/, "");
+  const mias = conferencias.filter((c) => a.conferencias.includes(c.id));
+  return (
+    <>
+      <h1 className="titulo text-4xl">Hola, {nombre}.</h1>
+      {!a.algo ? (
+        <div data-testid="espacio-vacio">
+          <p className="texto-2 text-lg mt-4">Todavía no tenés nada acá. Cuando compres algo, aparece en este lugar.</p>
+          <h2 className="text-2xl mt-12 mb-4">Por dónde empezar</h2>
+          <ul className="border-t borde">
+            <li className="border-b borde py-5">
+              <Link href="/masterclass" className="text-xl enlace">
+                La masterclass
+              </Link>
+              <p className="texto-2 mt-1">
+                Con los audios por tema y el encuentro de preguntas de regalo. <Precio {...precios.masterclass} />
+              </p>
+            </li>
+            <li className="border-b borde py-5">
+              <Link href="/conferencias" className="text-xl enlace">
+                Una conferencia privada
+              </Link>
+              <p className="texto-2 mt-1">
+                Entrada simbólica. <Precio {...precios.conferenciaPrivada} />
+              </p>
+            </li>
+          </ul>
+        </div>
+      ) : (
+        <div data-testid="tus-accesos">
+          <h2 className="text-2xl mt-10 mb-4">Tus accesos</h2>
+          <ul className="border-t borde">
+            {a.masterclass && (
+              <>
+                <li className="border-b borde py-5">
+                  <Link href="/mi-espacio/masterclass" className="text-xl enlace">
+                    Masterclass
+                  </Link>
+                  <p className="texto-2 mt-1">Seguí desde donde dejaste.</p>
+                </li>
+                <li className="border-b borde py-5">
+                  <Link href="/mi-espacio/audios" className="text-xl enlace">
+                    Audios por tema
+                  </Link>
+                </li>
+                <li className="border-b borde py-5">
+                  <Link href="/mi-espacio/encuentro" className="text-xl enlace">
+                    Encuentro de preguntas
+                  </Link>
+                  <p className="texto-2 mt-1">Próximo: {encuentro.proximo}</p>
+                </li>
+              </>
+            )}
+            {mias.map((c) => (
+              <li key={c.id} className="border-b borde py-5">
+                <Link href="/mi-espacio/conferencias" className="text-xl enlace">
+                  {c.titulo}
+                </Link>
+                <p className="texto-2 mt-1">{c.fecha}</p>
+              </li>
+            ))}
+          </ul>
+          {!a.masterclass && (
+            <p className="texto-2 mt-10">
+              También está la{" "}
+              <Link href="/masterclass" className="enlace">
+                masterclass
+              </Link>
+              .
+            </p>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
