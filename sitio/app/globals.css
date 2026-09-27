@@ -535,3 +535,9 @@ html.js .foto.visto .foto-pie { opacity: 1; }
   html.js .revelar, html.js .revelar.visto, html.js .palabras .p, html.js .revelar .despues, .yosoy-boton, .yosoy-boton.presente { filter: none !important; }
   .foto-marco img { transition: none; }
 }
+
+/* Seguro: si el JavaScript del sitio no llegó a cargar, se ve todo igual, sin animaciones */
+html.sin-revelar .umbral { display: none !important; }
+html.sin-revelar .revelar, html.sin-revelar .trazo, html.sin-revelar .palabras .p, html.sin-revelar .ornamento.revelar span, html.sin-revelar .revelar .despues { opacity: 1 !important; transform: none !important; filter: none !important; }
+html.sin-revelar .foto .foto-marco { clip-path: none !important; }
+html.sin-revelar .foto .foto-pie { opacity: 1 !important; }

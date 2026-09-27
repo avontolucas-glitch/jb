@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 export default function Revelar() {
   const ruta = usePathname();
   useEffect(() => {
+    (window as Window & { __jbListo?: boolean }).__jbListo = true;
     const quieto = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const marcar = (el: Element) => el.classList.add("visto");
     if (quieto || !("IntersectionObserver" in window)) {

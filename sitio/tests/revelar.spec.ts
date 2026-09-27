@@ -24,3 +24,15 @@ base("entrando por el ojo, todo el contenido aparece al bajar, en cada página",
     expect(await pendientes(page), `${ruta}: quedaron bloques sin aparecer`).toEqual([]);
   }
 });
+
+base("si el JavaScript del sitio no carga, a los pocos segundos se ve todo igual", async ({ page }) => {
+  await page.route("**/_next/static/chunks/**", (r) => r.abort());
+  await page.goto("/");
+  await page.waitForTimeout(7800);
+  await expect(page.locator("html")).toHaveClass(/sin-revelar/);
+  await expect(page.getByTestId("umbral")).toBeHidden();
+  const quien = page.locator("#quien");
+  await quien.scrollIntoViewIfNeeded();
+  await expect(quien).toBeVisible();
+  expect(await page.locator("main .revelar").first().evaluate((e) => getComputedStyle(e).opacity)).toBe("1");
+});

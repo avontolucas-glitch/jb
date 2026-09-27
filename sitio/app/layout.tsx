@@ -42,6 +42,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html:
               "var h=document.documentElement;h.classList.add('js');try{h.classList.add(sessionStorage.getItem('jb-umbral')?'umbral-visto':'en-umbral')}catch(e){h.classList.add('umbral-visto')}" +
               // el pedido de instalación de Chrome/Edge/Android llega temprano: se guarda para el botón «Instalar la app»
+              // seguro: si una parte del sitio no carga, a los 7 s se muestra todo igual (sin animaciones)
+              ";setTimeout(function(){if(!window.__jbListo){h.classList.add('sin-revelar');h.classList.remove('en-umbral')}},7000)" +
               ";addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__jbInstalar=e;dispatchEvent(new Event('jb:instalable'))});addEventListener('appinstalled',function(){window.__jbInstalar=null;window.__jbInstalada=1;dispatchEvent(new Event('jb:instalada'))})",
           }}
         />
