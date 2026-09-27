@@ -30,10 +30,30 @@ export default function Revelar() {
     else observar();
     const mo = new MutationObserver(() => !document.documentElement.classList.contains("en-umbral") && observar());
     mo.observe(document.body, { childList: true, subtree: true });
+    // Seguro: al dejar de bajar, todo lo que quedó en pantalla aparece sí o sí,
+    // aunque el observador llegue tarde (celulares lentos o en ahorro de batería).
+    let pausa: ReturnType<typeof setTimeout> | undefined;
+    const revisar = () => {
+      if (document.documentElement.classList.contains("en-umbral")) return;
+      const alto = window.innerHeight;
+      document.querySelectorAll(".revelar:not(.visto), .trazo:not(.visto)").forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < alto * 0.96) marcar(el);
+      });
+    };
+    const alDesplazar = () => {
+      if (pausa) clearTimeout(pausa);
+      pausa = setTimeout(revisar, 180);
+    };
+    window.addEventListener("scroll", alDesplazar, { passive: true });
+    const inicial = setTimeout(revisar, 2600);
     return () => {
       io.disconnect();
       mo.disconnect();
       window.removeEventListener("umbral:abierto", alAbrir);
+      window.removeEventListener("scroll", alDesplazar);
+      if (pausa) clearTimeout(pausa);
+      clearTimeout(inicial);
     };
   }, [ruta]);
   return null;

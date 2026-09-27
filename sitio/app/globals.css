@@ -332,7 +332,8 @@ html.js h2.revelar.visto { letter-spacing: .01em; }
 }
 
 /* ───────── Emblemas de la trilogía que flotan ───────── */
-.flotantes { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; opacity: 1; transition: opacity 3s var(--lento) 1.5s; mix-blend-mode: screen; }
+.flotantes { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; opacity: 1; transition: opacity 3s var(--lento) 1.5s; }
+/* (sin mix-blend-mode: una capa de pantalla completa que se mezcla con todo lo de abajo hace que el celular no llegue a dibujar la página) */
 html.en-umbral .flotantes { opacity: 0; }
 .flota { position: absolute; top: 0; opacity: .15; animation-name: sube; animation-timing-function: linear; animation-iteration-count: infinite; will-change: transform; }
 .flota:nth-child(3n) { opacity: .1; }
@@ -450,7 +451,7 @@ html.js .foto.visto .foto-pie { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .foto-marco img { transition: none; } .foto:hover .foto-marco img { transform: none; } html.js .foto .foto-marco { clip-path: none; } html.js .foto .foto-pie { opacity: 1; } }
 
 /* Música de fondo: un botón chico abajo a la izquierda, tres barras que respiran cuando suena */
-.musica-boton, .yosoy-boton { position: fixed; bottom: 1rem; z-index: 45; width: 2.75rem; height: 2.75rem; border-radius: 999px; border: 1px solid var(--linea); background: rgba(8, 8, 8, 0.82); backdrop-filter: blur(4px); color: var(--crema); display: flex; align-items: center; justify-content: center; transition: border-color 0.6s var(--lento), transform 0.6s var(--lento); }
+.musica-boton, .yosoy-boton { position: fixed; bottom: 1rem; z-index: 45; width: 2.75rem; height: 2.75rem; border-radius: 999px; border: 1px solid var(--linea); background: rgba(8, 8, 8, 0.92); color: var(--crema); display: flex; align-items: center; justify-content: center; transition: border-color 0.6s var(--lento), transform 0.6s var(--lento); }
 .musica-boton { left: 1rem; }
 .musica-boton:hover, .yosoy-boton:hover, .musica-boton:focus-visible, .yosoy-boton:focus-visible { border-color: var(--gris); transform: translateY(-2px); }
 .musica-ondas { display: flex; align-items: flex-end; gap: 3px; height: 14px; }
@@ -527,3 +528,10 @@ html.js .foto.visto .foto-pie { opacity: 1; }
 .ojo-pixel-orejas { fill: #ffffff; }
 .yosoy-nube-cuenta { display: inline-block; margin-top: 0.5rem; font-style: normal; font-size: 0.82rem; padding: 0.2rem 0.65rem; border: 1px solid var(--gris); transition: border-color 0.4s var(--lento); }
 .yosoy-nube-cuenta:hover, .yosoy-nube-cuenta:focus-visible { border-color: var(--crema); }
+
+/* En celulares y tablets (sin puntero fino) lo que aparece lo hace sin desenfoque:
+   solo fundido y movimiento, que el teléfono dibuja sin esfuerzo */
+@media (hover: none), (pointer: coarse) {
+  html.js .revelar, html.js .revelar.visto, html.js .palabras .p, html.js .revelar .despues, .yosoy-boton, .yosoy-boton.presente { filter: none !important; }
+  .foto-marco img { transition: none; }
+}
