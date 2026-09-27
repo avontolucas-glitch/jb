@@ -172,7 +172,7 @@ if __name__ == '__main__':
             G.append(par(f['motivo'], 'BodyText', negrita='   Por qué ahí: '))
     if respiros:
         G.append(par('Páginas de respiro: lo que Julián escribió en THE CHANNEL', 'Heading2'))
-        G.append(par('Textos que Julián escribió en sus canales de Instagram (no son de sus audios): por eso no van mezclados en los capítulos, que son su obra hablada, sino en una página propia al final del capítulo con el que conversan, con el armado de la página de transición y la firma «JULIÁN BERMÚDEZ · THE CHANNEL». Van como los escribió (con su «tú» de lo escrito); solo se corrigieron tildes, signos de apertura y errores evidentes del teclado. Los originales, en fuentes/canal-de-julian.md.', 'BodyText'))
+        G.append(par('Textos que Julián escribió en sus canales de Instagram (no son de sus audios): por eso no van mezclados en los capítulos, que son su obra hablada, sino en una página propia al final del capítulo con el que conversan, con el armado de la página de transición y la firma «JULIÁN BERMÚDEZ» (en el libro no se aclara que salen de THE CHANNEL: eso queda solo en el sitio). Van como los escribió (con su «tú» de lo escrito); solo se corrigieron tildes, signos de apertura y errores evidentes del teclado. Los originales, en fuentes/canal-de-julian.md.', 'BodyText'))
         for i, (k, n, p) in enumerate(sorted(respiros, key=lambda r: (list(LIBROS).index(r[0]), r[1])), 1):
             G.append(par(f'{i}. {NOMBRE[k]}, al final del Cap. {n}', 'BodyText'))
             G.append(par(p['texto'].replace('\n', ' '), 'BodyText', italica=True))

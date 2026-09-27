@@ -4,7 +4,8 @@ en una página propia al final de un capítulo (después del cierre ◆ ◆ ◆ 
 apertura del siguiente), con el mismo armado que la página de transición de cada libro:
 la textura del libro de fondo, el texto centrado en itálica y, abajo, el emblema del
 capítulo, chico y sin marco (la transición lleva el suyo enmarcado), y la firma
-«JULIÁN BERMÚDEZ · THE CHANNEL». Sin encabezado ni folio, como la transición.
+«JULIÁN BERMÚDEZ». En el libro no se aclara de dónde salen (Lucas: «THE CHANNEL», solo
+en el sitio). Sin encabezado ni folio, como la transición.
 Qué va en cada libro y capítulo: revision4_respiro.json (curaduría por libro,
 arbitraje y verificación letra por letra contra fuentes/canal-de-julian.md).
 Lo usa revision_4.py.
@@ -22,7 +23,7 @@ from designs import build
 W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 R = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
 q = lambda t: f'{{{W}}}{t}'
-FIRMA = 'JULIÁN BERMÚDEZ · THE CHANNEL'
+FIRMA = 'JULIÁN BERMÚDEZ'
 
 # el mismo papel que assets.py (la textura de cada libro)
 DPI = 200
