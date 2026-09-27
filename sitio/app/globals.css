@@ -541,3 +541,6 @@ html.sin-revelar .umbral { display: none !important; }
 html.sin-revelar .revelar, html.sin-revelar .trazo, html.sin-revelar .palabras .p, html.sin-revelar .ornamento.revelar span, html.sin-revelar .revelar .despues { opacity: 1 !important; transform: none !important; filter: none !important; }
 html.sin-revelar .foto .foto-marco { clip-path: none !important; }
 html.sin-revelar .foto .foto-pie { opacity: 1 !important; }
+.yosoy-altavoz { width: 2rem; height: 2rem; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--linea); border-radius: 999px; color: var(--gris); transition: color 0.4s var(--lento), border-color 0.4s var(--lento); }
+.yosoy-altavoz:hover, .yosoy-altavoz:focus-visible { color: var(--crema); border-color: var(--gris); }
+.yosoy-altavoz[aria-pressed="true"] { color: var(--crema); }

@@ -59,8 +59,14 @@ export default function Musica() {
 
   useEffect(() => {
     const abrir = () => setAbierta(true);
+    // cuando se silencia el sitio (desde Yo Da), la música también se detiene
+    const pausar = () => control.current?.pause();
     window.addEventListener("jb:musica", abrir);
-    return () => window.removeEventListener("jb:musica", abrir);
+    window.addEventListener("jb:musica-pausa", pausar);
+    return () => {
+      window.removeEventListener("jb:musica", abrir);
+      window.removeEventListener("jb:musica-pausa", pausar);
+    };
   }, []);
 
   const siguiente = () => {

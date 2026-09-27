@@ -74,3 +74,23 @@ test("la música no suena sola: el botón abre el panel y explica el volumen", a
   await expect(panel).toContainText("El volumen, desde tu dispositivo");
   await expect(panel.getByRole("button", { name: "Escuchar" })).toBeVisible();
 });
+
+test("Yo Da saca el sonido del sitio (y lo vuelve a poner)", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("yosoy-boton").click();
+  const yo = page.getByTestId("yosoy");
+  const campo = yo.getByLabel("Escribile a Yo Da");
+  await campo.fill("sacame el sonido por favor");
+  await campo.press("Enter");
+  const boton = yo.getByTestId("yosoy-sonido");
+  await expect(boton).toHaveText(/Silenciar el sitio/);
+  await boton.click();
+  await expect(boton).toHaveText(/Activar el sonido/);
+  expect(await page.evaluate(() => localStorage.getItem("jb-sonido"))).toBe("no");
+  // el altavoz de la cabecera de Yo Da muestra lo mismo y lo vuelve a prender
+  const altavoz = yo.getByTestId("yosoy-altavoz");
+  await expect(altavoz).toHaveAttribute("aria-pressed", "true");
+  await altavoz.click();
+  expect(await page.evaluate(() => localStorage.getItem("jb-sonido"))).toBe("si");
+  await expect(boton).toHaveText(/Silenciar el sitio/);
+});

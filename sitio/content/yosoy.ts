@@ -18,6 +18,7 @@ export type Accion =
   | { tipo: "link"; texto: string; href: string }
   | { tipo: "instalar" }
   | { tipo: "musica" }
+  | { tipo: "sonido" }
   | { tipo: "horarios" };
 
 /** `cuenta: true`: tema de una compra, un encuentro o el acceso; sin sesión, Yo Da primero pide ingresar o crear la cuenta. */
@@ -147,6 +148,12 @@ export const temas: Tema[] = [
       { tipo: "link", texto: "Mi cuenta", href: "/mi-espacio/cuenta" },
     ],
     cuenta: true,
+  },
+  {
+    id: "sonido",
+    claves: ["sonido", "silenci", "mute", "mutear", "callar", "calla", "apaga el sonido", "sin sonido", "volumen", "ruido", "molesta"],
+    respuesta: "Hmm. También el silencio enseña. Desde aquí, el sonido del sitio apagar o prender podés. Si la música suena, también se detiene:",
+    acciones: [{ tipo: "sonido" }],
   },
   {
     id: "musica",

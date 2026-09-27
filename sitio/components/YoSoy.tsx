@@ -5,6 +5,7 @@ import OjoPixel from "./OjoPixel";
 import Hora from "./Hora";
 import { abrirMusica } from "./Musica";
 import { instalar } from "@/lib/instalar";
+import { activarSonido, sonidoActivo } from "@/lib/sonido";
 import { aviso, avisoCon, entender, nombreBot, noEntendi, pedirCuenta, puertasCuenta, saludo, saludoCon, temas, type Accion, type Tema } from "@/content/yosoy";
 
 type Mensaje = { de: "yo" | "vos"; texto: string; acciones?: Accion[]; chips?: boolean };
@@ -28,6 +29,42 @@ function Tipeo({ texto }: { texto: string }) {
       <span className="sr-only">{texto}</span>
       <span aria-hidden="true">{texto.slice(0, n)}</span>
     </>
+  );
+}
+
+/** Apagar o prender el sonido del sitio (al apagar, también se pausa la música). */
+function useSonido(): [boolean, () => void] {
+  const [si, setSi] = useState(true);
+  useEffect(() => {
+    const leer = () => setSi(sonidoActivo());
+    leer();
+    window.addEventListener("jb-sonido", leer);
+    return () => window.removeEventListener("jb-sonido", leer);
+  }, []);
+  const cambiar = () => {
+    const nuevo = !sonidoActivo();
+    activarSonido(nuevo);
+    if (!nuevo) window.dispatchEvent(new Event("jb:musica-pausa"));
+  };
+  return [si, cambiar];
+}
+
+function Altavoz({ si }: { si: boolean }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true">
+      <path d="M4 9h4l5-4v14l-5-4H4z" />
+      {si ? <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" /> : <path d="M17 9l5 6M22 9l-5 6" />}
+    </svg>
+  );
+}
+
+function BotonSonido() {
+  const [si, cambiar] = useSonido();
+  return (
+    <button type="button" className="yosoy-accion inline-flex items-center gap-2" onClick={cambiar} aria-pressed={!si} data-testid="yosoy-sonido">
+      <Altavoz si={si} />
+      {si ? "Silenciar el sitio" : "Activar el sonido"}
+    </button>
   );
 }
 
@@ -69,6 +106,7 @@ export default function YoSoy() {
   const [nube, setNube] = useState(false);
   const nombre = useRef<string | null>(null);
   const [conSesion, setConSesion] = useState<string | null>(null);
+  const [sonidoSi, cambiarSonido] = useSonido();
 
   const quienEs = () =>
     fetch("/api/yo")
@@ -169,6 +207,7 @@ export default function YoSoy() {
 
   const accion = (a: Accion, i: number) => {
     if (a.tipo === "horarios") return <Horarios key={i} />;
+    if (a.tipo === "sonido") return <BotonSonido key={i} />;
     if (a.tipo === "link")
       return (
         <Link key={i} href={a.href} className="yosoy-accion" onClick={() => setAbierto(false)}>
@@ -226,6 +265,17 @@ export default function YoSoy() {
             <p className="text-lg leading-none">{nombreBot}</p>
             <p className="firma texto-2 text-[0.7rem] mt-1">guía del sitio</p>
           </div>
+          <button
+            type="button"
+            className="yosoy-altavoz"
+            onClick={cambiarSonido}
+            aria-pressed={!sonidoSi}
+            aria-label={sonidoSi ? "Silenciar el sitio" : "Activar el sonido"}
+            title={sonidoSi ? "Silenciar el sitio" : "Activar el sonido"}
+            data-testid="yosoy-altavoz"
+          >
+            <Altavoz si={sonidoSi} />
+          </button>
           <button type="button" className="enlace texto-2 text-sm" onClick={() => setAbierto(false)}>
             Cerrar
           </button>
