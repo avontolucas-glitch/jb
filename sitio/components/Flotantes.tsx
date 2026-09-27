@@ -1,6 +1,6 @@
 /**
  * Los emblemas de los capítulos de la trilogía flotan muy despacio, como polvo
- * en la luz. Posiciones y tiempos fijos (iguales en el servidor y en el navegador).
+ * en la luz; entre ellos, algunos de cocina (el universo de chef de Julián). Posiciones y tiempos fijos (iguales en el servidor y en el navegador).
  */
 const emblemas = [
   ["receta-0-dos-formatos", "Dos formatos de la mente"],
@@ -22,6 +22,13 @@ const emblemas = [
   ["pensamiento-6-atravesar-el-tiempo", "Atravesar el tiempo"],
   ["tres-clavos", "Los tres clavos"],
   ["surf", "El surf (próximo capítulo)"],
+  // el universo de chef de Julián (un plus del sitio: no van en los libros)
+  ["cocina-cuchillo", "Cuchillo de chef"],
+  ["cocina-sarten", "Sartén"],
+  ["cocina-batidor", "Batidor"],
+  ["cocina-cuchara", "Cuchara de madera"],
+  ["cocina-parrilla", "Parrilla"],
+  ["cocina-gorro", "Gorro de chef"],
 ] as const;
 
 // [izquierda %, tamaño px, duración de subida s, retardo s, vaivén s]
@@ -33,6 +40,9 @@ const recorridos = [
   [30, 22, 165, -150, 22],
   [50, 46, 132, -66, 18],
   [70, 40, 146, -12, 16],
+  // la cocina: chicos y espaciados entre los emblemas, para que se note sin pesar
+  [24, 30, 154, -34, 15], [66, 26, 141, -112, 18], [38, 28, 162, -80, 14],
+  [86, 32, 149, -52, 17], [56, 28, 158, -136, 19], [10, 30, 144, -100, 16],
 ];
 
 export default function Flotantes() {

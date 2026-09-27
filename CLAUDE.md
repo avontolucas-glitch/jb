@@ -84,6 +84,7 @@ Nunca autor, nunca coautor. No se agregan enseñanzas, conceptos, ejemplos, anal
 - `integrar_sitio.py` y `contratapas_sitio.py`: agregan el sitio a los libros (página del código y QR) y a las contratapas, como versiones nuevas.
 - `emblemas_nuevos.py`: el clavo y los tres clavos, con el mismo motor de grabado. `surf_desde_imagen.py`: el emblema del surf, a partir del dibujo de Lucas (`diseño/referencias/surf.png`; ver `diseño/referencias/LEEME.md`).
 - `fotos_web.py`: pasa las fotos de Julián (`diseño/fotos/`) a blanco y negro para el sitio.
+- `emblemas_cocina.py` (con `cocina/<ícono>.py`): los íconos de cocina del universo chef de Julián (cuchillo, sartén, batidor, cuchara de madera, parrilla, gorro), tallados con el mismo motor; flotan en el sitio entre los emblemas. Son un plus del sitio: no van en los libros.
 
 ## Sitio web (`sitio/`)
 
