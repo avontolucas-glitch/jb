@@ -21,7 +21,7 @@ type Control = {
   togglePlay: () => void;
   pause: () => void;
   destroy: () => void;
-  addListener: (ev: string, cb: (e: { data: { isPaused: boolean; position: number; duration: number } }) => void) => void;
+  addListener: (ev: string, cb: (e: { data: { isPaused: boolean; isBuffering?: boolean; position: number; duration: number } }) => void) => void;
 };
 type IFrameAPI = { createController: (el: HTMLElement, o: { uri: string; width: string; height: number }, cb: (c: Control) => void) => void };
 declare global {
@@ -101,16 +101,23 @@ export default function Musica() {
   const [nav, setNav] = useState<Navegador>("otro");
   const [probando, setProbando] = useState(false);
   const [noAbrio, setNoAbrio] = useState(false);
+  // se tocó «Escuchar» y no arrancó (en el celular, a veces hay que tocar la primera vez el ▶ de adentro del reproductor)
+  const [trabado, setTrabado] = useState(false);
+  const [listaSesion, setListaSesion] = useState(false);
+  const vigia = useRef<number | undefined>(undefined);
   const estadoRef = useRef(estado);
   estadoRef.current = estado;
   // las funciones de adentro cambian en cada render: los eventos usan siempre la última
-  const accionesRef = useRef({ empezar: () => {}, siguiente: () => {}, recargar: () => {} });
+  const accionesRef = useRef<{ empezar: () => void; siguiente: () => void; recargar: (auto?: boolean) => void }>({ empezar: () => {}, siguiente: () => {}, recargar: () => {} });
 
   useEffect(() => {
     setNav(navegador());
     const abrir = () => setAbierta(true);
     // cuando se silencia el sitio (desde Yo Da), la música también se detiene
-    const pausar = () => control.current?.pause();
+    const pausar = () => {
+      window.clearTimeout(vigia.current);
+      control.current?.pause();
+    };
     // desde Yo Da: «poné música», «otro tema»
     const poner = () => {
       setAbierta(true);
@@ -124,7 +131,8 @@ export default function Musica() {
       setProbando(true);
       window.setTimeout(() => {
         setProbando(false);
-        accionesRef.current.recargar();
+        // se rearma con la sesión, pero no suena solo: sin un toque, el celular no deja
+        accionesRef.current.recargar(true);
       }, 700);
     };
     window.addEventListener("jb:musica", abrir);
@@ -150,15 +158,36 @@ export default function Musica() {
     ultimo.current = { pos: 0, dur: 0 };
     c.loadUri(`spotify:track:${actual.current}`);
     c.play();
+    vigilar();
   };
 
-  /** Vuelve a armar el reproductor (después de iniciar sesión en Spotify en este navegador). */
-  function recargar() {
+  /** Después de pedir que suene: si en unos segundos no avanza, se ofrece ayuda. */
+  function vigilar() {
+    window.clearTimeout(vigia.current);
+    setTrabado(false);
+    const desde = ultimo.current.pos;
+    vigia.current = window.setTimeout(() => {
+      if (estadoRef.current !== "sonando" || ultimo.current.pos <= desde) {
+        setTrabado(true);
+        setAbierta(true);
+      }
+    }, 7000);
+  }
+
+  /**
+   * Vuelve a armar el reproductor (después de iniciar sesión en Spotify en este navegador).
+   * `auto`: al volver del login, sin un toque de la persona: se arma pero no suena (el
+   * celular no deja reproducir sin un toque, y el reproductor quedaba trabado).
+   */
+  function recargar(auto = false) {
     control.current?.destroy();
     control.current = null;
+    window.clearTimeout(vigia.current);
+    setTrabado(false);
     setFragmentos(false);
     setEstado("quieta");
-    empezar();
+    setListaSesion(auto);
+    armar(!auto);
   }
 
   function iniciarSesion() {
@@ -193,11 +222,21 @@ export default function Musica() {
     }
   }
 
-  async function empezar() {
-    if (control.current) {
-      control.current.togglePlay();
+  /** El botón: «Escuchar» reproduce y «Pausa» pausa (nunca alterna a ciegas: si el estado quedó raro, alternar lo dejaba trabado). */
+  function empezar() {
+    setListaSesion(false);
+    const c = control.current;
+    if (!c) return armar(true);
+    if (estadoRef.current === "sonando") {
+      window.clearTimeout(vigia.current);
+      c.pause();
       return;
     }
+    c.play();
+    vigilar();
+  }
+
+  async function armar(reproducir: boolean) {
     setEstado("cargando");
     try {
       const api = await cargarAPI();
@@ -206,10 +245,16 @@ export default function Musica() {
       actual.current = alAzar();
       api.createController(el, { uri: `spotify:track:${actual.current}`, width: "100%", height: 80 }, (c) => {
         control.current = c;
-        c.addListener("ready", () => c.play());
+        c.addListener("ready", () => {
+          if (reproducir) {
+            c.play();
+            vigilar();
+          } else setEstado("quieta");
+        });
         c.addListener("playback_update", (e) => {
           const { isPaused, position, duration } = e.data;
           setEstado(isPaused ? "pausa" : "sonando");
+          if (!isPaused && position > 0) setTrabado(false);
           if (duration > 0) setFragmentos(duration <= 31000);
           contar(!isPaused, duration);
           // terminó el tema (o el fragmento de 30 s): otro al azar
@@ -250,7 +295,7 @@ export default function Musica() {
         <div ref={lugar} className="musica-reproductor mt-3" />
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <button type="button" className="boton py-1 px-3 text-sm" onClick={empezar} data-testid="musica-play">
-            {estado === "cargando" ? "Cargando…" : sonando ? "Pausa" : control.current ? "Seguir" : "Escuchar"}
+            {estado === "cargando" ? "Cargando…" : sonando ? "Pausa" : estado === "pausa" ? "Seguir" : "Escuchar"}
           </button>
           {control.current && (
             <button type="button" className="boton py-1 px-3 text-sm" onClick={siguiente}>
@@ -261,6 +306,28 @@ export default function Musica() {
             Cerrar
           </button>
         </div>
+        {listaSesion && (
+          <p className="texto-2 text-xs mt-2 leading-relaxed" role="status" data-testid="musica-sesion-lista">
+            Listo: si iniciaste sesión, tocá «Escuchar» y los temas suenan enteros.
+          </p>
+        )}
+        {trabado && (
+          <div className="mt-3 border-t borde pt-3 text-sm" role="status" data-testid="musica-trabado">
+            <p className="leading-snug">¿No arranca?</p>
+            <p className="texto-2 text-xs mt-1 leading-relaxed">
+              En el celular, la primera vez a veces hay que tocar el ▶ de adentro del reproductor de Spotify, acá arriba. Y Spotify deja sonar tu cuenta en un
+              solo lugar a la vez: si la estás escuchando en la computadora o en la app, se frena acá (pausala allá y probá de nuevo).
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <button type="button" className="boton py-1 px-3 text-sm" onClick={() => recargar()}>
+                Probar de nuevo
+              </button>
+              <a href={PLAYLIST_WEB} target="_blank" rel="noopener noreferrer" className="enlace texto-2 text-sm" onClick={abrirEnApp}>
+                Escuchar en tu app
+              </a>
+            </div>
+          </div>
+        )}
         {fragmentos && (
           <div className="mt-3 border-t borde pt-3 text-sm" data-testid="musica-fragmentos">
             <p className="leading-snug">
@@ -279,7 +346,7 @@ export default function Musica() {
                 Escuchar en tu app
               </a>
               {nav !== "ios" && nav !== "safari" && (
-                <button type="button" className="enlace texto-2 text-sm" onClick={recargar}>
+                <button type="button" className="enlace texto-2 text-sm" onClick={() => recargar()}>
                   {probando ? "Probando…" : "Probar de nuevo"}
                 </button>
               )}

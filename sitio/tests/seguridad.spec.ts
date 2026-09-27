@@ -114,10 +114,20 @@ test("con la CSP, las páginas principales no registran violaciones y el umbral,
   const page = await ctx.newPage();
   const violaciones = await vigilarCsp(page);
   try {
-    // con sesión (el 1 a 1 se desbloquea con la cuenta), así Yo Da trae los horarios
-    await page.goto("/ingresar");
-    await page.getByRole("button", { name: "Entrar como comprador@demo.com" }).click();
-    await page.waitForURL("**/mi-espacio");
+    // con sesión (el 1 a 1 se desbloquea con la cuenta), así Yo Da trae los horarios.
+    // Se ingresa en otra pestaña que ya pasó el umbral (la marca vive en sessionStorage,
+    // que es de cada pestaña): la cookie queda para todo el navegador y esta pestaña
+    // todavía ve la bienvenida.
+    const login = await ctx.newPage();
+    await login.addInitScript(() => {
+      try {
+        sessionStorage.setItem("jb-umbral", "1");
+      } catch {}
+    });
+    await login.goto("/ingresar");
+    await login.getByRole("button", { name: "Entrar como comprador@demo.com" }).click();
+    await login.waitForURL("**/mi-espacio");
+    await login.close();
     await page.goto("/");
     await page.getByRole("button", { name: "Entrar" }).click();
     await expect(page.getByTestId("umbral")).toBeHidden();

@@ -46,6 +46,6 @@ export const frases: Frase[] = [
   { libro: "biografia", capitulo: "Cap. 1 — El Reconocimiento", texto: "Yo creo que la mente humana verdaderamente está todo el día mediante Instagram, mediante YouTube, mediante un librito, mediante ir a algún lugar, un evento, lo que sea, buscando una palabra, buscando una palabra." },
   { libro: "biografia", capitulo: "Cap. 1 — El Reconocimiento", texto: "Es impresionante, pero es real: sos vos mismo que, cuando se te ocurre la palabra o la encontraste y te identificás con esa palabra, basta para sanarte." },
   { libro: "biografia", capitulo: "Cap. 2 — El Desastre", texto: "Realmente la conversación mental crea la realidad y hablar tres o cuatro veces ya del mismo problema no tiene ningún tipo de sentido positivo." },
-  { libro: "biografia", capitulo: "Cap. 2 — El Desastre", texto: "Puedo llorar todo lo que quieras, pero detrás del que está llorando hay alguien que está muy tranquilo observando cómo vos estás llorando. Y yo siempre fui esa conciencia." },
+  { libro: "biografia", capitulo: "Cap. 2 — El Desastre", texto: "Podés llorar todo lo que quieras, pero detrás del que está llorando hay alguien que está muy tranquilo observando cómo vos estás llorando. Y yo siempre fui esa conciencia." },
   { libro: "biografia", capitulo: "Cap. 3 — Poner a Prueba", texto: "Entonces el día que bajé de peso físicamente y empecé a sentirme mejor conmigo mismo, muchas imágenes mentales se abrieron en mi mente de un buen futuro porque empecé a creer que eso ya podía ser posible de verdad." },
 ];
