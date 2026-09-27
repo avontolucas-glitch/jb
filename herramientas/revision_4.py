@@ -90,9 +90,13 @@ def procesar(k, nombre, registro, agregados, respiros):
             assert normal(tx[n]).startswith(normal(f['ancla'])), f'{k} ¶{n}: el ancla no coincide: «{f["ancla"]}» / «{tx[n][:80]}»'
         ppr = ancla.find(q('pPr'))
         assert ppr is not None and ppr.find(q('sectPr')) is None and ancla.find('.//' + q('framePr')) is None, f'{k} ¶{n}: no es un párrafo de cuerpo'
-        jc = ppr.find(q('jc'))
-        assert jc is not None and jc.get(q('val')) == 'both', f'{k} ¶{n}: no es un párrafo de cuerpo (justificado)'
-        nuevos = [nuevo_parrafo(ancla, t) for f in grupo for t in f['parrafos']]
+        cuerpo = lambda e: e.tag == q('p') and e.find(f'{q("pPr")}/{q("jc")}') is not None and e.find(f'{q("pPr")}/{q("jc")}').get(q('val')) == 'both'
+        # después de una nota de puente (va centrada, más chica): el formato lo da el párrafo de cuerpo de antes
+        modelo = ancla
+        if not cuerpo(ancla):
+            assert tx[n].strip().startswith('Este mismo'), f'{k} ¶{n}: no es un párrafo de cuerpo (justificado) ni una nota de puente'
+            modelo = next(hijos[i] for i in range(n - 1, 0, -1) if cuerpo(hijos[i]))
+        nuevos = [nuevo_parrafo(modelo, t) for f in grupo for t in f['parrafos']]
         # el cierre ◆ ◆ ◆ va pegado al último párrafo: si se agrega al final del capítulo, lo sigue pegado
         if n + 1 < len(hijos) and es_cierre(hijos[n + 1]) and r3.sacar(ppr, 'keepNext'):
             npr = nuevos[-1].find(q('pPr'))

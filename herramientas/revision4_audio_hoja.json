@@ -1,0 +1,810 @@
+[
+ {
+  "libro": "biografia",
+  "parrafo": 145,
+  "original": "El libro termina hoy en ¶145: «…había sucedido tal cual lo había sentido de antemano».",
+  "propuesta": "Con las inserciones, el libro termina en «Si perdonaste, tenés más chance de encontrar una solución, o de que la vida inclusive te acompañe a encontrar una solución.» (después vienen la casa, el pelo y el perdón al padre, en el orden del audio). No hay otro lugar: ¶138-145 es una sola secuencia con el puente de Shelleyar.",
+  "pregunta": "¿aprobás el nuevo final de la Biografía? Si preferís conservar ¶145 como final, la salida es dejar afuera estos tres fragmentos. El pelo y el perdón van juntos; la casa se puede dejar sola, pero entonces el libro termina en «Llevó un año esto».",
+  "editorial": true
+ },
+ {
+  "libro": "receta",
+  "parrafo": 73,
+  "original": "tomando algo con una mía o con quien sea",
+  "propuesta": "tomando algo con una mina o con quien sea",
+  "pregunta": "¿Dijo «con una mina» o «con una amiga»? Por el sonido pueden ser las dos.",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 73,
+  "original": "interiorizarte un poco más por lo que al otro subía",
+  "propuesta": "interiorizarte un poco más por lo que al otro le sucedía",
+  "pregunta": "¿Dijo «le sucedía», «le pasaba» u otra cosa?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 73,
+  "original": "como diría Serati, hoy volví cansado de hablar de mí",
+  "propuesta": "como diría Cerati, «hoy volví cansado de hablar de mí»",
+  "pregunta": "¿La frase es de Cerati y la letra es exactamente esa? Hay que verificarlo para citarla tal cual entre comillas.",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 73,
+  "original": "te estoy quitando ese ejemplo, muntanísimo",
+  "propuesta": "Te estoy tirando ese ejemplo, mundanísimo",
+  "pregunta": "¿Dijo «tirando», «dando» o «citando»? ¿Y «mundanísimo»?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 73,
+  "original": "si vos te procuras en hacerte una sola pregunta",
+  "propuesta": "si vos te preocupás en hacerte una sola pregunta",
+  "pregunta": "¿Dijo «te preocupás en», «te ocupás en» o «procurás hacerte»?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 73,
+  "original": "Uno dice corporalmente, no dice verbalmente, porque está mal conectado.",
+  "propuesta": "Uno dice corporalmente, no dice verbalmente, porque está mal considerado.",
+  "pregunta": "¿Dijo «mal considerado» o «mal visto»? Las dos encajan con lo que dice antes: que socialmente no está bueno hablar bien de uno.",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 84,
+  "original": "tenés que ser creativo en poder contar en tu imaginación el espejo",
+  "propuesta": "En el libro quedó «contar». Alternativas: «crear» o «montar».",
+  "pregunta": "¿Dijo «contar», «crear» o «montar» el espejo en la imaginación?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 84,
+  "original": "Y estás perdiendo el tiempo nomás. No es que estás perdiendo el tiempo. (se corta: «A ver una pregunta que acá había»)",
+  "propuesta": "Se deja «Y estás perdiendo el tiempo nomás» y se saca la frase cortada",
+  "pregunta": "Justo después empezó a decir «No es que estás perdiendo el tiempo…» y no la terminó. ¿Quería matizar lo anterior? Si es así, ¿cómo sigue la frase, o se saca «Y estás perdiendo el tiempo nomás»?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 96,
+  "original": "Acordáte del desarrollo mental, como lo diría hoy yo, la ebriedad del conocimiento",
+  "propuesta": "En el libro queda: «Acordate del desarrollo mental, como lo diría hoy yo: la ebriedad del conocimiento.» Si no fue eso, se saca la oración entera y la idea sigue con «Porque muchas personas… ebria de conocimiento».",
+  "pregunta": "¿dijiste «acordate del desarrollo mental»? La transcripción automática puede haber confundido otra expresión; ¿cómo va?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 118,
+  "original": "¿Cuándo atraveses la materialización con el cuerpo físico? Vos vas a decir, soy millonario, ¿verdad? ¿Lo conseguís? En serio, esto está pasando.",
+  "propuesta": "Cuando atravieses la materialización con el cuerpo físico, vos vas a decir: «soy millonario», ¿verdad? «¿Lo conseguí? En serio, esto está pasando»",
+  "pregunta": "¿Dijiste «¿lo conseguí?» (lo que dice la persona cuando atraviesa el cuerpo físico) o era otra cosa?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 118,
+  "original": "ponemos a prueba a ver si no abro las ventanas de los cielos y derramos sobre vosotros bendición tan grande que no tengas para recibirla. No tengas lugar para recibirla.",
+  "propuesta": "RVR1960, Malaquías 3:10: «y probadme ahora en esto, dice Jehová de los ejércitos, si no os abriré las ventanas de los cielos, y derramaré sobre vosotros bendición hasta que sobreabunde». Por ahora queda como lo dijiste, con «ponedme» y «derramo» corregidos del reconocimiento de voz.",
+  "pregunta": "Lo citaste de memoria, y «tan grande que no tengas lugar para recibirla» se parece más a otras traducciones. ¿Queda como lo dijiste o se cambia por el texto de la RVR1960?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "todos mis mambos como cocina",
+  "propuesta": "todos mis mambos como cocinero",
+  "pregunta": "¿Dijo «como cocinero» o «de cocina»?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "ir al ICI y comprarse una motosierra",
+  "propuesta": "ir al Easy y comprarse una motosierra",
+  "pregunta": "¿«ICI» es Easy, la cadena de ferretería de Argentina? ¿Se deja el nombre de la marca o se pone otra cosa? (Julián aclara en el vivo que no quiere hacer publicidad.)",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "caso el árbol más, que esté caído por ahí",
+  "propuesta": "cazo el árbol más... que esté caído por ahí",
+  "pregunta": "¿Qué dijo: «cazo», «busco», «agarro»? ¿«el árbol más [grande]»? La frase queda cortada en «más...».",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "me lo corto todo trueno",
+  "propuesta": "me lo corto todo en trozos",
+  "pregunta": "¿Dijo «en trozos», «en troncos» o «entero»?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "me estoqueo, me estoqueo, estoqueo, estoqueo",
+  "propuesta": "me stockeo, me stockeo, stockeo, stockeo",
+  "pregunta": "¿Se escribe «stockeo» (anglicismo) o «estoqueo»?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "dale, que dale, dale, que vuelta, buscando madera",
+  "propuesta": "dale que dale, dale que va, buscando madera",
+  "pregunta": "¿Dijo «dale que va» o «dale vueltas»?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "vos siempre conseguiste lo que querías escuchar, y ahí me olvidé",
+  "propuesta": "«vos siempre conseguiste lo que querías», escuché. Y ahí me olvidé",
+  "pregunta": "¿El «escuchar» es «escuché», o era parte de la frase («lo que querías escuchar»)?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "porque encima que no la conseguía físicamente y la conversación me logré una satisfacción",
+  "propuesta": "porque encima que no la conseguía físicamente, la conversación me logró una satisfacción",
+  "pregunta": "¿Dijo «la conversación me logró una satisfacción» o «con la conversación logré una satisfacción»?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "no voy a buscar árboles caídos y digo, no, no, yo no tenía que hacer esto, yo tenía que ir para otro lado, pero bueno, tengo la motosierra en el baúl",
+  "propuesta": "«no, no, yo no tenía que hacer esto, yo tenía que ir para otro lado». Pero bueno, tengo la motosierra en el baúl.",
+  "pregunta": "¿«Pero bueno, tengo la motosierra en el baúl» es parte de lo que se dice a sí mismo (dentro de las comillas) o es su comentario al contar?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "veo en solicitudes una cuenta que se llama Fuegos, / ya, [...] también me pasó algo como el de FuegoYa",
+  "propuesta": "una cuenta que se llama Fuego Ya",
+  "pregunta": "Para Julián: ¿cómo se llama exactamente la cuenta de leña que te escribió (Agustín)? Para Lucas: en el mismo vivo Julián prefiere no nombrar a otra empresa; ¿se deja el nombre de la marca o solo «una cuenta» (sacando «que se llama Fuego Ya»)?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "la mejor pregunta que me podrías haber hecho era, ¿cuánta madera necesito?",
+  "propuesta": "«¿cuánta madera necesitás?»",
+  "pregunta": "Para Julián: la pregunta que te hicieron era «¿qué cantidad de madera necesitás?»; la transcripción dice «necesito». ¿Es «necesitás»? Y antes, cuando les respondés «¿Qué les gustaría saber?», ¿era «saber» o «hacer»?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "a los tres días de dedicarle dos noches nada más, de cuatro cuadras cada uno",
+  "propuesta": "de cuatro cuadras cada una (se deja como lo dijo)",
+  "pregunta": "Para Julián: un momento antes la conversación «duró literalmente lo que duran tres cuadras a 40 kilómetros por hora»; acá, «dos noches... de cuatro cuadras cada una». ¿Se deja así?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "400 kilos de quebracho colorado, 400 kilos de quebracho blanco y 200 kilos de espinillo",
+  "propuesta": "Se deja tal cual (suma la tonelada que dice)",
+  "pregunta": "Para Julián: ¿confirmás las cifras y las maderas?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "cualquier cosa que pidas en oración, oración es hablar, es una oración, creyendo que ya la tenés, la vas a recibir",
+  "propuesta": "RVR1960, Mateo 21:22: «Y todo lo que pidiereis en oración, creyendo, lo recibiréis.» (también Marcos 11:24: «Por tanto, os digo que todo lo que pidiereis orando, creed que lo recibiréis, y os vendrá.»)",
+  "pregunta": "Julián lo dice con sus palabras, no lo lee: se deja como lo dijo, sin comillas ni cita. ¿Se agrega la referencia RVR1960 (Mateo 21:22) o queda así?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 130,
+  "original": "El grano no tendrías una Ferrari estacionada en la puerta de tu casa.",
+  "propuesta": "En general no tendrías una Ferrari estacionada en la puerta de tu casa.",
+  "pregunta": "¿Qué dijo Julián antes de «no tendrías una Ferrari»? ¿«En general», «Hermano» (que suena parecido a «el grano») u otra cosa?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 130,
+  "original": "Y meterte en una conversación que estás aquí en el bar con un amigo y ve un amigo vos le digas, tengo una Ferrari. Porque la Ferrari está estacionada ahí en la puerta, hermano.",
+  "propuesta": "Y meterte en una conversación: que estás aquí en el bar con un amigo, y viene un amigo, sin que vos le digas «tengo una Ferrari», porque la Ferrari está estacionada ahí en la puerta, hermano.",
+  "pregunta": "Ojo: «sin que» NO está en la transcripción; es la lectura que le da sentido a la frase (el amigo ve la Ferrari sin que vos le digas «tengo una Ferrari»), y así quedó en el libro. ¿Cuáles son las palabras exactas («y viene un amigo», «sin que vos le digas»)? Si Julián prefiere, se saca la oración y el párrafo sigue con «Primero la ve…».",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 130,
+  "original": "Primero dormido la ve. Hermano, ¿cómo hiciste para conseguir eso?",
+  "propuesta": "Primero la ve: «Hermano, ¿cómo hiciste para conseguir eso?».",
+  "pregunta": "¿Qué es «dormido»? ¿«De reojo», «de una», otra cosa? Por ahora se sacó la palabra.",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 157,
+  "original": "Hay una parte de mi mente que mientras yo estaba consiguiendo la manera proyectaba constantemente con tal esta experiencia.",
+  "propuesta": "Hay una parte de mi mente que, mientras yo estaba consiguiendo la manera, proyectaba constantemente contar esta experiencia.",
+  "pregunta": "¿Dijiste «proyectaba constantemente contar esta experiencia»? Y «consiguiendo la manera», ¿era eso o «la manifestación»?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 157,
+  "original": "Ponete a pensar, cambie la dirección.",
+  "propuesta": "Ponete a pensar: «cambié la dirección».",
+  "pregunta": "¿Dijo «cambié la dirección», «tengo que cambiar la dirección» o «cambiá la dirección»?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 157,
+  "original": "digo, el camino conocido, ni siquiera vamos a algo que pone el GPS, por las cámaras. Bueno, pone el GPS, voy a mi casa, digo, pero si yo quiero mudarme",
+  "propuesta": "digo, el camino conocido. Voy a mi casa, digo: «pero si yo quiero mudarme…» (se sacó «ni siquiera vamos a algo que pone el GPS, por las cámaras. Bueno, pone el GPS,»)",
+  "pregunta": "En la transcripción esto no se entiende (¿«ni siquiera hace falta que ponga el GPS, lo pongo por las cámaras. Bueno, pongo el GPS»?). ¿Lucas lo puede escuchar y confirmar si hay que restituirlo?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 199,
+  "original": "por la aliviandada",
+  "propuesta": "por lo alivianado",
+  "pregunta": "¿Dijo «por lo alivianado» (el peso del teléfono) o «por lo liviano»?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 199,
+  "original": "este es un 12 Pro Max… me doy cuenta que es un 13 Pro Max. Así que el cerebro 12, 13 sabe qué está teniendo",
+  "propuesta": "Se deja como lo dijo: primero cree que es un 12 y al tocarlo se da cuenta de que es un 13, o sea que el cerebro distingue un modelo del otro.",
+  "pregunta": "¿El paso del 12 al 13 es parte del ejemplo, como se lee, o fue un lapsus y era siempre el mismo modelo?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 199,
+  "original": "el libro de Joe Vitale, el poder de la atracción",
+  "propuesta": "El factor de atracción (título en español del libro de Joe Vitale); por ahora queda como lo dijo Julián",
+  "pregunta": "¿Se deja el título como lo dijo Julián o se corrige al título real, El factor de atracción?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 203,
+  "original": "No es la escalera del holder edificio, la de tu casa.",
+  "propuesta": "No es la escalera del edificio, la de tu casa,",
+  "pregunta": "¿«holder» es un arranque falso antes de «edificio», o dijo otra cosa (por ejemplo, «del hall del edificio»)?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 203,
+  "original": "orbes o como lucecitas que te parecen por reflejos del ojo",
+  "propuesta": "orbes o como lucecitas que te aparecen por reflejos del ojo",
+  "pregunta": "¿Dijo «que te aparecen por reflejos del ojo» o «que te parecen reflejos del ojo»?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 203,
+  "original": "y vos ahora pensás, pensás en Juliana no, vuelve a mirar esto",
+  "propuesta": "Y vos ahora pensás, pensás en Julián... No, volvé a mirar esto.",
+  "pregunta": "¿Dijo «pensás en Julián» (en él, que está explicando) o era otra palabra? Whisper puso «Juliana».",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 203,
+  "original": "por eso se llamaba un virgen justamente porque al rey le iba a dar descendencias",
+  "propuesta": "Porque por eso se llamaban vírgenes, justamente, porque al rey le iban a dar descendencia.",
+  "pregunta": "¿Es esta la lectura de lo que dijo sobre por qué se llamaban vírgenes? Hay que confirmarla con el audio.",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 203,
+  "original": "nuestra personalidad de la razón imprubente y nuestra personalidad de la razón imprubente, la razón más iluminada",
+  "propuesta": "nuestra personalidad de la razón imprudente y nuestra personalidad de la razón prudente, la razón más iluminada",
+  "pregunta": "Whisper repite «imprudente» dos veces. Por el sentido, la segunda debería ser «prudente» (la razón más iluminada). ¿Es así en el audio?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 203,
+  "original": "acordate que hay 10 virgenes 5 prubentes y 5 imprubentes, las imprubentes se quedaron dormidas porque no llevaron aceite ni frasadas ni comida, las prubentes llevaron frasadas, comida y víveres y aceite […] cuando llegó el rey en el medio de la noche",
+  "propuesta": "Se deja como lo contó Julián. Como referencia, la RVR1960 (Mateo 25:1-6): «Entonces el reino de los cielos será semejante a diez vírgenes que tomando sus lámparas, salieron a recibir al esposo. Cinco de ellas eran prudentes y cinco insensatas. Las insensatas, tomando sus lámparas, no tomaron consigo aceite; mas las prudentes tomaron aceite en sus vasijas, juntamente con sus lámparas. Y tardándose el esposo, cabecearon todas y se durmieron. Y a la medianoche se oyó un clamor: ¡Aquí viene el esposo; salid a recibirle!»",
+  "pregunta": "Julián cuenta la parábola de memoria, con su lectura: dice «el rey» donde el texto dice «el esposo», suma frazadas, comida y víveres, y dice que solo las imprudentes se durmieron (en el texto se duermen todas). ¿Se deja tal cual, como su lectura, o prefiere ajustar algo? No se cambió nada.",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 203,
+  "original": "le dije, por ejemplo a Abus una chica que tiene reuniones conmigo, le dije hacé este ejercicio",
+  "propuesta": "Le dije, por ejemplo, a una chica que tiene reuniones conmigo: «Hacé este ejercicio…",
+  "pregunta": "Se sacó el nombre porque el reconocimiento es dudoso («Abus») y es una persona privada. ¿Queda «a una chica que tiene reuniones conmigo» o Julián quiere nombrarla?",
+  "editorial": true
+ },
+ {
+  "libro": "receta",
+  "parrafo": 203,
+  "original": "te lo pido por favor, no te olvides de información hoy a la noche, hacé este ejercicio",
+  "propuesta": "te lo pido por favor, no te olvides de información, hoy a la noche hacé este ejercicio",
+  "pregunta": "«de información» no tiene sentido ahí. ¿Qué dijo? ¿Solo «no te olvides», o otra palabra?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 203,
+  "original": "es la señal de la confirmación de que en el estado mental que vos hiciste eso fue creativo",
+  "propuesta": "En el libro queda como lo dijo. Propuesta: «de que el estado mental en que vos hiciste eso fue creativo».",
+  "pregunta": "Se dejó el orden tal como lo dijo. ¿Se puede mover el «en» para que la oración cierre, o se deja como está?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 203,
+  "original": "yo precisamente la veo blanca, azul y violeta, y va así y hace así",
+  "propuesta": "Se deja como lo dijo: «y va así y hace así».",
+  "pregunta": "En el audio es un gesto que en el libro no se ve. ¿Se deja así o Julián dicta con palabras cómo se mueve la luz?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 203,
+  "original": "a visualizar a la noche con una prudente lo que vos quieras",
+  "propuesta": "a visualizar a la noche, como una prudente, lo que vos quieras",
+  "pregunta": "¿Dijo «como una prudente» (la virgen prudente de la parábola)? ¿O «como un prudente», «con prudencia» o algo distinto?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 66,
+  "original": "el ángel es de alguna manera simbólicamente desprezado el tipo de método de impregnación",
+  "propuesta": "el ángel es de alguna manera, simbólicamente, representando el tipo de método de impregnación",
+  "pregunta": "¿dijiste «representando», «representado» u otra palabra? La transcripción dice «desprezado».",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 66,
+  "original": "Es lo mismo que el ángel viene a María y le dice, vos vas a concebir un hijo de Dios. / lo que se llama en las Escrituras el ángel enviado",
+  "propuesta": "Queda como lo dijiste (no lo estás leyendo). RVR1960, Lucas 1:26: «el ángel Gabriel fue enviado por Dios»; Lucas 1:31: «Y ahora, concebirás en tu vientre, y darás a luz un hijo, y llamarás su nombre JESÚS.»",
+  "pregunta": "¿queda tu paráfrasis o preferís la RVR1960? ¿«El ángel enviado» alude a Lucas 1:26?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 95,
+  "original": "Y como dice justamente la Escritura, hay que permanecer incontaminado del mundo y ayudar a los más necesitados.",
+  "propuesta": "Queda como la dijiste, sin comillas. RVR1960, Santiago 1:27: «La religión pura y sin mácula delante de Dios el Padre es esta: Visitar a los huérfanos y a las viudas en sus tribulaciones, y guardarse sin mancha del mundo.»",
+  "pregunta": "¿queda tu paráfrasis o se cita textual Santiago 1:27? (El capítulo abre con Santiago 1:25.)",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 95,
+  "original": "Es un mundo que por un partido de fútbol estamos todos contaminados por el partido de fútbol. Porque si ganó, no ganó. Estamos todos contaminados por eso. Estamos todos tematizados con eso.",
+  "propuesta": "Se deja: es un ejemplo general, sin equipo ni resultado de esa semana del Mundial.",
+  "pregunta": "¿se conserva el ejemplo del partido o se saca por ser del momento? Si se saca, salen las cuatro oraciones juntas (el «eso» remite al partido) y el párrafo sigue en «Es un mundo contaminante.»",
+  "editorial": true
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 95,
+  "original": "Entonces, por eso, alguien muy sabio hizo esto para esto.",
+  "propuesta": "Se deja como lo dijiste: «esto» es el papel que envuelve al caramelito y «para esto», para protegerlo de las hormigas.",
+  "pregunta": "En el vivo seguramente lo acompañaste con un gesto. ¿Se entiende así por escrito o preferís dictar cómo lo dirías?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 96,
+  "original": "miran para arriba, agradezcan a la señora de la cruz",
+  "propuesta": "miran para arriba, agradecen, hacen la señal de la cruz",
+  "pregunta": "¿dijiste que los jugadores «agradecen, hacen la señal de la cruz»?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 96,
+  "original": "Es importante los equilibrios en ese sentido.",
+  "propuesta": "Queda como lo dijiste (alternativa: «Son importantes los equilibrios en ese sentido»).",
+  "pregunta": "¿Se corrige la concordancia o se deja como lo dijiste?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 96,
+  "original": "(88:14, más adelante en la misma charla) «Mas el que no tiene nada debe comprender que Dios está con él, para que nunca le falte nada.»",
+  "propuesta": "En el libro la frase queda una sola vez, en la versión que leíste de tu papel: «Mas el que no tiene nada debe enterarse que con Dios está, para que nunca le falte nada».",
+  "pregunta": "¿es esa la versión que querés en el libro («debe enterarse que con Dios está») o preferís «debe comprender que Dios está con él»?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 115,
+  "original": "Yo me decía, Mochari, que eso acaba de subir un video",
+  "propuesta": "Me decía que Mochari acaba de subir un video",
+  "pregunta": "¿qué nombre dijiste? ¿Quién subió el video de la colaboración (una marca, una cuenta)? «Mochari» es lo que entendió la transcripción. Lucas: si es una marca, ¿se nombra en el libro?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 115,
+  "original": "¿Qué haces yo? Porque yo no subí el video.",
+  "propuesta": "¿Qué hice yo? Porque yo no subí el video.",
+  "pregunta": "¿dijiste «¿Qué hice yo?»?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 115,
+  "original": "Como vos mirás la cuenta de Lonko, ¿sabés?",
+  "propuesta": "Como vos mirás la cuenta del banco, ¿sabés?",
+  "pregunta": "¿dijiste «la cuenta del banco»?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 115,
+  "original": "Y si podemos mirar a la hora de tu casa y decir, bueno, quién yo soy. Ahí están.",
+  "propuesta": "Y si podemos mirar ahora tu casa y decir: «bueno, quién yo soy», ahí están.",
+  "pregunta": "¿es «mirar ahora tu casa» o «mirar alrededor de tu casa» (suena parecido y conversa con «todas las cosas que están a tu alrededor»)?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 115,
+  "original": "mírate ya con la fama que crees, con el dinero que crees, con la relación que crees, con el lugar que crees",
+  "propuesta": "mirate ya con la fama que querés, con el dinero que querés, con la relación que querés, con el lugar que querés",
+  "pregunta": "¿dijiste «querés» o «creés»? Suenan casi igual; con «querés» la frase tiene sentido. («Para que tu cerebro crea que creés» queda con «creés».)",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 115,
+  "original": "Y si no se ve porque no hay obra.",
+  "propuesta": "Y sí, no se ve porque no hay obra.",
+  "pregunta": "¿es «Y sí» (afirmando) o «Y si no se ve, es porque no hay obra»?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 115,
+  "original": "«la fe sin obras es muerta» / «la fe es la convicción de lo que no se ve»",
+  "propuesta": "Quedan como las dijiste. La primera coincide con Santiago 2:20 (RVR1960). De la segunda citás solo una parte de Hebreos 11:1: «Es, pues, la fe la certeza de lo que se espera, la convicción de lo que no se ve.»",
+  "pregunta": "¿quedan así, entre comillas, como las dijiste?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 115,
+  "original": "Lo que siempre que hiciste lo tenés todo.",
+  "propuesta": "Lo que siempre quisiste, lo tenés todo.",
+  "pregunta": "¿dijiste «lo que siempre quisiste»? (90:13)",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 115,
+  "original": "Porque creer es simplemente una consecuencia de digestión.",
+  "propuesta": "Porque creer es simplemente una consecuencia de visión.",
+  "pregunta": "¿dijiste «de visión», «de la visión» u otra cosa? (91:33)",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 132,
+  "original": "miro el espejo, miro apartada, miro la bicisenda de adelante",
+  "propuesta": "miro el espejo, miro para atrás, miro la bicisenda de adelante",
+  "pregunta": "¿qué dijiste en 20:07? Puede ser «para atrás» o «a la par».",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 132,
+  "original": "por más que tenga el semáforo en verde que no se la da a alguien mientras dobla",
+  "propuesta": "por más que tenga el semáforo en verde, que no se la dé a alguien mientras dobla",
+  "pregunta": "Se leyó «dársela a alguien» como chocar a alguien (en eco con «me la puso un auto»). ¿Es así?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 132,
+  "original": "Ejemplo, tu viste un mal padre, perfecto. Vos vas a ser un buen padre.",
+  "propuesta": "Ejemplo: tuviste un mal padre, perfecto. Vos vas a ser un buen padre.",
+  "pregunta": "Tiene eco con la historia del padre en Biografía Cap. 2 (y con el perdón al padre que ahora cierra la Biografía). Va solo acá. ¿Se marca como eco invisible, igual que la plata de la mamá?",
+  "editorial": true
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 132,
+  "original": "una manera a llamarlo de desviar la atención",
+  "propuesta": "una manera, vamos a llamarlo, de desviar la atención",
+  "pregunta": "¿dijiste «vamos a llamarlo» (como en 35:16)?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 132,
+  "original": "el versículo que dice que ninguna carga es superior para quien justamente fue hecha (con tu aclaración: «no sé si lo estoy diciendo tal cual»)",
+  "propuesta": "Queda como lo dijiste, de memoria. ¿Es 1 Corintios 10:13? RVR1960: «No os ha sobrevenido ninguna tentación que no sea humana; pero fiel es Dios, que no os dejará ser tentados más de lo que podéis resistir, sino que dará también juntamente con la tentación la salida, para que podáis soportar.»",
+  "pregunta": "¿es ese el versículo? ¿Queda tu paráfrasis o se agrega la cita en nota?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "Sacrificio de alabanza por medio del verbo, es decir, frutos de labios que confiesan su nombre. […] Hacer el bien y la ayuda mutua no os olvidéis. Porque de todos los sacrificios se agrada Dios.",
+  "propuesta": "Queda como lo leíste de tus notas. RVR1960, Hebreos 13:15-16: «Así que, ofrezcamos siempre a Dios, por medio de él, sacrificio de alabanza, es decir, fruto de labios que confiesan su nombre. Y de hacer bien y de la ayuda mutua no os olvidéis; porque de tales sacrificios se agrada Dios.»",
+  "pregunta": "Decís «por medio del verbo» (RVR: «de él»), «frutos» («fruto») y «de todos los sacrificios» («de tales»). ¿Queda así o se cita la RVR1960? ¿Se agrega la cita (Hebreos 13:15-16), ya que decís que no te acordás cuál es? En la primera lectura la transcripción dice «confiesan» y en la segunda «confiesen»: ¿cuál es?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "De alabanza, que estás totalmente mal entendido de eso.",
+  "propuesta": "De alabanza, que está totalmente malentendido eso.",
+  "pregunta": "¿qué dijiste en 21:33?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "no celebres con fiestas lo que pediste de rodillas llorando",
+  "propuesta": "Queda como la dijiste (el dicho conocido es «no celebres con alcohol lo que le pediste a Dios de rodillas»).",
+  "pregunta": "¿cómo dice exactamente la frase? «Fiestas» puede ser un error de la transcripción.",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "tenés ganas, tenés barna para adelante",
+  "propuesta": "tenés ganas, tenés garra para adelante",
+  "pregunta": "¿dijiste «garra»? (23:54)",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "Agarrate de donde quieras agarrarte pero no hay ayudar al que lo necesita.",
+  "propuesta": "Agarrate de donde quieras agarrarte, pero andá a ayudar al que lo necesita.",
+  "pregunta": "¿es «andá a ayudar»? (23:58)",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "donde la totalidad de la población humana, el 5% de atención presta y el 1% lo entiende",
+  "propuesta": "donde la totalidad de la población humana, el 5% presta atención y el 1% lo entiende",
+  "pregunta": "¿es «el 5% presta atención» o «el 5% le presta atención»?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "Tenés que tener algo mucho más grande que lo que tiene el toro abajo.",
+  "propuesta": "Queda así.",
+  "pregunta": "¿dijiste «el toro» (el coraje, que es como se lee con lo que sigue: «se necesita mucha fuerza espiritual») o «los tres de abajo» (los chakras de abajo, que en el libro aparecen en el Cap. 1)?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "cuán fácil te saca alguien la ayuda o cuán fácil no ayudás",
+  "propuesta": "Queda como está: se lee como «cuán fácil alguien te saca ayuda (cuán fácil ayudás) o cuán fácil no ayudás».",
+  "pregunta": "¿qué dijiste en 25:00? Otras lecturas posibles: «cuán fácil te sale la ayuda», «cuán fácil te sacás a alguien de encima».",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "Que el sol no se ponga sobre vuestro enojo.",
+  "propuesta": "Queda como la dijiste. RVR1960, Efesios 4:26: «Airaos, pero no pequéis; no se ponga el sol sobre vuestro enojo».",
+  "pregunta": "¿queda como la dijiste o se ajusta a la RVR1960?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "Creo verdaderamente que todas las enfermedades que existen son enojos.",
+  "propuesta": "Queda tal cual, como creencia tuya («creo verdaderamente», «hablando generalmente, igual»).",
+  "pregunta": "Y Julián: es una afirmación sobre la salud. ¿Confirman que se publica así? (Lo mismo en el Cap. 6: «enfermedades… que la gente se las curó a sí misma por un poco de fe».)",
+  "editorial": true
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "Tercero porque él cree que le debe.",
+  "propuesta": "Tercero, porque él cree que le debe.",
+  "pregunta": "¿quisiste decir que él cree que les debe a los demás, o que él se debe a sí mismo?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "Así que si tu intuición te aconseja, por más que no la quieras, a escuchar.",
+  "propuesta": "Queda literal: «a escuchar» como mandato.",
+  "pregunta": "¿es eso, o «por más que no la quieras escuchar…»? (93:02)",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "y decirle a mi mamá, a la de los cachis, lo importante que es mi mamá para mí",
+  "propuesta": "y decirle a mi mamá lo importante que es mi mamá para mí",
+  "pregunta": "«a la de los cachis» (93:16) no se entiende. ¿Qué dijiste («a la cara», «a los ojos», un apodo)? Si había algo, se repone con tus palabras.",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "Hacelo hermano. Hacelo hermano porque una palabra basta para sanar. Tal vez es la tuya.",
+  "propuesta": "hacelo. Hacelo, porque una palabra basta para sanar. Tal vez es la tuya. (Se sacó el «hermano», dirigido a quien preguntó.)",
+  "pregunta": "Es un eco nuevo del puente «una palabra tuya basta para sanarme» (Biografía Cap. 1 ↔ Cap. 2), puesto al cierre de Pensamiento Cap. 3 sin tocar el puente. ¿Lo aprobás acá?",
+  "editorial": true
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 201,
+  "original": "hay un montón de enfermedades en este mundo que la gente se las curó a sí misma por un poco de fe",
+  "propuesta": "Queda como lo dijiste.",
+  "pregunta": "Y Julián: es una afirmación sobre la salud. ¿Se publica así?",
+  "editorial": true
+ },
+ {
+  "libro": "biografia",
+  "parrafo": 88,
+  "original": "Usted tiene que preguntar cuál sería la reacción de mi amigo si yo tuviese esta vida.",
+  "propuesta": "Uno tiene que preguntar cuál sería la reacción de mi amigo si yo tuviese esta vida.",
+  "pregunta": "Whisper puso «Usted», que vos no usás. Como se oye «tiene» y no «tenés», quedó «Uno tiene que preguntar». ¿Dijiste «uno tiene que preguntar(se)» o «vos tenés que preguntarte»? (64:26)",
+  "editorial": false
+ },
+ {
+  "libro": "biografia",
+  "parrafo": 88,
+  "original": "y le miro a la cara cómo se sonríe. Le llevo un traje. Le llevo cosas.",
+  "propuesta": "Se sacó «Le llevo un traje.» y quedó «…cómo se sonríe. Le llevo cosas.»",
+  "pregunta": "¿qué le llevás a tu amigo además de la bolsita de productos, «un traje», «un trago» u otra cosa? Si lo confirmás, la frase vuelve en su lugar, antes de «Le llevo cosas». (65:02)",
+  "editorial": false
+ },
+ {
+  "libro": "biografia",
+  "parrafo": 88,
+  "original": "pero no me gusta decir influencer. Influencer es una generación millennial de la computadora, no sé, ¿no es verdad? Es como alguien sin propósito.",
+  "propuesta": "Se sacaron las dos últimas oraciones; el párrafo termina en «pero no me gusta decir influencer».",
+  "pregunta": "Es la voz de Julián, pero es una opinión al pasar que no es esencial y puede leerse como un juicio a toda una generación. ¿Queda afuera o vuelve? (63:54–64:02)",
+  "editorial": true
+ },
+ {
+  "libro": "biografia",
+  "parrafo": 88,
+  "original": "Por ejemplo, esto lo hice ayer",
+  "propuesta": "Se deja «ayer», como lo contó.",
+  "pregunta": "«ayer» es el día anterior al vivo (fines de 2022). En el libro se entiende como su forma de contarlo, igual que «es el día de hoy» en ¶114. ¿Queda así?",
+  "editorial": true
+ },
+ {
+  "libro": "biografia",
+  "parrafo": 145,
+  "original": "Primero asumí que ese vecino no estábamos ahí, y literalmente al mes él terminó mudándose.",
+  "propuesta": "Primero asumí que ese vecino no estaba ahí, y literalmente al mes él terminó mudándose.",
+  "pregunta": "¿asumiste que el vecino «no estaba ahí» o que «ya no estaba más ahí»? La transcripción dice «no estábamos ahí». (04:59)",
+  "editorial": false
+ },
+ {
+  "libro": "biografia",
+  "parrafo": 145,
+  "original": "Y durante ese tiempo yo no vi conferencias, por eso digo, llevó un año esto.",
+  "propuesta": "Y durante ese tiempo yo no di conferencias. Llevó un año esto.",
+  "pregunta": "¿es «no di conferencias» (no diste conferencias en ese año)? La transcripción dice «no vi», igual que antes en el vivo («la última conferencia que vi fue en Gales»). (06:41)",
+  "editorial": false
+ },
+ {
+  "libro": "biografia",
+  "parrafo": 145,
+  "original": "lo primero que hice fue decir, a ver, yo que estoy quedando pelado, bueno, así puede ser, ¿me estoy quedando pelado?",
+  "propuesta": "lo primero que hice fue decir: «A ver, ¿yo me estoy quedando pelado? Bueno, ¿así puede ser? ¿Me estoy quedando pelado?».",
+  "pregunta": "¿confirmás esta lectura de lo que te dijiste al ver que se te caía el pelo? (55:59–56:11)",
+  "editorial": false
+ },
+ {
+  "libro": "biografia",
+  "parrafo": 145,
+  "original": "bueno, no pasa nada, ya fue, ¿qué cree que te diga?",
+  "propuesta": "«bueno, no pasa nada, ya fue». ¿Qué querés que te diga?",
+  "pregunta": "¿es «¿qué querés que te diga?»? (56:20)",
+  "editorial": false
+ },
+ {
+  "libro": "biografia",
+  "parrafo": 145,
+  "original": "hay muchas cosas que cuando no tenés plata o cuando no tenés mañana, bancátela",
+  "propuesta": "Se deja «cuando no tenés mañana».",
+  "pregunta": "¿dijiste «cuando no tenés mañana» o era otra palabra (por ejemplo, «maña»)? (57:13)",
+  "editorial": false
+ },
+ {
+  "libro": "biografia",
+  "parrafo": 145,
+  "original": "¿me preguntás si puede ser que tengo más pelo? ¿puedes ser? / Hace un tiempo me estaba quedando medio pelado",
+  "propuesta": "Entra solo desde «Hace un tiempo…», sin la pregunta del chat.",
+  "pregunta": "La historia del pelo nace de una pregunta del público; queda solo la vivencia, que suma que perdonar a su padre fue parte de salir de la obesidad. ¿Entra en la Biografía, al final del Cap. 3?",
+  "editorial": true
+ },
+ {
+  "libro": "biografia",
+  "parrafo": 145,
+  "original": "ejemplo con mi padre, y perdonarlo, que también perdonar es perdonar.",
+  "propuesta": "Se deja «perdonar es perdonar» (como énfasis). Otra lectura posible: «perdonar es perdonarse», que es a lo que apunta lo que sigue («¡Perdonate! Es lo mismo»).",
+  "pregunta": "¿dijiste «perdonar es perdonar» o «perdonar es perdonarse»? (59:55)",
+  "editorial": false
+ },
+ {
+  "libro": "biografia",
+  "parrafo": 145,
+  "original": "¿Te estás creando pelado?",
+  "propuesta": "¿Te estás quedando pelado?",
+  "pregunta": "Whisper transcribió «creando». Por el contexto (antes decís «me estaba quedando medio pelado») parece «quedando», pero también podría ser «¿te estás creando pelado?», en el sentido de crearte esa realidad. ¿Cuál dijiste? (60:00)",
+  "editorial": false
+ },
+ {
+  "libro": "biografia",
+  "parrafo": 145,
+  "original": "A tener más chance de encontrar una solución a la pelada, al diente, a lo que sea",
+  "propuesta": "Vas a tener más chance de encontrar una solución a la pelada, al diente, a lo que sea",
+  "pregunta": "Parece que Whisper se comió el «Vas» después del «¡Fue!». ¿Dijiste «vas a tener»? (60:06)",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 128,
+  "original": "Siempre que te llegan las matricizaciones te van a llegar apretadas, rebosando y volando.",
+  "propuesta": "Queda como lo dijo: «Siempre que te llegan las materializaciones te van a llegar apretadas, rebosando y volando». Como referencia, la RVR1960 (Lucas 6:38): «Dad, y se os dará; medida buena, apretada, remecida y rebosando darán en vuestro regazo; porque con la misma medida con que medís, os volverán a medir».",
+  "pregunta": "«Apretadas, rebosando» retoma de memoria Lucas 6:38, y «volando» es tuyo. ¿Queda así, como tu lectura, o querés que se note la cita?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 157,
+  "original": "Y acá nadie se burla de Dios.",
+  "propuesta": "Queda como lo dijo. Como referencia, la RVR1960 (Gálatas 6:7): «No os engañéis; Dios no puede ser burlado: pues todo lo que el hombre sembrare, eso también segará».",
+  "pregunta": "¿«Nadie se burla de Dios» es un eco de Gálatas 6:7? Si es así, ¿queda como lo dijiste o preferís el texto de la RVR1960?",
+  "editorial": false
+ },
+ {
+  "libro": "receta",
+  "parrafo": 203,
+  "original": "Dicen que está el peludo y el lampiño, dicen que está el hombre de afuera y el hombre de adentro, dicen que está el mayor y que está el menor.",
+  "propuesta": "Queda como lo dijo. Como referencia, la RVR1960: Génesis 27:11 («Esaú mi hermano es hombre velloso, y yo lampiño»), 2 Corintios 4:16 («aunque este nuestro hombre exterior se va desgastando, el interior no obstante se renueva de día en día») y Génesis 25:23 («y el mayor servirá al menor»).",
+  "pregunta": "Son alusiones de memoria a Esaú y Jacob y al hombre exterior e interior. ¿Quedan así, como tu forma de decirlo, o querés nombrar a Esaú y Jacob o citar los versículos?",
+  "editorial": false
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 135,
+  "original": "(contexto del audio, 91:36-92:22) «¿Cómo manifestar la sanación de mi mamá?» … «Dale un gran abrazo a tu mamá» … «yo estos temas no los hablo por acá» … «Hay una frase importantísima…»",
+  "propuesta": "Se deja el pasaje (92:25-93:25) tal cual, como enseñanza general: Julián lo generaliza («porque todos tenemos mamá»). No entra la pregunta del público ni lo de antes.",
+  "pregunta": "Este pasaje es la respuesta a una persona del público que preguntó por la sanación de su mamá (Lucas pidió dejar afuera lo que la gente pregunta). Leído solo, en el libro funciona como enseñanza general. ¿Queda así?",
+  "editorial": true
+ },
+ {
+  "libro": "pensamiento",
+  "parrafo": 115,
+  "original": "[90:05] Eso es ley de reversibilidad.",
+  "propuesta": "Se repone al comienzo de «Situate en el día…», en su lugar del audio, porque el párrafo anterior («…mirá todo lo que tengo», 90:02) entra justo antes, como pedía el tramo B2.",
+  "pregunta": "¿Dijo «ley de reversibilidad» (la ley que enseña Neville: si el hecho produce el sentimiento, el sentimiento produce el hecho)? ¿Queda así, sin más explicación?",
+  "editorial": false
+ }
+]
