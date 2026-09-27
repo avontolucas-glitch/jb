@@ -20,6 +20,8 @@ Vigentes (edición integral, sept. 2026):
 - `Registro de cambios - Edición integral.docx`: cada cambio con su antes, su ahora y el motivo.
 - `(edición integral con sitio)`: la misma edición integral más una página final, después del colofón, «Tu libro, también digital»: QR a julianbermudez.com/canjear y el recuadro `[CÓDIGO ÚNICO DEL EJEMPLAR]`, que la imprenta completa con datos variables (un código distinto por ejemplar, de un solo uso). Contratapas y PDF de imprenta `(con sitio)` con la dirección del sitio; vistas previas `(vista previa con sitio)`. Contratapas `(con fotos)`: la misma contratapa con una foto de Julián en duotono (Receta, doble exposición; Pensamiento, la mirada; Biografía, retrato de chef), hecha con `herramientas/contratapas_fotos.py`.
 
+- `(edición integral con sitio, sin colofón)`: la edición con sitio sin el colofón final («Este libro se terminó de componer…»), por pedido de Lucas; vistas previas `(vista previa con sitio, sin colofón)`. Es la versión a usar.
+
 Versiones anteriores, que se conservan intactas: `(nueva versión)`, `(sincronizado)`, `(sincronizada)` y `Hoja de Revisión para Julian.docx` (1ª pasada).
 
 Además: `diseño/portadas/` tiene tapa y contratapa de cada libro (5.5×8.5 con 0.125" de sangrado, 300 dpi; las tapas llevan los tres corazones del Cap. 1, las contratapas la frase de transición de Julián con espacio para el código de barras); `vista previa/` tiene los PDF de los libros (la vista previa usa TeX Gyre Pagella en lugar de Palatino), `diseño/grabados/` los grabados sueltos en alta resolución y `herramientas/` los scripts de construcción.
@@ -62,7 +64,7 @@ Nunca autor, nunca coautor. No se agregan enseñanzas, conceptos, ejemplos, anal
 - Cuerpo: Palatino Linotype 11 pt, interlineado 1,2, 7,5 pt entre párrafos, justificado.
 - Aperturas: grabado del capítulo en el fondo (arriba), espaciador de altura fija, «CAPÍTULO N» en 9,5 pt con tracking, título en 16,5 pt y epígrafe «…» en itálica con la cita en versalitas. Los epígrafes van en RVR1960; los no confirmados llevan `[versículo propuesto — a confirmar]`.
 - Encabezado: el emblema del capítulo arriba a la derecha (0.30"). Portada, copyright e índice van sin ícono; la transición lleva encabezado vacío.
-- Letra capital de 3 líneas en cada apertura. Titulillos: página par = título del libro con emblema a la izquierda; impar = título del capítulo con emblema a la derecha. Folios «· N ·» centrados. Copyright en Palatino 8 pt en el tono del libro. Página «La trilogía» antes del índice. Al final de cada libro: «La trilogía, capítulo a capítulo» (tabla con los grabados de los tres libros, sección con encabezado vacío) y colofón. Las notas de puente llevan arriba el emblema del capítulo al que remiten.
+- Letra capital de 3 líneas en cada apertura. Titulillos: página par = título del libro con emblema a la izquierda; impar = título del capítulo con emblema a la derecha. Folios «· N ·» centrados. Copyright en Palatino 8 pt en el tono del libro. Página «La trilogía» antes del índice. Al final de cada libro: «La trilogía, capítulo a capítulo» (tabla con los grabados de los tres libros, sección con encabezado vacío); el colofón se sacó en la versión «sin colofón». Las notas de puente llevan arriba el emblema del capítulo al que remiten.
 - «En el principio» en versalitas en cada Cap. 0. Cierre de capítulo con ◆ ◆ ◆ en el color de acento, siempre pegado al último párrafo.
 - Imprenta: Receta y Biografía tienen fondo de página completo oscuro, así que al exportar para imprimir hay que pedir sangrado (0.125").
 
