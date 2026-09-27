@@ -1,15 +1,18 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import OjoPixel from "./OjoPixel";
 import Tipeo from "./Tipeo";
 import { nombreBot, recorrido, type Parada } from "@/content/yosoy";
 import { EVENTO_RECORRIDO, marcarRecorridoVisto, type Inicio } from "@/lib/recorrido";
 
 /**
- * El recorrido de Yo Da: sale de su rincón (el ojo de siempre se oculta en el
- * mismo instante: vuela uno solo, nunca dos), vuela hasta cada cosa, la ilumina
- * (el resto queda en penumbra) y la explica en un globo. Se maneja con los
+ * El recorrido de Yo Da: sale de donde está (su rincón, o la cabecera del chat si
+ * lo pidió ahí), y el ojo de siempre se oculta en el mismo cuadro en que aparece el
+ * que vuela: uno solo, nunca dos, y sin parpadeo. Su círculo del rincón se disuelve
+ * mientras anda y se vuelve a formar cuando regresa (en la última parada, «aquí me
+ * quedo», se posa ahí). Vuela hasta cada cosa, la ilumina (el resto queda en
+ * penumbra) y la explica en un globo. Se maneja con los
  * botones o el teclado (→ sigue, ← vuelve, Esc sale); el foco queda en el globo
  * y, al terminar, vuelve a donde estaba. Sin movimiento si la persona lo pidió.
  * Las paradas y sus textos: content/yosoy.ts → `recorrido`.
@@ -20,9 +23,12 @@ type Punto = { x: number; y: number };
 
 const YO_W = 64; // el ojo en vuelo: la grilla de 32 × 9, al doble
 const YO_H = 18;
-/** En su rincón, el ojo mide 48 (components/YoSoy.tsx): al salir y al volver, la copia tiene ese tamaño. */
+/** En su rincón, el ojo mide 48 (components/YoSoy.tsx): al volver, el que vuela toma ese tamaño. */
 const EN_CASA = 48 / YO_W;
+/** En <html>: mientras dura el recorrido (el ojo del rincón y el del chat se ocultan; el círculo se disuelve). */
 const CLASE = "en-recorrido";
+/** En <html>: Yo Da está en su rincón o volviendo a él (el círculo se vuelve a formar). */
+const CLASE_CASA = "recorrido-en-casa";
 const MARGEN = 12;
 const VUELO_MS = 950;
 
@@ -85,10 +91,21 @@ function ubicar(c: Caja | null, vw: number, vh: number): { yo: Punto; globo: CSS
   return { yo: { x, y }, globo: { left: gx, bottom: vh - y + 12, width: gw } };
 }
 
-/** El lugar de siempre de Yo Da (abajo a la derecha), para salir de ahí y volver ahí. */
+/** Dónde queda el que vuela para calzar justo encima de un ojo que ya está en pantalla (mismo centro). */
+function sobre(el: Element | null | undefined): { p: Punto; escala: number } | null {
+  const b = el?.getBoundingClientRect();
+  if (!b || b.width < 2) return null;
+  return { p: { x: b.left + b.width / 2 - YO_W / 2, y: b.top + b.height / 2 - YO_H / 2 }, escala: b.width / YO_W };
+}
+
+/** El lugar de siempre de Yo Da (abajo a la derecha): ahí vuelve. */
 function casa(): Punto | null {
-  const b = document.querySelector<HTMLElement>('[data-recorrido="yoda"]')?.getBoundingClientRect();
-  return b ? { x: b.left + b.width / 2 - YO_W / 2, y: b.top + b.height / 2 - YO_H / 2 } : null;
+  return sobre(document.querySelector('[data-recorrido="yoda"] .ojo-pixel'))?.p ?? null;
+}
+
+/** De dónde sale: de la cabecera del chat si estaba abierto (ahí es donde se lo ve), si no, de su rincón. */
+function origen(): { p: Punto; escala: number } | null {
+  return sobre(document.querySelector("#yosoy.abierto .yosoy-cabeza .ojo-pixel")) ?? sobre(document.querySelector('[data-recorrido="yoda"] .ojo-pixel'));
 }
 
 export default function RecorridoYoDa() {
@@ -103,6 +120,8 @@ export default function RecorridoYoDa() {
   const [volando, setVolando] = useState(0);
   const [giro, setGiro] = useState(1);
   const [enCasa, setEnCasa] = useState(true);
+  /** El tamaño del que vuela mientras está posado (en `enCasa`): el del ojo del que sale, y al volver, el del rincón. */
+  const [escala, setEscala] = useState(EN_CASA);
   const posicion = useRef<Punto | null>(null);
   const quieto = useRef(false);
   const previo = useRef<HTMLElement | null>(null);
@@ -126,12 +145,12 @@ export default function RecorridoYoDa() {
       if (!lista.length) return;
       quieto.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       previo.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      const inicio = casa();
-      posicion.current = inicio;
-      setYo(inicio);
+      // sale justo de donde está, con su mismo tamaño (el de siempre se oculta en el mismo cuadro: ver abajo)
+      const o = origen();
+      posicion.current = o?.p ?? null;
+      setYo(o?.p ?? null);
+      setEscala(o?.escala ?? EN_CASA);
       setEnCasa(true);
-      // el ojo de siempre se oculta ya: el que sale volando es él
-      document.documentElement.classList.add(CLASE);
       setSesion(!!(e as CustomEvent<Inicio>).detail?.sesion);
       setParadas(lista);
       setCaja(null);
@@ -144,11 +163,36 @@ export default function RecorridoYoDa() {
     return () => window.removeEventListener(EVENTO_RECORRIDO, empezar);
   }, []);
 
+  // el cambio de un ojo al otro, en el mismo cuadro: la clase se pone y se saca en el mismo
+  // commit en que aparece o desaparece el que vuela (nunca se ven dos, nunca ninguno)
+  useLayoutEffect(() => {
+    if (!activo) return;
+    const html = document.documentElement;
+    html.classList.add(CLASE);
+    return () => html.classList.remove(CLASE, CLASE_CASA);
+  }, [activo]);
+  useLayoutEffect(() => {
+    if (activo) document.documentElement.classList.toggle(CLASE_CASA, enCasa);
+  }, [activo, enCasa]);
+
   const colocar = useCallback(
     (animar: boolean) => {
       const p = paradas[i];
       if (!p) return;
       const c = cajaDe(p.donde);
+      // la parada de Yo Da («aquí me quedo»): vuelve a su rincón y se posa en su círculo
+      const hogar = p.donde?.includes("yoda") ? casa() : null;
+      if (hogar && c) {
+        const vw = window.innerWidth;
+        const gw = Math.min(320, vw - MARGEN * 2);
+        const gx = Math.max(MARGEN, Math.min(vw - gw - MARGEN, c.x + c.w / 2 - gw / 2));
+        setCaja(c);
+        setGlobo({ left: gx, bottom: window.innerHeight - c.y + 12, width: gw });
+        setEscala(EN_CASA);
+        setEnCasa(true);
+        volarA(hogar, animar);
+        return;
+      }
       const l = ubicar(c, window.innerWidth, window.innerHeight);
       setCaja(c);
       setGlobo(l.globo);
@@ -195,12 +239,13 @@ export default function RecorridoYoDa() {
     if (!activo || saliendo) return;
     const c = casa();
     if (c) volarA(c, true);
+    setEscala(EN_CASA);
     setEnCasa(true);
     setSaliendo(true);
     window.setTimeout(
       () => {
         // se posó: vuelve a ser el de siempre, en el mismo lugar y del mismo tamaño
-        document.documentElement.classList.remove(CLASE);
+        // (la clase se saca en el mismo cuadro en que desaparece el que vuela: el useLayoutEffect de arriba)
         setActivo(false);
         setSaliendo(false);
         const volver = previo.current?.isConnected ? previo.current : document.querySelector<HTMLElement>('[data-recorrido="yoda"]');
@@ -215,9 +260,6 @@ export default function RecorridoYoDa() {
     else cerrar();
   }, [i, paradas.length, cerrar]);
   const atras = useCallback(() => setI((n) => Math.max(0, n - 1)), []);
-
-  // si el recorrido se desarma a mitad de camino, el ojo de siempre vuelve
-  useEffect(() => () => document.documentElement.classList.remove(CLASE), []);
 
   // el foco, en «Seguir» de cada parada
   useEffect(() => {
@@ -331,7 +373,7 @@ export default function RecorridoYoDa() {
           </div>
         )}
       </div>
-      {/* el ojo, afuera del fundido del velo: sale entero, en el mismo instante en que se oculta el del rincón */}
+      {/* el ojo, afuera del fundido del velo: sale entero, en el mismo cuadro en que se oculta el de siempre */}
       {yo && (
         <div
           className="recorrido-yo"
@@ -341,7 +383,7 @@ export default function RecorridoYoDa() {
           }}
           aria-hidden="true"
         >
-          <div className={`recorrido-yo-escala ${enCasa ? "en-casa" : ""}`} style={{ ["--en-casa" as string]: EN_CASA }}>
+          <div className={`recorrido-yo-escala ${enCasa ? "en-casa" : ""}`} style={{ ["--en-casa" as string]: escala }}>
             <div key={volando} className={`recorrido-yo-cuerpo ${volando ? "volando" : ""}`}>
               <OjoPixel size={YO_W} mira={giro as -1 | 1} />
             </div>

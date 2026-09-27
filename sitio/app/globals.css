@@ -598,12 +598,19 @@ html.sin-revelar .foto .foto-pie { opacity: 1 !important; }
 .recorrido-seguir:hover, .recorrido-seguir:focus-visible { background: var(--crema); color: var(--negro); }
 .recorrido.saliendo .recorrido-luz { animation: recorrido-cierra 0.8s var(--lento) both; }
 @keyframes recorrido-cierra { to { box-shadow: 0 0 0 200vmax rgba(5, 5, 5, 0); border-color: transparent; } }
-/* uno solo: mientras dura el recorrido, el ojo del rincón se oculta (vuela la copia, que sale y vuelve con su mismo tamaño) */
-html.en-recorrido .yosoy-boton .ojo-pixel { visibility: hidden; }
+/* uno solo: mientras dura el recorrido, el ojo del rincón (y el de la cabecera del chat) se oculta y vuela
+   él mismo, que sale y vuelve con su mismo tamaño. Su círculo no se queda esperando vacío: se disuelve
+   mientras Yo Da anda y se vuelve a formar cuando regresa (html.recorrido-en-casa). */
+html.en-recorrido .yosoy-boton .ojo-pixel, html.en-recorrido .yosoy-cabeza .ojo-pixel { visibility: hidden; }
+html.en-recorrido .yosoy-boton { transition: background-color 0.6s var(--lento), border-color 0.6s var(--lento); }
+html.en-recorrido:not(.recorrido-en-casa) .yosoy-boton { background-color: transparent; border-color: transparent; }
+html.en-recorrido .yosoy-boton::before { animation: none; }
 .recorrido-yo-escala { transform-origin: 50% 50%; transition: transform 0.95s cubic-bezier(0.45, 0, 0.2, 1); }
 .recorrido-yo-escala.en-casa { transform: scale(var(--en-casa, 0.75)); }
+/* posado en su círculo, quieto como el de siempre (al llegar, el arco del vuelo y nada más) */
 .recorrido-yo-escala.en-casa .recorrido-yo-cuerpo:not(.volando) { animation: none; }
+.recorrido-yo-escala.en-casa .recorrido-yo-cuerpo.volando { animation: recorrido-arco 0.95s cubic-bezier(0.45, 0, 0.2, 1); }
 .recorrido.saliendo .recorrido-capa { pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
-  .recorrido, .recorrido-luz, .recorrido-yo, .recorrido-yo-escala, .recorrido-globo, .recorrido-yo-cuerpo, .recorrido-yo-cuerpo.volando, .recorrido-yo-cuerpo .ojo-pixel-orejas { transition: none !important; animation: none !important; }
+  .recorrido, .recorrido-luz, .recorrido-yo, .recorrido-yo-escala, .recorrido-globo, .recorrido-yo-cuerpo, .recorrido-yo-cuerpo.volando, .recorrido-yo-cuerpo .ojo-pixel-orejas, html.en-recorrido .yosoy-boton { transition: none !important; animation: none !important; }
 }
