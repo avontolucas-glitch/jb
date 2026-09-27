@@ -1,0 +1,286 @@
+/* Orla de página: la ventana enmarcada como la página de un libro.
+   Un filete doble (dos líneas de 1px con 4px de aire) a 12px de los bordes,
+   en tinta crema muy tenue, con un rombo pequeño en cada esquina.
+   Arriba empieza debajo del encabezado, que es sticky y opaco: si no,
+   taparía el filete de arriba y los dos rombos de ese lado.
+   Usa los tokens globales de app/globals.css: --crema, --lento y
+   --alto-encabezado (si falta, toma 4rem: con los 12px de aire, el filete
+   queda debajo del encabezado, que en computadora mide entre 59 y 65px).
+
+   Al cargar, las líneas nacen en los rombos y avanzan despacio hasta
+   encontrarse en el medio de cada lado. Solo en computadora (desde 1024px). */
+
+.marco {
+  /* Medidas: se pueden ajustar sin tocar el resto */
+  --marco-borde: 12px; /* distancia a los bordes de la ventana */
+  --marco-linea: 1px; /* grosor de cada filete */
+  --marco-luz: 4px; /* aire entre los dos filetes */
+  --marco-banda: calc(var(--marco-linea) * 2 + var(--marco-luz));
+  --marco-rombo: 9px; /* alto y ancho del rombo */
+  --marco-aire: 10px; /* del centro del rombo al comienzo de los filetes */
+  --marco-arranque: calc(var(--marco-banda) / 2 + var(--marco-aire));
+
+  /* Tinta */
+  --marco-opacidad: 0.14;
+  /* Apenas más que los filetes: un rombo relleno ya carga más tinta
+     que una línea de 1px */
+  --marco-opacidad-rombo: 0.18;
+
+  /* Tiempos: primero los rombos, después el filete de afuera y, apenas
+     detrás, el de adentro, como una pluma que vuelve a pasar */
+  --marco-trazo: 2.4s;
+  --marco-curva: var(--lento, cubic-bezier(0.22, 0.61, 0.36, 1));
+  --marco-retraso-rombo: 0.1s;
+  --marco-retraso-afuera: 0.25s;
+  --marco-retraso-adentro: 0.5s;
+
+  display: none;
+  position: fixed;
+  /* Por defecto, arriba arranca debajo del encabezado (con el mismo aire que
+     los otros lados). --marco-arriba (la prop «arriba») lo reemplaza entero. */
+  top: var(--marco-arriba, calc(var(--alto-encabezado, 4rem) + var(--marco-borde)));
+  right: var(--marco-borde);
+  bottom: var(--marco-borde);
+  left: var(--marco-borde);
+  /* Encima del fondo y del halo del puntero (1); debajo del encabezado (40),
+     del grano del papel (60) y de la bienvenida (70). No recibe clics. */
+  z-index: 2;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (min-width: 1024px) {
+  .marco {
+    display: block;
+  }
+}
+
+/* ───────── Los cuatro lados ───────── */
+
+/* La opacidad va en el lado entero: donde se tocan las dos mitades
+   la tinta no se superpone ni se oscurece. */
+.lado {
+  position: absolute;
+  opacity: var(--marco-opacidad);
+}
+
+.arriba {
+  top: 0;
+  right: 0;
+  left: 0;
+  height: var(--marco-banda);
+}
+
+.abajo {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--marco-banda);
+}
+
+.izquierda {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--marco-banda);
+}
+
+.derecha {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--marco-banda);
+}
+
+/* En cada mitad, ::before y ::after son los dos filetes. Cuál es el de afuera
+   depende del lado: arriba e izquierda es ::before; abajo y derecha, ::after. */
+.arriba,
+.izquierda {
+  --marco-antes: var(--marco-retraso-afuera);
+  --marco-despues: var(--marco-retraso-adentro);
+}
+
+.abajo,
+.derecha {
+  --marco-antes: var(--marco-retraso-adentro);
+  --marco-despues: var(--marco-retraso-afuera);
+}
+
+/* ───────── Cada lado, en dos mitades que crecen desde su esquina ───────── */
+
+.mitad {
+  position: absolute;
+}
+
+.horizontal .mitad {
+  top: 0;
+  bottom: 0;
+}
+
+.horizontal .inicio {
+  left: var(--marco-arranque);
+  right: 50%;
+  --marco-origen: left center;
+}
+
+.horizontal .fin {
+  left: 50%;
+  right: var(--marco-arranque);
+  --marco-origen: right center;
+}
+
+.vertical .mitad {
+  right: 0;
+  left: 0;
+}
+
+.vertical .inicio {
+  top: var(--marco-arranque);
+  bottom: 50%;
+  --marco-origen: center top;
+}
+
+.vertical .fin {
+  top: 50%;
+  bottom: var(--marco-arranque);
+  --marco-origen: center bottom;
+}
+
+.mitad::before,
+.mitad::after {
+  content: "";
+  position: absolute;
+  background: var(--crema, #efe9dc);
+  transform-origin: var(--marco-origen);
+  animation-duration: var(--marco-trazo);
+  animation-timing-function: var(--marco-curva);
+  animation-fill-mode: both;
+}
+
+.mitad::before {
+  animation-delay: var(--marco-antes);
+}
+
+.mitad::after {
+  animation-delay: var(--marco-despues);
+}
+
+.horizontal .mitad::before,
+.horizontal .mitad::after {
+  right: 0;
+  left: 0;
+  height: var(--marco-linea);
+  animation-name: trazoHorizontal;
+}
+
+.horizontal .mitad::before {
+  top: 0;
+}
+
+.horizontal .mitad::after {
+  bottom: 0;
+}
+
+.vertical .mitad::before,
+.vertical .mitad::after {
+  top: 0;
+  bottom: 0;
+  width: var(--marco-linea);
+  animation-name: trazoVertical;
+}
+
+.vertical .mitad::before {
+  left: 0;
+}
+
+.vertical .mitad::after {
+  right: 0;
+}
+
+/* ───────── Rombos de las esquinas ───────── */
+
+/* Dibujados con clip-path (no es un carácter): centrados sobre la banda
+   del filete doble, con sus puntas mirando hacia los lados. */
+.rombo {
+  --marco-rombo-pos: calc((var(--marco-banda) - var(--marco-rombo)) / 2);
+  position: absolute;
+  width: var(--marco-rombo);
+  height: var(--marco-rombo);
+  background: var(--crema, #efe9dc);
+  opacity: var(--marco-opacidad-rombo);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  animation-name: rombo;
+  animation-duration: 1.2s;
+  animation-timing-function: var(--marco-curva);
+  animation-delay: var(--marco-retraso-rombo);
+  animation-fill-mode: both;
+}
+
+.noroeste {
+  top: var(--marco-rombo-pos);
+  left: var(--marco-rombo-pos);
+}
+
+.noreste {
+  top: var(--marco-rombo-pos);
+  right: var(--marco-rombo-pos);
+}
+
+.sureste {
+  right: var(--marco-rombo-pos);
+  bottom: var(--marco-rombo-pos);
+}
+
+.suroeste {
+  bottom: var(--marco-rombo-pos);
+  left: var(--marco-rombo-pos);
+}
+
+/* Solo el estado de partida: el final es el estilo de reposo, así que sin
+   animación (o con «reducir movimiento») el marco ya está completo. */
+@keyframes trazoHorizontal {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes trazoVertical {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes rombo {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+/* Mientras está la bienvenida (el cuadro del ojo), el marco espera sin trazarse:
+   empieza cuando se entra, junto con el resto del sitio. */
+:global(html.en-umbral) .rombo,
+:global(html.en-umbral) .mitad::before,
+:global(html.en-umbral) .mitad::after {
+  animation-play-state: paused;
+}
+
+/* Con «reducir movimiento», aparece quieto y completo. Va con más
+   especificidad que .horizontal .mitad::before y .vertical .mitad::before
+   (y que cualquier «.arriba .mitad::before» futuro) para que animation-name
+   quede de verdad en none: no se dispara ningún trazo ni queda nada que la
+   pausa de la bienvenida tenga que pausar. */
+@media (prefers-reduced-motion: reduce) {
+  .marco .rombo,
+  .marco .lado .mitad::before,
+  .marco .lado .mitad::after {
+    animation: none;
+  }
+}
+
+/* Es solo adorno: no se imprime ni se fuerza en modo de alto contraste */
+@media print, (forced-colors: active) {
+  .marco {
+    display: none;
+  }
+}

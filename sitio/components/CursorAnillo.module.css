@@ -1,0 +1,95 @@
+/* Anillo que acompaña al puntero, como una lupa de tinta sobre la página.
+   Usa los tokens globales de app/globals.css: --crema y --lento.
+   No reemplaza el cursor del sistema: se suma a él. */
+
+/* Capa única y sin tamaño: los dos trazos se mezclan juntos con el fondo.
+   Con «difference», la tinta crema se ve clara sobre el negro y oscura
+   sobre las páginas blancas del Pensamiento. */
+.cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  z-index: 69; /* debajo de la bienvenida (.umbral, 70); encima del grano del papel (60) */
+  pointer-events: none;
+  mix-blend-mode: difference;
+  opacity: 0;
+  transition: opacity 0.45s var(--lento);
+}
+
+.visible {
+  opacity: 1;
+}
+
+/* Portadores: el JS solo les cambia el transform */
+.anillo,
+.punto {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+/* El aro: línea fina, centrado en el punto que lo lleva */
+.aro {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(239, 233, 220, 0.55);
+  border-color: color-mix(in srgb, var(--crema) 55%, transparent);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s var(--lento),
+    height 0.6s var(--lento),
+    border-color 0.6s var(--lento),
+    transform 0.45s var(--lento);
+}
+
+/* Sobre algo que se puede tocar: el aro se abre y se vuelve más tenue */
+.sobre .aro {
+  width: 54px;
+  height: 54px;
+  border-color: rgba(239, 233, 220, 0.28);
+  border-color: color-mix(in srgb, var(--crema) 28%, transparent);
+}
+
+/* Al hacer clic: se contrae un instante, rápido; vuelve despacio */
+.presionado .aro {
+  transform: translate(-50%, -50%) scale(0.78);
+  transition:
+    width 0.6s var(--lento),
+    height 0.6s var(--lento),
+    border-color 0.6s var(--lento),
+    transform 0.12s var(--lento);
+}
+
+/* El punto central: sigue al puntero exacto */
+.punto {
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: var(--crema);
+}
+
+/* Con un cuadro modal arriba (la bienvenida o la guía «Instalar la app») el anillo
+   queda debajo y no se ve: se saca del todo, para que no se siga pintando y mezclando
+   detrás del velo. El z-index 69 no cambia. Al cerrarse, vuelve en su lugar. */
+:global(html.guia-abierta) .cursor,
+:global(html.en-umbral) .cursor {
+  display: none;
+}
+
+/* Red de seguridad por si el componente se monta igual: en pantallas táctiles,
+   sin hover, con «reducir movimiento», en colores forzados o al imprimir, no existe. */
+@media (prefers-reduced-motion: reduce), (pointer: coarse), (hover: none), (forced-colors: active), print {
+  .cursor {
+    display: none;
+  }
+}

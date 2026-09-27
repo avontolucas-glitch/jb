@@ -2,16 +2,21 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import BotonApp from "./BotonApp";
 import NavEnlace, { type Enlace } from "./NavEnlace";
 import InterruptorSonido from "./InterruptorSonido";
 
 export default function MenuMovil({ enlaces, cuenta }: { enlaces: Enlace[]; cuenta: Enlace }) {
   const [abierto, setAbierto] = useState(false);
   const ruta = usePathname();
-  useEffect(() => setAbierto(false), [ruta]);
+  // se cierra un instante después de cambiar de página: así se alcanza a ver el sello del emblema
+  useEffect(() => {
+    const t = window.setTimeout(() => setAbierto(false), 480);
+    return () => window.clearTimeout(t);
+  }, [ruta]);
   return (
     <div className="xl:hidden flex items-center gap-1.5 shrink-0">
-      <Link href={cuenta.href} className="boton py-1 px-2.5 text-[0.92rem]" data-testid="cuenta-movil">
+      <Link href={cuenta.href} className="boton !py-1 !px-2.5 !text-[0.92rem] whitespace-nowrap" data-testid="cuenta-movil">
         {cuenta.texto}
       </Link>
       <button
@@ -32,9 +37,7 @@ export default function MenuMovil({ enlaces, cuenta }: { enlaces: Enlace[]; cuen
               </li>
             ))}
             <li className="flex items-center justify-between gap-4 py-3 text-sm texto-2">
-              <Link href="/app" className="enlace">
-                Instalar la app
-              </Link>
+              <BotonApp variante="menu" />
               <InterruptorSonido />
             </li>
           </ul>

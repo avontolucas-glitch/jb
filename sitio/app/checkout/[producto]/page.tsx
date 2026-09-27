@@ -9,7 +9,8 @@ import { usuarioActual } from "@/lib/auth";
 import { accesos } from "@/lib/access";
 import { producto } from "@/lib/payments";
 import { accionPagar } from "@/lib/acciones";
-import { ocupados } from "@/lib/sesiones";
+import { disponible, horarioDesdeId, ocupados } from "@/lib/sesiones";
+import Hora from "@/components/Hora";
 
 export const metadata: Metadata = { title: "Comprar", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -17,7 +18,7 @@ export const dynamic = "force-dynamic";
 function destino(id: string) {
   if (id === "masterclass") return { href: "/mi-espacio/masterclass", texto: "la masterclass" };
   if (id.startsWith("directo:")) return { href: `/mi-espacio/en-vivo/${id.split(":")[1]}`, texto: "la sala" };
-  if (id.startsWith("sesion:")) return { href: "/mi-espacio/sesiones", texto: "tus sesiones" };
+  if (id.startsWith("sesion:")) return { href: "/mi-espacio/sesiones", texto: "tu Masterclass 1 a 1" };
   if (id.startsWith("libro:")) return { href: `/mi-espacio/biblioteca/${id.split(":")[1]}`, texto: "tu biblioteca" };
   return { href: "/mi-espacio/conferencias", texto: "mis conferencias" };
 }
@@ -31,7 +32,10 @@ export default async function Checkout({ params }: { params: Promise<{ producto:
   const a = await accesos(u.id);
   const yaLoTiene = a.compras.some((c) => c.producto === p.id);
   const esSesion = p.id.startsWith("sesion:");
-  const tomadoPorOtro = esSesion && !yaLoTiene && (await ocupados()).has(p.id.slice("sesion:".length));
+  const slot = p.id.slice("sesion:".length);
+  const horario = esSesion ? horarioDesdeId(slot) : null;
+  const tomadoPorOtro = esSesion && !yaLoTiene && (await ocupados()).has(slot);
+  const fueraDeAgenda = esSesion && !yaLoTiene && !tomadoPorOtro && !(await disponible(slot));
   const ir = destino(p.id);
 
   return (
@@ -44,6 +48,14 @@ export default async function Checkout({ params }: { params: Promise<{ producto:
             <dt className="texto-2">Producto</dt>
             <dd className="text-right">{p.titulo}</dd>
           </div>
+          {esSesion && horario && (
+            <div className="border-b borde py-4 flex justify-between gap-4">
+              <dt className="texto-2">Cuándo</dt>
+              <dd className="text-right" data-testid="cuando">
+                <Hora inicio={horario.fecha.toISOString()} />
+              </dd>
+            </div>
+          )}
           <div className="border-b borde py-4 flex justify-between gap-4">
             <dt className="texto-2">Precio</dt>
             <dd>
@@ -65,7 +77,14 @@ export default async function Checkout({ params }: { params: Promise<{ producto:
         {tomadoPorOtro ? (
           <div className="mt-8" data-testid="horario-tomado">
             <p>Ese horario ya está reservado.</p>
-            <Link href="/sesiones" className="boton boton-lleno mt-4">
+            <Link href="/masterclass/1-a-1" className="boton boton-lleno mt-4">
+              Elegir otro horario
+            </Link>
+          </div>
+        ) : fueraDeAgenda ? (
+          <div className="mt-8" data-testid="horario-no-disponible">
+            <p>Ese horario ya no está en la agenda.</p>
+            <Link href="/masterclass/1-a-1" className="boton boton-lleno mt-4">
               Elegir otro horario
             </Link>
           </div>
@@ -86,7 +105,7 @@ export default async function Checkout({ params }: { params: Promise<{ producto:
               {esSesion && (
                 <div>
                   <label htmlFor="campo-nota" className="etiqueta">
-                    ¿Qué te gustaría trabajar en la sesión? (opcional)
+                    ¿Qué te gustaría trabajar en el encuentro? (opcional)
                   </label>
                   <textarea id="campo-nota" name="nota" maxLength={1500} className="campo" />
                   <p className="texto-2 text-sm mt-1">Lo lee solo Julián, antes del encuentro.</p>

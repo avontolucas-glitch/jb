@@ -1,0 +1,87 @@
+/* ───────── El mecanismo ─────────
+   Tres anillos grabados en línea fina (los tres libros) que, al bajar,
+   giran hasta quedar alineados sobre la misma vertical; entonces el ojo
+   del centro se abre y aparece la leyenda.
+   Sin JavaScript o con "reducir movimiento": todo alineado y quieto. */
+
+/* Nunca más ancho que su contenedor (sin scroll horizontal en celulares) ni más alto
+   que la pantalla: al alinearse, el ◆ de arriba y el borde de abajo quedan a la vista.
+   La primera línea es para navegadores sin la unidad svh. */
+.mecanismo {
+  display: block;
+  width: min(88vw, 520px, 100%, 78vh);
+  width: min(88vw, 520px, 100%, 78svh);
+  margin: 0 auto;
+  color: var(--texto);
+}
+
+/* El disco es el contenedor de referencia del tamaño del texto grabado (ver abajo) */
+.disco { position: relative; width: 100%; aspect-ratio: 1 / 1; container-type: inline-size; }
+/* Capas superpuestas del mismo tamaño: la montura, los tres anillos y los fijos del centro */
+.svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; overflow: visible; }
+/* El trazo queda fino a cualquier tamaño, como el ojo del sitio */
+.svg :where(path, circle, polygon) { vector-effect: non-scaling-stroke; }
+
+/* Tipografía que sigue la curva */
+.texto { font-family: var(--serif); }
+.pregunta { letter-spacing: .05em; }
+.cursiva { font-style: italic; }
+.numeral { letter-spacing: .16em; }
+.capitulo { color: var(--texto-2); letter-spacing: .08em; }
+.capitulo.marca { color: var(--texto); transition: opacity 1.1s var(--lento), color 1.1s var(--lento); }
+
+/* Tonos: todo con currentColor sobre las variables del sitio */
+.fino { color: var(--texto-2); }
+.puntos { color: var(--texto-2); opacity: .55; }
+
+/* Cada anillo es su propio <svg> y gira entero alrededor del centro: el compositor
+   lo rota sin volver a pintar el dibujo (will-change se pone solo mientras gira). */
+.anillo { transform-origin: 50% 50%; }
+:global(html.js) .anillo { transform: rotate(var(--inicio, 0deg)); }
+
+/* Estado alineado (por defecto): marcas encendidas, ojo abierto, leyenda visible */
+.marca { transition: opacity 1.1s var(--lento); }
+.uniones { opacity: .75; transition: opacity 1.2s var(--lento) .1s; }
+.rayos { opacity: .8; transition: opacity 1.6s var(--lento) .6s; }
+.parpado { transform-box: fill-box; transform-origin: center; transition: transform 1.3s var(--lento) .2s; }
+.iris { transform-box: fill-box; transform-origin: center; transition: opacity 1s var(--lento) .9s, transform 1.4s var(--lento) .8s; }
+.leyenda {
+  margin-top: 1.6rem;
+  text-align: center;
+  color: var(--texto-2);
+  transition: opacity 1.4s var(--lento) .7s, transform 1.4s var(--lento) .7s, filter 1.4s var(--lento) .7s;
+}
+
+/* Mientras los anillos no coinciden */
+:global(html.js) .mecanismo:not(.alineado) .marca { opacity: .42; }
+:global(html.js) .mecanismo:not(.alineado) .capitulo.marca { color: var(--texto-2); }
+:global(html.js) .mecanismo:not(.alineado) .uniones { opacity: 0; }
+:global(html.js) .mecanismo:not(.alineado) .rayos { opacity: .3; }
+:global(html.js) .mecanismo:not(.alineado) .parpado { transform: scaleY(.06); }
+:global(html.js) .mecanismo:not(.alineado) .iris { opacity: 0; transform: scale(.7); }
+:global(html.js) .mecanismo:not(.alineado) .leyenda { opacity: 0; transform: translateY(8px); filter: blur(3px); }
+/* Si la leyenda trae un enlace o un botón, al recibir el foco se muestra enseguida */
+:global(html.js) .mecanismo:not(.alineado) .leyenda:focus-within {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition-duration: .3s;
+  transition-delay: 0s;
+}
+
+/* Disco chico (celulares, ventanas bajas): el texto grabado se agranda para que se lea.
+   Son unidades del dibujo (viewBox 600): a 316 px de ancho quedan en unos 9,5 y 8,5 px reales.
+   La pregunta no pasa de 18: más grande, la del anillo interior roza el capítulo III (120°). */
+@container (max-width: 440px) {
+  .pregunta { font-size: 18px; letter-spacing: .03em; }
+  .capitulo { font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anillo { transform: none !important; }
+  .marca, .iris, .leyenda { opacity: 1 !important; }
+  .uniones { opacity: .75 !important; }
+  .rayos { opacity: .8 !important; }
+  .parpado, .iris, .leyenda { transform: none !important; }
+  .leyenda { filter: none !important; }
+}

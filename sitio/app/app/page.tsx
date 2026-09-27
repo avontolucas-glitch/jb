@@ -1,20 +1,11 @@
 import type { Metadata } from "next";
 import Apertura from "@/components/Apertura";
 import BotonInstalar from "@/components/BotonInstalar";
-import { IconoCompartir } from "@/components/InstalarApp";
+import { IconoCompartir } from "@/components/GuiaInstalar";
 import type { Plataforma } from "@/lib/plataforma";
 import { portadillas } from "@/content/config";
 
 export const metadata: Metadata = { title: "Instalar la app" };
-
-const nombres: Record<Plataforma, string> = {
-  instalada: "la app instalada",
-  ios: "iPhone o iPad",
-  "safari-mac": "Safari en Mac",
-  chromium: "Chrome, Edge o Android",
-  firefox: "Firefox",
-  otra: "otro navegador",
-};
 
 const sistemas: { id: Plataforma; titulo: string; pasos: React.ReactNode[] }[] = [
   {
@@ -71,7 +62,7 @@ export default function App() {
       />
       <section className="hondo border-t borde px-5 py-14">
         <div className="mx-auto max-w-2xl revelar">
-          <BotonInstalar nombres={nombres} />
+          <BotonInstalar />
         </div>
       </section>
       <section className="px-5 py-14">

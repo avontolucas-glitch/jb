@@ -8,15 +8,15 @@ const fecha = (iso: string) =>
   new Date(iso).toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" });
 
 function nombreProducto(p: string) {
-  if (p === "masterclass") return "Masterclass";
+  if (p === "masterclass") return "Masterclass grabada";
   if (p.startsWith("sesion:")) {
     const h = horarioDesdeId(p.slice("sesion:".length));
-    return h ? `Sesión privada · ${h.etiqueta}` : "Sesión privada";
+    return h ? `Masterclass 1 a 1 · ${h.etiqueta} (hora de Argentina)` : "Masterclass 1 a 1";
   }
   const l = libros.find((x) => `libro:${x.id}` === p);
   if (l) return `${l.titulo} · edición digital`;
   const d = enVivo.directos.find((x) => `directo:${x.id}` === p);
-  if (d) return `En vivo · ${d.titulo}`;
+  if (d) return `${enVivo.titulo} · ${d.titulo}`;
   const c = conferencias.find((x) => `conferencia:${x.id}` === p);
   return c ? `Entrada · ${c.titulo}` : p;
 }

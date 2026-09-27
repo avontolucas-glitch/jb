@@ -1,56 +1,24 @@
 "use client";
-import { useEffect, useState } from "react";
-import { detectarPlataforma, type Plataforma } from "@/lib/plataforma";
+import { useEffect } from "react";
+import BotonApp from "./BotonApp";
+import { useInstalar } from "@/lib/instalar";
+import { nombreSistema, plataformaDe } from "@/lib/plataforma";
 
-type EventoInstalar = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
-
-/** En /app: botón de instalación directa (Chrome, Edge, Android) y aviso del sistema detectado. */
-export default function BotonInstalar({ nombres }: { nombres: Record<Plataforma, string> }) {
-  const [p, setP] = useState<Plataforma | null>(null);
-  const [evento, setEvento] = useState<EventoInstalar | null>(null);
-  const [instalada, setInstalada] = useState(false);
-
+/** En /app: el sistema detectado y el botón que instala (o guía paso a paso). */
+export default function BotonInstalar() {
+  const { sistema, instalada } = useInstalar();
   useEffect(() => {
-    const plataforma = detectarPlataforma();
-    setP(plataforma);
-    setInstalada(plataforma === "instalada");
-    document.getElementById(`so-${plataforma}`)?.setAttribute("data-actual", "si");
-    const alInstalar = (e: Event) => {
-      e.preventDefault();
-      setEvento(e as EventoInstalar);
-    };
-    const listo = () => setInstalada(true);
-    window.addEventListener("beforeinstallprompt", alInstalar);
-    window.addEventListener("appinstalled", listo);
-    return () => {
-      window.removeEventListener("beforeinstallprompt", alInstalar);
-      window.removeEventListener("appinstalled", listo);
-    };
-  }, []);
-
-  if (!p) return <div className="h-12" />;
+    if (sistema) document.getElementById(`so-${plataformaDe(sistema)}`)?.setAttribute("data-actual", "si");
+  }, [sistema]);
+  if (!sistema) return <div className="h-12" />;
   if (instalada) return <p className="border borde p-4" data-testid="estado-app">La app ya está instalada en este dispositivo.</p>;
   return (
-    <div className="space-y-4" data-testid="estado-app">
-      <p>
-        Estás en: <strong>{nombres[p]}</strong>.
+    <div className="space-y-5 text-center" data-testid="estado-app">
+      <p className="texto-2">
+        Estás en <strong style={{ color: "var(--texto)" }}>{nombreSistema(sistema)}</strong>.
       </p>
-      {evento ? (
-        <button
-          type="button"
-          className="boton boton-lleno"
-          onClick={async () => {
-            await evento.prompt();
-            const r = await evento.userChoice.catch(() => null);
-            if (r?.outcome === "accepted") setInstalada(true);
-            setEvento(null);
-          }}
-        >
-          Instalar la app
-        </button>
-      ) : (
-        <p className="texto-2">Seguí los pasos de tu sistema, más abajo.</p>
-      )}
+      <BotonApp className="text-lg px-8" />
+      <p className="texto-2 text-sm">Un toque: si tu navegador instala directo, se instala; si no, te mostramos los pasos exactos.</p>
     </div>
   );
 }

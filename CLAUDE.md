@@ -18,7 +18,7 @@ Vigentes (edición integral, sept. 2026):
 - `La Biografía (edición integral).docx`
 - `Hoja de Revisión para Julián (2ª pasada).docx`: dudas que solo Julián puede confirmar o dictar.
 - `Registro de cambios - Edición integral.docx`: cada cambio con su antes, su ahora y el motivo.
-- `(edición integral con sitio)`: la misma edición integral más una página final, después del colofón, «Tu libro, también digital»: QR a julianbermudez.com/canjear y el recuadro `[CÓDIGO ÚNICO DEL EJEMPLAR]`, que la imprenta completa con datos variables (un código distinto por ejemplar, de un solo uso). Contratapas y PDF de imprenta `(con sitio)` con la dirección del sitio; vistas previas `(vista previa con sitio)`.
+- `(edición integral con sitio)`: la misma edición integral más una página final, después del colofón, «Tu libro, también digital»: QR a julianbermudez.com/canjear y el recuadro `[CÓDIGO ÚNICO DEL EJEMPLAR]`, que la imprenta completa con datos variables (un código distinto por ejemplar, de un solo uso). Contratapas y PDF de imprenta `(con sitio)` con la dirección del sitio; vistas previas `(vista previa con sitio)`. Contratapas `(con fotos)`: la misma contratapa con una foto de Julián en duotono (Receta, doble exposición; Pensamiento, la mirada; Biografía, retrato de chef), hecha con `herramientas/contratapas_fotos.py`.
 
 Versiones anteriores, que se conservan intactas: `(nueva versión)`, `(sincronizado)`, `(sincronizada)` y `Hoja de Revisión para Julian.docx` (1ª pasada).
 
@@ -77,10 +77,18 @@ Nunca autor, nunca coautor. No se agregan enseñanzas, conceptos, ejemplos, anal
 - `covers.py`: genera las tapas y contratapas.
 - `make_docs.py`: genera el registro de cambios y la Hoja de Revisión.
 - `integrar_sitio.py` y `contratapas_sitio.py`: agregan el sitio a los libros (página del código y QR) y a las contratapas, como versiones nuevas.
+- `emblemas_nuevos.py`: el clavo y los tres clavos, con el mismo motor de grabado. `surf_desde_imagen.py`: el emblema del surf, a partir del dibujo de Lucas (`diseño/referencias/surf.png`; ver `diseño/referencias/LEEME.md`).
+- `fotos_web.py`: pasa las fotos de Julián (`diseño/fotos/`) a blanco y negro para el sitio.
 
 ## Sitio web (`sitio/`)
 
-Prototipo de julianbermudez.com (Next.js). El nombre va «Julián Bermúdez», con tilde, también en el sitio. Estética de los libros: tinta crema sobre negro, los grabados y emblemas de la trilogía, nada de urgencia ni trucos de venta. Precios, fechas y textos en `sitio/content/config.ts`; todo lo que es voz de Julián es `[TEXTO DE JULIÁN]` hasta que él lo escriba. Cómo correrlo, probarlo y publicarlo: `sitio/README.md`.
+Prototipo de julianbermudez.com (Next.js). El nombre va «Julián Bermúdez», con tilde, también en el sitio. Estética de los libros: tinta crema sobre negro, los grabados y emblemas de la trilogía, nada de urgencia ni trucos de venta. Precios, fechas y textos en `sitio/content/config.ts`; lo que falta escribir va como «(Texto … a definir)» (nunca «lo escribe Julián»). Cómo correrlo, probarlo y publicarlo: `sitio/README.md`.
+
+- **Frases de los epígrafes** (`sitio/content/frases.ts`): solo textuales de los manuscritos, verificadas palabra por palabra; rotan cada vez que se entra a una página. Para sumar una, copiarla exacta del libro.
+- **Fotos de Julián**: originales en `diseño/fotos/`; las versiones web en blanco y negro salen con `herramientas/fotos_web.py` a `sitio/public/fotos/`.
+- **Agenda de la Masterclass 1 a 1**: Julián carga horarios en hora de Argentina; cada visitante los ve en su hora, con la de Julián al lado (`sitio/lib/zona.ts`).
+- **App instalable**: un solo botón «Instalar la app» que detecta sistema y navegador (`sitio/lib/instalar.ts`).
+- **YoDa** (`sitio/content/yosoy.ts`): la guía del sitio, un ojo pixelado que habla a lo Yoda con tono místico; es soporte, nunca la voz de Julián. **Música de fondo**: temas al azar de su playlist de Spotify (`sitio/content/musica.ts`).
 
 Las rutas de trabajo están fijadas a la sesión donde se crearon: para reusarlos hay que ajustarlas.
 

@@ -51,7 +51,42 @@ export async function leerSemilla<T>(nombre: string, porDefecto: T): Promise<T> 
   }
 }
 
-export async function escribir<T>(nombre: string, datos: T): Promise<void> {
+/**
+ * Una cola por archivo: lo que lee, cambia y escribe un mismo archivo pasa de a
+ * uno, así dos pedidos casi simultáneos no se pisan. Vive en globalThis porque
+ * Next puede cargar este módulo más de una vez en el mismo servidor.
+ * PRODUCCIÓN: esto lo resuelve la base de datos (transacciones, restricciones únicas).
+ */
+const g = globalThis as { __jbColas?: Map<string, Promise<unknown>> };
+const colas = (g.__jbColas ??= new Map());
+
+function enCola<R>(nombre: string, fn: () => Promise<R>): Promise<R> {
+  const esta = (colas.get(nombre) ?? Promise.resolve()).then(fn);
+  colas.set(nombre, esta.catch(() => {})); // si algo falla, la cola sigue
+  return esta;
+}
+
+/** Escribe en un archivo aparte y lo renombra: nadie lee nunca un JSON a medio escribir. */
+async function escribirYa<T>(nombre: string, datos: T): Promise<void> {
   const dir = await carpeta();
-  await fs.writeFile(path.join(dir, `${nombre}.json`), JSON.stringify(datos, null, 2));
+  const final = path.join(dir, `${nombre}.json`);
+  const temporal = `${final}.${process.pid}.${crypto.randomUUID()}.tmp`;
+  await fs.writeFile(temporal, JSON.stringify(datos, null, 2));
+  await fs.rename(temporal, final);
+}
+
+export function escribir<T>(nombre: string, datos: T): Promise<void> {
+  return enCola(nombre, () => escribirYa(nombre, datos));
+}
+
+/**
+ * Lee, cambia y escribe un archivo sin que otro pedido se meta en el medio.
+ * `fn` devuelve los datos nuevos (o `undefined` para no escribir nada) y un resultado.
+ */
+export function modificar<T, R>(nombre: string, fn: (datos: T) => { datos?: T; resultado: R } | Promise<{ datos?: T; resultado: R }>): Promise<R> {
+  return enCola(nombre, async () => {
+    const { datos, resultado } = await fn(await leer<T>(nombre));
+    if (datos !== undefined) await escribirYa(nombre, datos);
+    return resultado;
+  });
 }

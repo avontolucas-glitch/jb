@@ -1,4 +1,13 @@
 import { test, expect } from "./ayuda";
+import type { Page } from "@playwright/test";
+
+/** Las pruebas esconden el aviso de la app; estas lo quieren ver (una sola vez: después vale lo que elija la persona). */
+const verAviso = (page: Page) =>
+  page.addInitScript(() => {
+    if (sessionStorage.getItem("jb-probar-aviso")) return;
+    sessionStorage.setItem("jb-probar-aviso", "1");
+    localStorage.removeItem("jb-aviso-app-cerrado");
+  });
 
 test("el manifiesto de la app es válido e instalable", async ({ request }) => {
   const r = await request.get("/manifest.webmanifest");
@@ -49,7 +58,40 @@ test("la página /app muestra los pasos para cada sistema", async ({ page }) => 
   for (const s of ["iPhone y iPad", "Android, Windows, Linux y Chromebook", "Mac", "Firefox"]) {
     await expect(page.getByRole("heading", { name: s, exact: true })).toBeVisible();
   }
-  await expect(page.getByTestId("estado-app")).toBeVisible();
+  await expect(page.getByTestId("estado-app")).toContainText("Estás en");
+});
+
+test("un solo botón: sin instalación directa, abre la guía del sistema detectado", async ({ page }, info) => {
+  await page.goto("/app");
+  await page.getByTestId("estado-app").getByRole("button", { name: "Instalar la app" }).click();
+  const guia = page.getByTestId("guia-instalar");
+  await expect(guia).toBeVisible();
+  await expect(guia).toContainText(info.project.name === "celular" ? "Instalá la app en tu teléfono" : "Instalá la app en tu computadora");
+  await guia.getByRole("button", { name: "Cerrar" }).click();
+  await expect(guia).toHaveCount(0);
+});
+
+test("un solo botón: donde el navegador instala directo, abre su ventana de instalación", async ({ page }, info) => {
+  await page.goto("/app");
+  await page.evaluate(() => {
+    const e = new Event("beforeinstallprompt", { cancelable: true }) as Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
+    e.prompt = async () => {
+      (window as unknown as { __pidio: number }).__pidio = 1;
+    };
+    e.userChoice = Promise.resolve({ outcome: "accepted" });
+    window.dispatchEvent(e);
+  });
+  const boton = info.project.name === "celular" ? page.getByTestId("estado-app").getByRole("button", { name: "Instalar la app" }) : page.getByTestId("instalar-nav");
+  await boton.click();
+  expect(await page.evaluate(() => (window as unknown as { __pidio?: number }).__pidio)).toBe(1);
+  await expect(page.getByTestId("guia-instalar")).toHaveCount(0);
+  await expect(page.getByTestId("estado-app")).toContainText("ya está instalada");
+});
+
+test("al llegar desde otro navegador para instalar, la guía se abre sola", async ({ page }) => {
+  await page.goto("/app?instalar=1");
+  await expect(page.getByTestId("guia-instalar")).toBeVisible();
+  await expect(page).toHaveURL(/\/app$/);
 });
 
 test.describe("aviso de instalación en iPhone", () => {
@@ -57,17 +99,23 @@ test.describe("aviso de instalación en iPhone", () => {
     userAgent:
       "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1",
   });
-  test("explica Compartir y Agregar a pantalla de inicio, y recuerda si se cierra", async ({ page }) => {
+  test("el aviso recuerda si se cierra, y el botón muestra Compartir y Agregar a pantalla de inicio", async ({ page }) => {
+    await verAviso(page);
     await page.goto("/");
     const aviso = page.getByTestId("aviso-app");
     await expect(aviso).toBeVisible();
     await expect(aviso).toHaveAttribute("data-plataforma", "ios");
-    await expect(aviso).toContainText("Agregar a pantalla de inicio");
     await aviso.getByRole("button", { name: /Cerrar el aviso/ }).click();
     await expect(aviso).toHaveCount(0);
     await page.reload();
     await page.waitForTimeout(2500);
     await expect(page.getByTestId("aviso-app")).toHaveCount(0);
+
+    await page.goto("/app");
+    await page.getByTestId("estado-app").getByRole("button", { name: "Instalar la app" }).click();
+    const guia = page.getByTestId("guia-instalar");
+    await expect(guia).toContainText("Agregar a pantalla de inicio");
+    await expect(guia).toContainText("iPhone · Safari");
   });
 });
 
@@ -78,9 +126,24 @@ test.describe("aviso de instalación en Safari de Mac", () => {
     hasTouch: false,
     isMobile: false,
   });
-  test("explica Archivo y Agregar al Dock", async ({ page }) => {
+  test("el botón explica Archivo y Agregar al Dock", async ({ page }) => {
+    await verAviso(page);
     await page.goto("/");
     await expect(page.getByTestId("aviso-app")).toHaveAttribute("data-plataforma", "safari-mac");
-    await expect(page.getByTestId("aviso-app")).toContainText("Agregar al Dock");
+    await page.getByTestId("aviso-app").getByRole("button", { name: "Instalar la app" }).click();
+    await expect(page.getByTestId("guia-instalar")).toContainText("Agregar al Dock");
+  });
+});
+
+test.describe("desde el navegador de Instagram", () => {
+  test.use({
+    userAgent:
+      "Mozilla/5.0 (Linux; Android 14; Pixel 7 Build/UQ1A.240205.004; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/128.0.6613.127 Mobile Safari/537.36 Instagram 348.0.0.36.101 Android",
+  });
+  test("intenta abrir Chrome y, si no puede, explica cómo salir de Instagram", async ({ page }) => {
+    await page.goto("/app");
+    await page.getByTestId("estado-app").getByRole("button", { name: "Instalar la app" }).click();
+    await expect(page.getByTestId("guia-instalar")).toContainText("Desde Instagram no se puede instalar");
+    await expect(page.getByTestId("guia-instalar")).toContainText("Abrir en Chrome");
   });
 });

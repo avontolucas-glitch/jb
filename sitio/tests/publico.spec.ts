@@ -18,7 +18,7 @@ const paginas = [
   "/legales/reembolsos",
   "/app",
   "/canjear",
-  "/sesiones",
+  "/masterclass/1-a-1",
   "/arrepentimiento",
 ];
 
@@ -80,6 +80,7 @@ sinAtajo("al entrar aparece el cuadro de bienvenida, una vez por visita", async 
   await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page.locator("html")).toHaveClass(/umbral-saliendo/);
   await expect(umbral).toBeHidden();
+  await page.mouse.wheel(0, 700); // lo que se revela está debajo de la portadilla
   await expect(page.locator(".revelar.visto").first()).toBeAttached();
   await expect(page.getByRole("heading", { name: "Los libros" })).toBeVisible();
   await page.goto("/");
@@ -89,7 +90,7 @@ sinAtajo("al entrar aparece el cuadro de bienvenida, una vez por visita", async 
 test.describe("celular chico", () => {
   test.use({ viewport: { width: 360, height: 740 } });
   test("la barra de arriba entra entera y muestra Ingresar", async ({ page }) => {
-    for (const ruta of ["/", "/sesiones"]) {
+    for (const ruta of ["/", "/masterclass/1-a-1"]) {
       await page.goto(ruta);
       const ancho = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(ancho, `${ruta} desborda`).toBeLessThanOrEqual(1);
@@ -117,7 +118,7 @@ test("privacidad y reembolsos tienen texto, y el botón de arrepentimiento da un
   await page.getByRole("link", { name: "Botón de arrepentimiento" }).last().click();
   await page.getByLabel("Nombre").fill("Ana");
   await page.getByLabel("Mail de la compra").fill("ana@prueba.com");
-  await page.getByLabel("Qué compraste y cuándo").fill("Sesión privada del martes");
+  await page.getByLabel("Qué compraste y cuándo").fill("Masterclass 1 a 1 del martes");
   await page.getByRole("button", { name: "Pedir la cancelación" }).click();
   await expect(page.getByTestId("mensaje-ok")).toContainText("ARR-");
 });

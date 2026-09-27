@@ -45,7 +45,7 @@ export default async function Libros() {
               </div>
               {l.epigrafe && (
                 <div className="revelar">
-                  <Epigrafe cita={l.epigrafe} className="mt-12" />
+                  <Epigrafe cita={l.epigrafe} libro={l.id} className="mt-12" />
                 </div>
               )}
               <Ornamento className="mt-12" />

@@ -1,18 +1,35 @@
 import Link from "next/link";
+import Hora from "@/components/Hora";
 import { miembro } from "@/lib/miembro";
 import Precio from "@/components/Precio";
 import { conferencias, encuentro, enVivo, libros, precios, sesiones } from "@/content/config";
 import { horarioDesdeId } from "@/lib/sesiones";
+import { esAdmin } from "@/lib/auth";
+import { reservasFuturas } from "@/lib/agenda";
 
 export default async function Espacio() {
   const { u, a } = await miembro();
   const nombre = u.nombre.replace(/\s*\(demo\)$/, "");
   const mias = conferencias.filter((c) => a.conferencias.includes(c.id));
   const directos = enVivo.directos.filter((d) => a.directos.includes(d.id));
+  const admin = esAdmin(u);
+  const reservas = admin ? (await reservasFuturas()).length : 0;
   return (
     <>
       <h1 className="titulo text-4xl">Hola, {nombre}.</h1>
-      {!a.algo ? (
+      {admin && (
+        <div className="border borde p-5 mt-6" data-testid="acceso-agenda">
+          <Link href="/mi-espacio/agenda" className="text-xl enlace">
+            Tu agenda de la {sesiones.titulo}
+          </Link>
+          <p className="texto-2 mt-1" data-testid="reservas-por-delante">
+            {reservas === 0 ? "Todavía no hay reservas por delante." : reservas === 1 ? "Una reserva por delante." : `${reservas} reservas por delante.`}{" "}
+            Horarios, bloqueos y reservas.
+          </p>
+        </div>
+      )}
+      {/* la cuenta de Julián no compra: no se le ofrece «por dónde empezar» (ni su propia Masterclass 1 a 1) */}
+      {admin && !a.algo ? null : !a.algo ? (
         <div data-testid="espacio-vacio">
           <p className="texto-2 text-lg mt-4">Todavía no tenés nada acá. Cuando compres algo, aparece en este lugar.</p>
           <h2 className="text-2xl mt-12 mb-4">Por dónde empezar</h2>
@@ -34,8 +51,8 @@ export default async function Espacio() {
               </p>
             </li>
             <li className="border-b borde py-5">
-              <Link href="/sesiones" className="text-xl enlace">
-                Una sesión privada con Julián
+              <Link href="/masterclass/1-a-1" className="text-xl enlace">
+                La Masterclass 1 a 1 con Julián
               </Link>
               <p className="texto-2 mt-1">
                 Uno a uno, {sesiones.modalidad.toLowerCase()}. <Precio {...precios.sesionPrivada} />
@@ -49,7 +66,7 @@ export default async function Espacio() {
             </li>
             <li className="border-b borde py-5">
               <Link href="/conferencias" className="text-xl enlace">
-                Una conferencia privada
+                Una conferencia
               </Link>
               <p className="texto-2 mt-1">
                 Entrada simbólica. <Precio {...precios.conferenciaPrivada} />
@@ -87,9 +104,11 @@ export default async function Espacio() {
               return h ? (
                 <li key={id} className="border-b borde py-5">
                   <Link href="/mi-espacio/sesiones" className="text-xl enlace">
-                    Sesión privada
+                    Masterclass 1 a 1
                   </Link>
-                  <p className="texto-2 mt-1 first-letter:uppercase">{h.etiqueta}</p>
+                  <p className="texto-2 mt-1">
+                    <Hora inicio={h.fecha.toISOString()} />
+                  </p>
                 </li>
               ) : null;
             })}

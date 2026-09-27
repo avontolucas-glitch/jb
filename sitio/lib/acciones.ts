@@ -7,10 +7,10 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { crearCuenta, ingresar, cerrarSesion, usuarioActual } from "./auth";
 import { accesos, type Progreso } from "./access";
-import { leer, escribir } from "./db";
+import { leer, escribir, modificar } from "./db";
 import { producto, pagarSimulado, montoElegido } from "./payments";
 import { canjear } from "./codigos";
-import { ocupados } from "./sesiones";
+import { disponible, ocupados } from "./sesiones";
 import { modulos } from "@/content/config";
 
 export type Estado = { error?: string; ok?: string } | null;
@@ -94,18 +94,24 @@ export async function accionPagar(_: Estado, f: FormData): Promise<Estado> {
   if (!p) return { error: "Ese producto no existe." };
   const m = montoElegido(p, txt(f, "monto"));
   if ("error" in m) return { error: m.error };
-  if (p.id.startsWith("sesion:")) {
-    const slot = p.id.slice("sesion:".length);
+  const tomado = { error: "Ese horario se acaba de reservar. Elegí otro." };
+  const slot = p.id.startsWith("sesion:") ? p.id.slice("sesion:".length) : null;
+  if (slot) {
     const quien = (await ocupados()).get(slot);
-    if (quien && quien !== u.id) return { error: "Ese horario se acaba de reservar. Elegí otro." };
-    const nota = txt(f, "nota").slice(0, 1500);
-    if (nota) {
-      const notas = await leer<{ usuario: string; horario: string; nota: string; fecha: string }[]>("notas_sesion");
-      notas.push({ usuario: u.id, horario: slot, nota, fecha: new Date().toISOString() });
-      await escribir("notas_sesion", notas);
-    }
+    if (quien && quien !== u.id) return tomado;
+    if (!quien && !(await disponible(slot))) return { error: "Ese horario ya no está en la agenda. Elegí otro." };
   }
-  await pagarSimulado(u.id, p, m.monto);
+  // el pago vuelve a mirar, de una sola vez, que nadie haya reservado ese horario en el medio
+  const pago = await pagarSimulado(u.id, p, m.monto);
+  if (!pago.ok) return tomado;
+  const nota = slot ? txt(f, "nota").slice(0, 1500) : "";
+  if (slot && nota) {
+    type Nota = { usuario: string; horario: string; nota: string; fecha: string };
+    await modificar<Nota[], void>("notas_sesion", (notas) => ({
+      datos: [...notas, { usuario: u.id, horario: slot, nota, fecha: new Date().toISOString() }],
+      resultado: undefined,
+    }));
+  }
   revalidatePath("/", "layout");
   if (p.id === "masterclass") redirect("/mi-espacio/masterclass?compra=ok");
   if (p.id.startsWith("directo:")) redirect(`/mi-espacio/en-vivo?compra=ok`);

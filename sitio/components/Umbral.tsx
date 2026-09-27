@@ -10,12 +10,28 @@ export const CLAVE_UMBRAL = "jb-umbral";
  * Cuadro de bienvenida al entrar. Se muestra una vez por visita (sesión del
  * navegador). Un script en el <head> lo oculta antes de pintar si ya se entró.
  */
+/** Deja inerte (o no) todo lo que está detrás de la bienvenida. */
+function fondo(inerte: boolean) {
+  if (inerte)
+    document.querySelectorAll("body > *:not(.umbral):not(script):not(svg):not([inert])").forEach((el) => {
+      el.setAttribute("inert", "");
+      el.setAttribute("data-inerte-umbral", "");
+    });
+  else
+    document.querySelectorAll("[data-inerte-umbral]").forEach((el) => {
+      el.removeAttribute("inert");
+      el.removeAttribute("data-inerte-umbral");
+    });
+}
+
 export default function Umbral() {
   const boton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const html = document.documentElement;
     if (html.classList.contains("umbral-visto")) return;
+    // mientras está la bienvenida, el resto de la página no recibe el foco
+    fondo(true);
     boton.current?.focus({ preventScroll: true });
   }, []);
 
@@ -29,6 +45,7 @@ export default function Umbral() {
     // la pupila como un iris; 3) el sitio despierta y empieza su propia secuencia.
     html.classList.add("umbral-saliendo");
     const despertar = () => {
+      fondo(false);
       html.classList.remove("en-umbral");
       window.dispatchEvent(new Event("umbral:abierto"));
     };

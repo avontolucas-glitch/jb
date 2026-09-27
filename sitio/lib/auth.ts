@@ -23,8 +23,49 @@ export type Usuario = {
   admin?: boolean;
 };
 
-/** Solo la cuenta marcada como admin en data/usuarios.json (nunca algo que mande el navegador). */
-export const esAdmin = (u: Usuario | null | undefined): boolean => u?.admin === true;
+/**
+ * ¿Se puede entrar como Julián con la cuenta demo (julian@demo.com, con la clave a la vista)?
+ * Solo si se enciende a propósito con JB_ADMIN_DEMO=1 (las pruebas, una demo local).
+ * En un sitio publicado queda apagado: ahí la cuenta de Julián es la de ADMIN_EMAIL y ADMIN_CLAVE.
+ */
+export const adminDemoActivo = () => process.env.JB_ADMIN_DEMO === "1";
+
+/**
+ * Solo una cuenta marcada como admin por el servidor (nunca algo que mande el navegador):
+ * la de ADMIN_EMAIL, o la demo de data/usuarios.json si JB_ADMIN_DEMO=1.
+ */
+export const esAdmin = (u: Usuario | null | undefined): boolean => u?.admin === true && (!u.demo || adminDemoActivo());
+
+const ID_ADMIN = "admin-julian";
+let cuentaAdmin: { clave: string; usuario: Promise<Usuario> } | null = null;
+
+/**
+ * La cuenta de Julián para el sitio publicado: mail y clave en variables de
+ * entorno (ADMIN_EMAIL y ADMIN_CLAVE, al menos 8 caracteres), nunca a la vista
+ * en el sitio ni en el repositorio.
+ */
+function cuentaAdminPrivada(): Promise<Usuario> | null {
+  const email = (process.env.ADMIN_EMAIL ?? "").trim().toLowerCase();
+  const clave = process.env.ADMIN_CLAVE ?? "";
+  if (!email || clave.length < 8) return null;
+  const firma = `${email}\n${clave}`;
+  if (cuentaAdmin?.clave !== firma) {
+    const sal = `admin-${email}`;
+    cuentaAdmin = {
+      clave: firma,
+      usuario: hashClave(clave, sal).then((hash) => ({
+        id: ID_ADMIN,
+        nombre: (process.env.ADMIN_NOMBRE ?? "").trim() || "Julián",
+        email,
+        sal,
+        hash,
+        creado: "2026-09-01T00:00:00.000Z",
+        admin: true,
+      })),
+    };
+  }
+  return cuentaAdmin.usuario;
+}
 
 const enc = new TextEncoder();
 
@@ -49,7 +90,9 @@ function normalizar(email: string) {
 export async function usuarios(): Promise<Usuario[]> {
   const guardados = await leer<Usuario[]>("usuarios");
   const demos = (await leerSemilla<Usuario[]>("usuarios", [])).filter((d) => d.demo && !guardados.some((g) => g.id === d.id));
-  return [...guardados, ...demos];
+  const admin = await cuentaAdminPrivada();
+  // la cuenta privada de Julián va primero: su mail no lo puede usar otra cuenta
+  return admin ? [admin, ...guardados.filter((g) => g.email !== admin.email && g.id !== ID_ADMIN), ...demos] : [...guardados, ...demos];
 }
 
 export async function buscarPorEmail(email: string) {
@@ -81,7 +124,13 @@ export async function crearCuenta(
   email: string,
   clave: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  nombre = nombre.trim();
+  // sin caracteres de control (el nombre llega al calendario de Julián) y con un largo razonable
+  nombre = nombre
+    .replace(/[\u0000-\u001f\u007f-\u009f]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 80)
+    .trim();
   email = normalizar(email);
   if (nombre.length < 2) return { ok: false, error: "Escribí tu nombre." };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, error: "Revisá el mail." };

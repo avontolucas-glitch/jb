@@ -11,8 +11,8 @@ export default async function MisConferencias({ searchParams }: { searchParams: 
   if (mias.length === 0)
     return (
       <>
-        <h1 className="titulo text-4xl mb-8">Conferencias privadas</h1>
-        <SinAcceso que="Acá aparecen las conferencias privadas para las que tenés entrada." href="/conferencias" boton="Ver las conferencias" />
+        <h1 className="titulo text-4xl mb-8">Conferencias</h1>
+        <SinAcceso que="Acá aparecen las conferencias para las que tenés entrada." href="/conferencias" boton="Ver las conferencias" />
       </>
     );
   return (
@@ -22,7 +22,7 @@ export default async function MisConferencias({ searchParams }: { searchParams: 
           Listo, ya tenés tu entrada.
         </p>
       )}
-      <h1 className="titulo text-4xl">Conferencias privadas</h1>
+      <h1 className="titulo text-4xl">Conferencias</h1>
       <ul className="border-t borde mt-8">
         {mias.map((c) => (
           <li key={c.id} className="border-b borde py-6" data-testid={`mi-conferencia-${c.id}`}>
@@ -42,7 +42,7 @@ export default async function MisConferencias({ searchParams }: { searchParams: 
       </ul>
       {otras.length > 0 && (
         <p className="texto-2 mt-10">
-          Hay {otras.length === 1 ? "otra conferencia privada" : `${otras.length} conferencias privadas más`}.{" "}
+          Hay {otras.length === 1 ? "otra conferencia" : `${otras.length} conferencias más`}.{" "}
           <Link href="/conferencias" className="enlace">
             Ver conferencias
           </Link>

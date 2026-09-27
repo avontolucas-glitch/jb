@@ -4,6 +4,7 @@ import Apertura from "@/components/Apertura";
 import Texto from "@/components/Marcador";
 import Ornamento from "@/components/Ornamento";
 import Epigrafe from "@/components/Epigrafe";
+import Foto from "@/components/Foto";
 import { usuarioActual } from "@/lib/auth";
 import { accesos } from "@/lib/access";
 import Precio from "@/components/Precio";
@@ -23,7 +24,8 @@ export default async function EnVivo() {
       <SubnavMasterclass actual="vivo" />
 
       <section className="hondo border-t borde px-5 py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-5xl grid gap-14 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] items-start">
+        <div>
           <div className="prosa revelar">
             <Texto bloque>{enVivo.descripcion}</Texto>
           </div>
@@ -41,6 +43,8 @@ export default async function EnVivo() {
               </li>
             ))}
           </ol>
+        </div>
+        <Foto nombre="julian-movimiento" pie="Julián Bermúdez" inclinada={0.7} sizes="(min-width: 768px) 22rem, 80vw" className="max-w-xs w-full mx-auto md:mt-4" />
         </div>
       </section>
 

@@ -66,6 +66,9 @@ export function Campo({
   requerido = true,
   defecto,
   ayuda,
+  min,
+  max,
+  step,
 }: {
   nombre: string;
   etiqueta: string;
@@ -74,6 +77,10 @@ export function Campo({
   requerido?: boolean;
   defecto?: string;
   ayuda?: string;
+  /** Para fechas y horas: el selector del teléfono no ofrece lo que queda afuera. */
+  min?: string;
+  max?: string;
+  step?: number;
 }) {
   const id = `campo-${nombre}`;
   return (
@@ -88,6 +95,9 @@ export function Campo({
         autoComplete={autoComplete}
         required={requerido}
         defaultValue={defecto}
+        min={min}
+        max={max}
+        step={step}
         className="campo"
         aria-describedby={ayuda ? `${id}-ayuda` : undefined}
       />

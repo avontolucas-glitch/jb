@@ -15,7 +15,8 @@ export default defineConfig({
   workers: 1,
   timeout: 45_000,
   reporter: [["list"]],
-  use: { baseURL: `http://localhost:${PUERTO}`, locale: "es-AR" },
+  // Por defecto el navegador está en hora de Argentina (la de Julián); zonas.spec.ts prueba otras.
+  use: { baseURL: `http://localhost:${PUERTO}`, locale: "es-AR", timezoneId: "America/Argentina/Buenos_Aires" },
   projects: [
     { name: "celular", use: { ...devices["Pixel 7"], launchOptions: lanzar } },
     { name: "computadora", use: { ...devices["Desktop Chrome"], launchOptions: lanzar } },
@@ -24,7 +25,8 @@ export default defineConfig({
     command: `npm run start -- -p ${PUERTO}`,
     url: `http://localhost:${PUERTO}`,
     reuseExistingServer: false,
-    env: { DATA_DIR },
+    // JB_ADMIN_DEMO: la cuenta demo de Julián (julian@demo.com) vale como la suya solo acá, en las pruebas.
+    env: { DATA_DIR, JB_ADMIN_DEMO: "1" },
     timeout: 60_000,
   },
 });

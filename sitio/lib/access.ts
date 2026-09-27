@@ -4,7 +4,7 @@
  * - Entrada a una conferencia privada: solo esa conferencia.
  * - Directo en vivo (a voluntad): solo ese directo.
  * - Libro digital (comprado o con el código del libro impreso): leer ese libro.
- * - Sesión privada: ese horario, con su link de videollamada.
+ * - Masterclass 1 a 1: ese horario, con su link de videollamada.
  */
 import { leer } from "./db";
 

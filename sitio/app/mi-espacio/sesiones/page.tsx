@@ -1,7 +1,9 @@
 import Link from "next/link";
+import Hora from "@/components/Hora";
 import { miembro } from "@/lib/miembro";
 import { leer } from "@/lib/db";
-import { horarioDesdeId } from "@/lib/sesiones";
+import { fin, horarioDesdeId } from "@/lib/sesiones";
+import { eventoDeReserva, linkGoogleCalendar, linkSala } from "@/lib/ics";
 import SinAcceso from "@/components/SinAcceso";
 import { sesiones } from "@/content/config";
 
@@ -17,8 +19,8 @@ export default async function MisSesiones({ searchParams }: { searchParams: Prom
   if (mias.length === 0)
     return (
       <>
-        <h1 className="titulo text-4xl mb-8">Sesiones privadas</h1>
-        <SinAcceso que="Acá aparecen tus sesiones 1 a 1 con Julián, con el link para entrar." href="/sesiones" boton="Ver horarios" />
+        <h1 className="titulo text-4xl mb-8">{sesiones.titulo}</h1>
+        <SinAcceso que="Acá aparecen tus encuentros 1 a 1 con Julián, con el link para entrar." href="/masterclass/1-a-1" boton="Ver horarios" />
       </>
     );
   const notas = (await leer<Nota[]>("notas_sesion")).filter((n) => n.usuario === u.id);
@@ -27,27 +29,50 @@ export default async function MisSesiones({ searchParams }: { searchParams: Prom
     <>
       {compra === "ok" && (
         <p role="status" className="border borde p-4 mb-8" data-testid="compra-ok">
-          Listo, tu sesión está reservada.
+          Listo, tu encuentro está reservado.
         </p>
       )}
-      <h1 className="titulo text-4xl">Sesiones privadas</h1>
+      <h1 className="titulo text-4xl">{sesiones.titulo}</h1>
       <ul className="border-t borde mt-8">
         {mias.map((h) => {
-          const pasada = h.fecha.getTime() < ahora;
+          // el link sigue a la vista hasta que termina el encuentro: quien llega tarde tiene con qué entrar
+          const pasada = fin(h) < ahora;
           const nota = notas.filter((n) => n.horario === h.id).at(-1)?.nota;
           return (
             <li key={h.id} className={`border-b borde py-6 ${pasada ? "opacity-60" : ""}`} data-testid={`mi-sesion-${h.id}`}>
-              <h2 className="text-2xl first-letter:uppercase">{h.dia}</h2>
-              <p className="texto-2 mt-1">
-                {h.hora} h, {sesiones.zonaHoraria} · {sesiones.modalidad}
+              <h2 className="text-2xl">
+                <Hora inicio={h.fecha.toISOString()} parte="dia" />
+              </h2>
+              <p className="mt-1">
+                <Hora inicio={h.fecha.toISOString()} parte="hora" />
+                <span className="texto-2"> · {sesiones.modalidad}</span>
               </p>
               {!pasada && (
                 <p className="mt-4">
                   Link de la videollamada:{" "}
-                  <a href={`${sesiones.linkSala}${h.id}`} className="enlace break-all" data-testid="link-sesion">
-                    {`${sesiones.linkSala}${h.id}`}
+                  <a href={linkSala(h.id)} className="enlace break-all" data-testid="link-sesion">
+                    {linkSala(h.id)}
                   </a>
                 </p>
+              )}
+              {!pasada && (
+                <div className="mt-4">
+                  <p className="flex flex-wrap gap-3">
+                    <a href={`/api/sesion-ics?id=${encodeURIComponent(h.id)}`} className="boton boton-chico" data-testid="agregar-calendario">
+                      Agregar a mi calendario
+                    </a>
+                    <a
+                      href={linkGoogleCalendar(eventoDeReserva(h))}
+                      className="boton boton-chico"
+                      target="_blank"
+                      rel="noopener"
+                      data-testid="google-calendar"
+                    >
+                      Google Calendar
+                    </a>
+                  </p>
+                  <p className="texto-2 text-xs mt-2">En Android, usá Google Calendar.</p>
+                </div>
               )}
               {nota && (
                 <div className="mt-4">

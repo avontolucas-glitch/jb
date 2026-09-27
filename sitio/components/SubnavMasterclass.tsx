@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-/** La masterclass es una sola sección con dos formas: en vivo y grabada. */
-export default function SubnavMasterclass({ actual }: { actual: "vivo" | "grabada" }) {
+/** La masterclass es una sola sección con tres formas: en vivo, 1 a 1 y grabada. */
+export default function SubnavMasterclass({ actual }: { actual: "vivo" | "uno" | "grabada" }) {
   const item = (href: string, texto: string, activo: boolean) => (
     <Link
       href={href}
@@ -15,6 +15,7 @@ export default function SubnavMasterclass({ actual }: { actual: "vivo" | "grabad
     <nav aria-label="Masterclass" className="flex justify-center -mt-6 mb-2 relative z-10" data-testid="subnav-masterclass">
       <div className="inline-flex text-sm tracking-wide">
         {item("/masterclass", "En vivo", actual === "vivo")}
+        {item("/masterclass/1-a-1", "1 a 1", actual === "uno")}
         {item("/masterclass/grabada", "Grabada", actual === "grabada")}
       </div>
     </nav>

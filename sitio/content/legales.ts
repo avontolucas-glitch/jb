@@ -6,7 +6,7 @@
 export type Legal = { titulo: string; bajada: string; partes: { titulo: string; parrafos: string[]; id?: string }[] };
 
 const CONTACTO = "(mail de contacto, a definir)";
-const RESPONSABLE = "Julián Bermúdez / ELVERBO (nombre legal, CUIT y domicilio, a definir)";
+const RESPONSABLE = "Julián Bermúdez (nombre legal, CUIT y domicilio, a definir)";
 
 export const legales: Record<string, Legal> = {
   terminos: {
@@ -35,14 +35,14 @@ export const legales: Record<string, Legal> = {
         parrafos: [
           "Tu cuenta: nombre, mail y la clave, que se guarda cifrada (nadie puede leerla, ni siquiera nosotros).",
           "Tus compras: qué compraste, cuándo, el monto y el medio de pago. Los datos de tu tarjeta los procesa el medio de pago; este sitio no los ve ni los guarda.",
-          "Lo que nos mandás: tus preguntas para el encuentro, lo que contás al reservar una sesión, tu inscripción a una conferencia y tu mail o WhatsApp si te sumás a la lista.",
+          "Lo que nos mandás: tus preguntas para el encuentro, lo que contás al reservar una Masterclass 1 a 1, tu inscripción a una conferencia y tu mail o WhatsApp si te sumás a la lista.",
           "Lo mínimo para que el sitio funcione: una cookie que mantiene tu sesión abierta y algunas preferencias que quedan en tu dispositivo (por ejemplo, si silenciaste los sonidos).",
         ],
       },
       {
         titulo: "Para qué los usamos",
         parrafos: [
-          "Para darte acceso a lo que compraste, avisarte lo que pediste que te avisemos, preparar tu sesión o el encuentro de preguntas y cuidar la seguridad de tu cuenta.",
+          "Para darte acceso a lo que compraste, avisarte lo que pediste que te avisemos, preparar tu Masterclass 1 a 1 o el encuentro de preguntas y cuidar la seguridad de tu cuenta.",
           "En los directos y en los libros digitales tu mail aparece como marca de agua: sirve para proteger el contenido y saber de quién era si alguien lo difunde.",
           "No vendemos ni alquilamos tus datos, y el sitio no tiene publicidad de terceros.",
         ],
@@ -97,10 +97,10 @@ export const legales: Record<string, Legal> = {
         parrafos: ["Te devolvemos el total dentro de los 10 días de la compra si todavía no viste ningún módulo."],
       },
       {
-        titulo: "Sesiones privadas",
+        titulo: "Masterclass 1 a 1",
         parrafos: [
-          "Podés reprogramar o cancelar sin costo avisando con al menos 48 horas. Con menos aviso, o si no te presentás, la sesión no se reembolsa.",
-          "Si Julián tiene que cancelarla, elegís entre una nueva fecha o el reembolso total.",
+          "Podés reprogramar o cancelar sin costo avisando con al menos 48 horas. Con menos aviso, o si no te presentás, el encuentro no se reembolsa.",
+          "Si Julián tiene que cancelarlo, elegís entre una nueva fecha o el reembolso total.",
         ],
       },
       {

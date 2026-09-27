@@ -29,7 +29,7 @@ export default function Pie() {
         </nav>
       </div>
       <p className="firma text-center text-xs texto-2 mt-12">
-        {sitio.nombre} · {sitio.editorial} · {sitio.anio}
+        {sitio.nombre} · {sitio.anio}
       </p>
     </footer>
   );

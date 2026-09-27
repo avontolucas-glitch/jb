@@ -25,7 +25,7 @@ export default async function Conferencia({ params }: P) {
   const tiene = u ? (await accesos(u.id)).conferencias.includes(c.id) : false;
   return (
     <>
-      <Apertura titulo={c.titulo} bajada={`${c.fecha} · ${c.lugar}`} folio={portadillas.conferencias.folio} />
+      <Apertura titulo={c.titulo} bajada={`${c.fecha} · ${c.lugar}`} {...portadillas.conferencias} />
       <section className="hondo border-t borde px-5 py-16">
         <div className="mx-auto max-w-xl revelar">
           <Texto bloque>{c.descripcion}</Texto>

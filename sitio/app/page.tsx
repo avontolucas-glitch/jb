@@ -5,7 +5,9 @@ import Estrellas from "@/components/Estrellas";
 import Divisor from "@/components/Divisor";
 import Trazo from "@/components/Trazo";
 import MarcasImprenta from "@/components/MarcasImprenta";
-import EspacioFoto from "@/components/EspacioFoto";
+import Foto from "@/components/Foto";
+import Mecanismo from "@/components/Mecanismo";
+import IndiceLibro from "@/components/IndiceLibro";
 import Epigrafe from "@/components/Epigrafe";
 import Ornamento from "@/components/Ornamento";
 import Precio from "@/components/Precio";
@@ -52,7 +54,7 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
 
           <div className="lg:order-1 lg:-mt-6">
             <p className="firma texto-2 text-xs aparece" style={{ animationDelay: "1.2s" }}>
-              {sitio.editorial} · {romano(sitio.anio)}
+              {romano(sitio.anio)}
             </p>
             <TituloTinta
               texto={sitio.nombre}
@@ -87,7 +89,7 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
 
       <section className="hondo px-5 py-20 sm:py-28 border-t borde" aria-labelledby="quien">
         <div className="mx-auto max-w-5xl grid gap-12 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] items-center">
-          <EspacioFoto className="max-w-sm w-full mx-auto revelar cortina" />
+          <Foto nombre="julian-chef" pie="Julián Bermúdez" inclinada={-0.8} sizes="(min-width: 640px) 24rem, 90vw" className="max-w-sm w-full mx-auto" />
           <div className="prosa revelar" style={{ ["--retardo" as string]: ".2s" }}>
             <h2 id="quien" className="titulo text-3xl mb-6">
               Quién es
@@ -107,6 +109,11 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
             </ol>
             <p className="texto-2 text-xs mt-4 italic">{inicio.quienEsNota}</p>
           </div>
+        </div>
+        <div className="laminas mx-auto max-w-5xl mt-20 sm:mt-28" aria-label="Fotos de Julián">
+          <Foto nombre="julian-trofeo" pie="El Gran Premio de la Cocina · 2021" inclinada={0.9} sizes="(min-width: 640px) 20rem, 45vw" />
+          <Foto nombre="julian-emplatando" pie="En la cocina" inclinada={-0.6} retardo={0.15} sizes="(min-width: 640px) 20rem, 45vw" className="sm:mt-12" />
+          <Foto nombre="julian-doble-exposicion" pie="Retrato" inclinada={0.5} retardo={0.3} sizes="(min-width: 640px) 20rem, 70vw" />
         </div>
       </section>
 
@@ -139,8 +146,8 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
           </h2>
           <p className="text-xl prosa revelar">{sesiones.bajada}</p>
           <div className="mt-10 flex flex-wrap items-center gap-5 revelar">
-            <Link href="/sesiones" className="boton">
-              Agendar una sesión
+            <Link href="/masterclass/1-a-1" className="boton">
+              Agendar un encuentro
             </Link>
             <span className="texto-2">
               <Precio {...precios.sesionPrivada} />
@@ -150,7 +157,7 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
       </section>
 
       <Divisor />
-      <section className="px-5 pb-20 sm:pb-28" aria-labelledby="trilogia">
+      <section className="px-5 pb-20 sm:pb-28 overflow-x-clip" aria-labelledby="trilogia">
         <div className="mx-auto max-w-3xl">
           <h2 id="trilogia" className="titulo text-3xl mb-2 revelar">
             La trilogía
@@ -172,6 +179,9 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
             ))}
           </ol>
         </div>
+        <Mecanismo className="mx-auto mt-20 sm:mt-28 max-w-xl">
+          <p className="firma texto-2">tres preguntas · una misma verdad</p>
+        </Mecanismo>
       </section>
 
       <section className="hondo px-5 py-20 sm:py-28 border-t borde" aria-labelledby="conf">
@@ -195,7 +205,24 @@ export default async function Inicio({ searchParams }: { searchParams: Promise<{
         </div>
       </section>
 
+      <section className="px-5 py-20 sm:py-28 border-t borde">
+        <IndiceLibro
+          items={[
+            { folio: "II", titulo: "Los libros", href: "/libros", nota: "La Receta de la Manifestación, El Pensamiento es Tu Fe y la Biografía" },
+            { folio: "III", titulo: "Masterclass", href: "/masterclass", nota: "Julián en vivo, cada semana" },
+            { folio: "IV", titulo: "Masterclass 1 a 1", href: "/masterclass/1-a-1" },
+            { folio: "V", titulo: "Masterclass grabada", href: "/masterclass/grabada" },
+            { folio: "VI", titulo: "Conferencias", href: "/conferencias" },
+            { folio: "VII", titulo: "Fragmentos", href: "/fragmentos" },
+            { folio: "VIII", titulo: "Sumate", href: "/lista" },
+            { folio: "IX", titulo: "Canjeá el código de tu libro", href: "/canjear" },
+            { folio: "X", titulo: "La app", href: "/app" },
+          ]}
+        />
+      </section>
+
       <section className="relative overflow-hidden px-5 py-24 sm:py-32 border-t borde">
+        <Foto nombre="julian-mirada" sizes="(min-width: 1024px) 60rem, 94vw" className="mx-auto max-w-4xl mb-16 sm:mb-20" />
         <div className="revelar">
           <Epigrafe cita={citas.observador} />
         </div>

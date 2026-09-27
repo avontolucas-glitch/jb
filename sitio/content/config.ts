@@ -20,7 +20,6 @@ export const sitio = {
   nombreCorto: "Julián",
   dominio: "julianbermudez.com",
   descripcion: "Conferencias, masterclass en vivo y la trilogía de Julián Bermúdez.",
-  editorial: "ELVERBO",
   anio: 2026,
 };
 
@@ -185,6 +184,7 @@ export const fragmentos = [
 export const redes = [
   { nombre: "Instagram", usuario: "@coacher.julian", url: "https://www.instagram.com/coacher.julian/" },
   { nombre: "YouTube", usuario: "@coacherjulian", url: "https://www.youtube.com/@coacherjulian" },
+  { nombre: "Spotify", usuario: "sus playlists", url: "https://open.spotify.com/user/21pqnwdix5ibobcldbvsdqzca" },
   { nombre: "TikTok", usuario: "", url: "#" },
 ].filter((r) => r.url !== "#");
 
@@ -228,16 +228,17 @@ export const umbral = {
  */
 const g = (src: string, alt: string, pie: string) => ({ src: `/grabados/${src}.webp`, alt: `Grabado: ${alt}`, pie });
 export const portadillas = {
-  libros: { folio: "II" },
-  conferencias: { folio: "III", grabado: g("la-palabra", "la pluma de La Palabra", "La Palabra · El Pensamiento es Tu Fe, cap. 0") },
-  masterclass: { folio: "IV", grabado: g("cargar-el-estado", "la lámpara de aceite encendida", "Cargar el estado · La Receta de la Manifestación, cap. 5") },
+  libros: { folio: "II", grabado: g("observador-crema", "el ojo radiante de El Observador Eterno", "El Observador Eterno · El Pensamiento es Tu Fe, cap. 2") },
+  conferencias: { folio: "VI", grabado: g("la-palabra", "la pluma de La Palabra", "La Palabra · El Pensamiento es Tu Fe, cap. 0") },
+  masterclass: { folio: "III", grabado: g("cargar-el-estado", "la lámpara de aceite encendida", "Cargar el estado · La Receta de la Manifestación, cap. 5") },
   grabada: { folio: "V", grabado: g("el-sentimiento", "el corazón con ojo y raíz", "El sentimiento crea la realidad · La Receta de la Manifestación, cap. 1") },
-  fragmentos: { folio: "VI", grabado: g("atravesar-el-tiempo", "la espiral", "Atravesar el tiempo · El Pensamiento es Tu Fe, cap. 6") },
-  lista: { folio: "VII", grabado: g("primera-imagen", "la semilla que germina", "Primera imagen · Biografía, cap. 0") },
-  ingresar: { folio: "VIII", grabado: g("libertad-interna", "el corazón con cerradura", "Libertad interna · El Pensamiento es Tu Fe, cap. 1") },
-  crearCuenta: { folio: "VIII", grabado: g("el-reconocimiento", "el corazón coronado", "El reconocimiento · Biografía, cap. 1") },
+  fragmentos: { folio: "VII", grabado: g("atravesar-el-tiempo", "la espiral", "Atravesar el tiempo · El Pensamiento es Tu Fe, cap. 6") },
+  lista: { folio: "VIII", grabado: g("primera-imagen", "la semilla que germina", "Primera imagen · Biografía, cap. 0") },
+  ingresar: { folio: "XI", grabado: g("libertad-interna", "el corazón con cerradura", "Libertad interna · El Pensamiento es Tu Fe, cap. 1") },
+  crearCuenta: { folio: "XII", grabado: g("el-reconocimiento", "el corazón coronado", "El reconocimiento · Biografía, cap. 1") },
   canjear: { folio: "IX", grabado: g("ahora-mismo", "el reloj de arena", "Ahora mismo · La Receta de la Manifestación, cap. 3") },
-  sesiones: { folio: "XI", grabado: g("conversaciones-sinceras", "el fruto de Conversaciones Sinceras", "Conversaciones sinceras · El Pensamiento es Tu Fe, cap. 3") },
+  sesiones: { folio: "IV", grabado: g("conversaciones-sinceras", "el fruto de Conversaciones Sinceras", "Conversaciones sinceras · El Pensamiento es Tu Fe, cap. 3") },
+  legales: { folio: "XIII" },
   app: { folio: "X", grabado: g("receta-ojo", "el ojo de luz y sombra", "Conocedores del bien y el mal · La Receta de la Manifestación, cap. 2") },
 };
 
@@ -287,8 +288,14 @@ export const sesiones = {
   bajada: "Un encuentro uno a uno con Julián, por videollamada.",
   descripcion: MARCADOR,
   duracion: "Duración a definir",
-  /** Duración que se usa en el calendario del teléfono (.ics), en minutos. */
+  /**
+   * Duración que se usa en el calendario del teléfono (.ics), en minutos. Es
+   * también la distancia mínima entre dos horarios (no se pueden pisar) y el
+   * tiempo que el link de la videollamada sigue a la vista después de empezar.
+   */
   duracionMinutos: 60,
+  /** Con cuántas horas de anticipación, como mínimo, se puede reservar un horario. */
+  anticipacionHoras: 12,
   modalidad: "Por videollamada",
   zonaHoraria: "hora de Argentina",
   // día de la semana (0 = domingo) y hora, en hora de Argentina

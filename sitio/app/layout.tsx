@@ -4,10 +4,15 @@ import "./globals.css";
 import Encabezado from "@/components/Encabezado";
 import Pie from "@/components/Pie";
 import InstalarApp from "@/components/InstalarApp";
+import GuiaInstalar from "@/components/GuiaInstalar";
+import Musica from "@/components/Musica";
+import YoSoy from "@/components/YoSoy";
 import RegistrarSW from "@/components/RegistrarSW";
 import Revelar from "@/components/Revelar";
 import Umbral from "@/components/Umbral";
 import Atencion from "@/components/Atencion";
+import CursorAnillo from "@/components/CursorAnillo";
+import MarcoPagina from "@/components/MarcoPagina";
 import Flotantes from "@/components/Flotantes";
 import Sonidos from "@/components/Sonidos";
 import { sitio } from "@/content/config";
@@ -35,7 +40,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "var h=document.documentElement;h.classList.add('js');try{h.classList.add(sessionStorage.getItem('jb-umbral')?'umbral-visto':'en-umbral')}catch(e){h.classList.add('umbral-visto')}",
+              "var h=document.documentElement;h.classList.add('js');try{h.classList.add(sessionStorage.getItem('jb-umbral')?'umbral-visto':'en-umbral')}catch(e){h.classList.add('umbral-visto')}" +
+              // el pedido de instalación de Chrome/Edge/Android llega temprano: se guarda para el botón «Instalar la app»
+              ";addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__jbInstalar=e;dispatchEvent(new Event('jb:instalable'))});addEventListener('appinstalled',function(){window.__jbInstalar=null;window.__jbInstalada=1;dispatchEvent(new Event('jb:instalada'))})",
           }}
         />
       </head>
@@ -54,12 +61,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         <Pie />
+        <MarcoPagina />
         <Flotantes />
         <Sonidos />
         <InstalarApp />
+        <GuiaInstalar />
+        <Musica />
+        <YoSoy />
         <RegistrarSW />
         <Revelar />
         <Atencion />
+        <CursorAnillo />
       </body>
     </html>
   );

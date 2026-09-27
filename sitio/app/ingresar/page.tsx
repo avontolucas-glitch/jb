@@ -5,7 +5,7 @@ import Apertura from "@/components/Apertura";
 import { portadillas } from "@/content/config";
 import Formulario, { Campo } from "@/components/Formulario";
 import { accionIngresar } from "@/lib/acciones";
-import { usuarioActual } from "@/lib/auth";
+import { adminDemoActivo, usuarioActual } from "@/lib/auth";
 import { avisos, volverSeguro } from "@/components/Avisos";
 
 export const metadata: Metadata = { title: "Ingresar" };
@@ -15,6 +15,12 @@ const demos = [
   { email: "sincompras@demo.com", quien: "Cuenta sin compras" },
   { email: "comprador@demo.com", quien: "Cuenta con la masterclass" },
 ];
+/**
+ * La de Julián ve las reservas de todos: solo aparece (y solo vale como suya)
+ * si el servidor tiene JB_ADMIN_DEMO=1. En el sitio publicado, Julián entra
+ * con su cuenta privada (ADMIN_EMAIL y ADMIN_CLAVE), que no se muestra acá.
+ */
+const demoJulian = { email: "julian@demo.com", quien: "Cuenta de Julián (agenda)" };
 
 type P = { searchParams: Promise<{ aviso?: string; volver?: string }> };
 
@@ -22,6 +28,7 @@ export default async function Ingresar({ searchParams }: P) {
   const { aviso, volver } = await searchParams;
   const destino = volverSeguro(volver);
   if (await usuarioActual()) redirect(destino);
+  const cuentas = adminDemoActivo() ? [...demos, demoJulian] : demos;
   return (
     <>
     <Apertura titulo="Ingresar" bajada="Tu espacio: lo que compraste, tus directos y tus lecturas." {...portadillas.ingresar} />
@@ -49,9 +56,9 @@ export default async function Ingresar({ searchParams }: P) {
           <h2 id="demos" className="text-xl mb-2">
             Cuentas de prueba
           </h2>
-          <p className="texto-2 text-sm mb-5">Solo existen en este prototipo. La clave de las dos es demo1234.</p>
+          <p className="texto-2 text-sm mb-5">Solo existen en este prototipo. La clave de todas es demo1234.</p>
           <ul className="space-y-4">
-            {demos.map((d) => (
+            {cuentas.map((d) => (
               <li key={d.email}>
                 <p>{d.quien}</p>
                 <p className="texto-2 text-sm">

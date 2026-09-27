@@ -1,0 +1,234 @@
+/* Índice como el de un libro impreso: título, puntos guía y folio romano.
+   Usa los tokens del sitio (app/globals.css): --texto, --texto-2, --fondo,
+   --linea, --lento. */
+
+.indice {
+  width: 100%;
+  max-width: 32rem;
+  margin-inline: auto;
+  font-variant-numeric: oldstyle-nums;
+}
+
+/* «Índice» en versalitas espaciadas (la clase global .firma pone las
+   versalitas y el espaciado; acá solo el tamaño y el centrado óptico). */
+.encabezado {
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--texto-2);
+  /* compensa el espaciado que queda después de la última letra */
+  padding-inline-start: 0.22em;
+}
+
+.filete {
+  display: block;
+  width: 2.5rem;
+  height: 1px;
+  margin: 0.9rem auto 2rem;
+  background: var(--linea);
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.renglon + .renglon {
+  margin-top: 0.1rem;
+}
+
+/* Un renglón que recibe el foco se muestra enseguida, aunque todavía no haya
+   emergido: el foco nunca queda invisible. (Le gana a html.js .revelar.) */
+:global(html.js) .renglon:focus-within {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition-duration: 0.3s;
+  transition-delay: 0s;
+}
+
+.vinculo {
+  display: block;
+  padding: 0.55rem 0.25rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.vinculo:focus-visible {
+  outline: 2px solid var(--texto);
+  outline-offset: 3px;
+}
+
+/* El título a la izquierda y el folio en su columna, alineado con la última
+   línea del título (como en imprenta). */
+.linea {
+  display: flex;
+  align-items: flex-end;
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+@supports (align-items: last baseline) {
+  .linea {
+    align-items: last baseline;
+  }
+}
+
+/* El título ocupa todo el ancho que deja el folio. Siempre reserva a la
+   derecha lugar para unos puntos y el aire antes del folio. */
+.texto {
+  position: relative;
+  isolation: isolate;
+  flex: 1 1 0%;
+  min-width: 0;
+  padding-inline-end: calc(1.25rem + 0.5em);
+  overflow-wrap: break-word;
+}
+
+/* El título va en línea, sobre los puntos: su fondo los tapa, así los puntos
+   arrancan justo donde termina la última línea, sea cual sea su largo. */
+.nombre {
+  position: relative;
+  z-index: 1;
+  inset-inline-start: 0;
+  padding-inline-end: 0.45em;
+  color: var(--texto);
+  background-color: var(--fondo-indice, var(--fondo));
+  transition: inset-inline-start 0.9s var(--lento);
+}
+
+/* Puntos guía: una sola fila del ancho del título, pegada a su última línea.
+   Tiene la misma letra y el mismo interlineado que el título, así que su
+   línea de base es la misma, y los puntos se sientan sobre ella. Arranca un
+   poco adentro (0.5em) para que, al correrse el título, no asome ninguno a
+   la izquierda. */
+.puntos {
+  position: absolute;
+  z-index: 0;
+  inset-inline: 0.5em 0.5em;
+  bottom: 0;
+  pointer-events: none;
+}
+
+/* Un punto redondo cada media eme, dibujado con una máscara sobre el color de
+   fondo, así el color cambia con una transición confiable. Se alinean desde
+   la derecha, de modo que quedan en columna de un renglón a otro. */
+.puntos::before {
+  content: "";
+  display: inline-block;
+  vertical-align: baseline;
+  width: 100%;
+  height: 2.5px;
+  background-color: var(--texto-2);
+  opacity: 0.75;
+  -webkit-mask-image: radial-gradient(circle, #000 0.8px, transparent 1.25px);
+  mask-image: radial-gradient(circle, #000 0.8px, transparent 1.25px);
+  -webkit-mask-size: 0.5em 2.5px;
+  mask-size: 0.5em 2.5px;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-position: right bottom;
+  mask-position: right bottom;
+  transition: background-color 1.1s var(--lento), opacity 1.1s var(--lento);
+}
+
+/* Folio romano: versalitas, cifras de estilo antiguo, en una columna fija
+   a la derecha para que los puntos terminen todos en el mismo lugar. */
+.folio {
+  flex: none;
+  min-width: 2.2em;
+  text-align: right;
+  white-space: nowrap;
+  font-size: 0.95em;
+  /* el mismo alto de renglón que el título, para alinear por abajo donde
+     no hay last baseline */
+  line-height: calc(1.4 / 0.95);
+  font-variant-caps: all-small-caps;
+  font-variant-numeric: oldstyle-nums;
+  letter-spacing: 0.08em;
+  margin-inline-end: -0.08em;
+  color: var(--texto-2);
+  transition: color 1.1s var(--lento);
+}
+
+.nota {
+  display: block;
+  margin-top: 0.1rem;
+  padding-inline-end: 3em;
+  font-size: 0.875rem;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--texto-2);
+  transition: transform 0.9s var(--lento);
+}
+
+/* Al pasar o enfocar: los puntos se oscurecen hacia la tinta y el título se corre. */
+.vinculo:focus-visible .puntos::before {
+  background-color: var(--texto);
+  opacity: 1;
+}
+.vinculo:focus-visible .folio {
+  color: var(--texto);
+}
+.vinculo:focus-visible .nombre {
+  inset-inline-start: 4px;
+}
+.vinculo:focus-visible .nota {
+  transform: translateX(4px);
+}
+
+@media (hover: hover) {
+  .vinculo:hover .puntos::before {
+    background-color: var(--texto);
+    opacity: 1;
+  }
+  .vinculo:hover .folio {
+    color: var(--texto);
+  }
+  .vinculo:hover .nombre {
+    inset-inline-start: 4px;
+  }
+  .vinculo:hover .nota {
+    transform: translateX(4px);
+  }
+}
+
+/* Celular angosto: nada desborda y el folio sigue en su renglón. */
+@media (max-width: 399.98px) {
+  .linea {
+    font-size: 1.02rem;
+  }
+  .texto {
+    padding-inline-end: calc(0.9rem + 0.4em);
+  }
+  .nombre {
+    padding-inline-end: 0.35em;
+  }
+  .puntos {
+    inset-inline-end: 0.4em;
+  }
+  .folio {
+    min-width: 1.9em;
+  }
+  .nota {
+    padding-inline-end: 2.3em;
+  }
+}
+
+/* Con "reducir movimiento": el color cambia, pero nada se corre. */
+@media (prefers-reduced-motion: reduce) {
+  .nombre,
+  .nota,
+  .puntos::before,
+  .folio {
+    transition: none;
+  }
+  .vinculo:focus-visible .nombre,
+  .vinculo:hover .nombre {
+    inset-inline-start: 0;
+  }
+  .vinculo:focus-visible .nota,
+  .vinculo:hover .nota {
+    transform: none;
+  }
+}

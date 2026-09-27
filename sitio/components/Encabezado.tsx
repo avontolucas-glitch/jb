@@ -9,7 +9,6 @@ import { sitio } from "@/content/config";
 export const enlaces = [
   { href: "/libros", texto: "Libros", emblema: "pensamiento-2-observador-eterno" },
   { href: "/masterclass", texto: "Masterclass", emblema: "receta-5-cargar-el-estado" },
-  { href: "/sesiones", texto: "Sesiones", emblema: "pensamiento-3-conversaciones-sinceras" },
   { href: "/conferencias", texto: "Conferencias", emblema: "pensamiento-0-la-palabra" },
   { href: "/fragmentos", texto: "Fragmentos", emblema: "pensamiento-6-atravesar-el-tiempo" },
   { href: "/lista", texto: "Sumate", emblema: "biografia-0-primera-imagen" },

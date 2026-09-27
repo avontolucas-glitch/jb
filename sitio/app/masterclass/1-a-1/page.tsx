@@ -6,22 +6,31 @@ import Precio from "@/components/Precio";
 import Epigrafe from "@/components/Epigrafe";
 import Ornamento from "@/components/Ornamento";
 import Calendario from "@/components/Calendario";
+import SubnavMasterclass from "@/components/SubnavMasterclass";
 import { usuarioActual } from "@/lib/auth";
-import { horarios, ocupados } from "@/lib/sesiones";
+import { fin, horarioDesdeId, horarios, ocupados } from "@/lib/sesiones";
 import { citas, portadillas, precios, sesiones } from "@/content/config";
 
-export const metadata: Metadata = { title: "Sesiones privadas" };
+export const metadata: Metadata = { title: sesiones.titulo };
 export const dynamic = "force-dynamic";
 
-export default async function Sesiones() {
+export default async function MasterclassUnoAUno() {
   const u = await usuarioActual();
   const tomados = await ocupados();
-  const lista = horarios();
-  const mias = u ? lista.filter((h) => tomados.get(h.id) === u.id) : [];
+  const lista = await horarios();
+  // tus encuentros que todavía no terminaron (también los de las próximas horas, que ya no se ofrecen al público)
+  const ahora = Date.now();
+  const mias = u
+    ? [...tomados].filter(([id, uid]) => {
+        const h = uid === u.id ? horarioDesdeId(id) : null;
+        return h !== null && fin(h) > ahora;
+      })
+    : [];
 
   return (
     <>
       <Apertura titulo={sesiones.titulo} bajada={sesiones.bajada} {...portadillas.sesiones} />
+      <SubnavMasterclass actual="uno" />
 
       <section className="hondo border-t borde px-5 py-16 sm:py-20">
         <div className="mx-auto max-w-3xl">
@@ -50,16 +59,16 @@ export default async function Sesiones() {
       <section className="px-5 py-16 sm:py-20" aria-labelledby="horarios">
         <div className="mx-auto max-w-3xl">
           <h2 id="horarios" className="titulo text-3xl mb-2 revelar">
-            Agendá tu sesión
+            Agendá tu encuentro
           </h2>
           <p className="texto-2 mb-8 revelar">
-            En {sesiones.zonaHoraria}. Horarios de ejemplo: los reales los carga Julián.
+            Los horarios los carga Julián, en hora de Argentina. Acá los ves en tu hora, con la de él al lado.
           </p>
           {mias.length > 0 && (
             <p className="border borde p-4 mb-8" data-testid="ya-reservada">
-              Ya tenés {mias.length === 1 ? "una sesión reservada" : `${mias.length} sesiones reservadas`}.{" "}
+              Ya tenés {mias.length === 1 ? "un encuentro reservado" : `${mias.length} encuentros reservados`}.{" "}
               <Link href="/mi-espacio/sesiones" className="enlace">
-                Verla en tu espacio
+                {mias.length === 1 ? "Verlo" : "Verlos"} en tu espacio
               </Link>
             </p>
           )}
@@ -67,7 +76,7 @@ export default async function Sesiones() {
             <Calendario
               turnos={lista.map((h) => {
                 const quien = tomados.get(h.id);
-                return { id: h.id, dia: h.dia, hora: h.hora, estado: !quien ? "libre" : quien === u?.id ? "tuya" : "ocupado" };
+                return { id: h.id, inicio: h.fecha.toISOString(), estado: !quien ? "libre" : quien === u?.id ? "tuya" : "ocupado" };
               })}
             />
           </div>

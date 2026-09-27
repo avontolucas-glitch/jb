@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Apertura from "@/components/Apertura";
+import { portadillas } from "@/content/config";
 import Texto from "@/components/Marcador";
 import { legales } from "@/content/legales";
 
@@ -18,7 +19,7 @@ export default async function Legal({ params }: P) {
   if (!p) notFound();
   return (
     <>
-      <Apertura titulo={p.titulo} bajada={p.bajada} />
+      <Apertura titulo={p.titulo} bajada={p.bajada} {...portadillas.legales} />
       <section className="hondo border-t borde px-5 py-16 sm:py-24">
         <article className="mx-auto max-w-2xl" data-testid="texto-legal">
           {p.partes.map((parte, i) => (

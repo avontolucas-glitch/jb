@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Apertura from "@/components/Apertura";
+import { portadillas } from "@/content/config";
 import Formulario, { Campo } from "@/components/Formulario";
 import { accionArrepentimiento } from "@/lib/acciones";
 
@@ -13,13 +14,14 @@ export default function Arrepentimiento() {
       <Apertura
         titulo="Botón de arrepentimiento"
         bajada="Si compraste en los últimos 10 días y te arrepentiste, pedí acá la cancelación. Te damos un código para seguir el pedido."
+        {...portadillas.legales}
       />
       <section className="hondo border-t borde px-5 py-16 sm:py-20">
         <div className="mx-auto max-w-md revelar">
           <Formulario accion={accionArrepentimiento} boton="Pedir la cancelación" ocultarAlTerminar>
             <Campo nombre="nombre" etiqueta="Nombre" autoComplete="name" />
             <Campo nombre="email" etiqueta="Mail de la compra" tipo="email" autoComplete="email" />
-            <Campo nombre="compra" etiqueta="Qué compraste y cuándo" ayuda="Por ejemplo: sesión privada del martes 29." />
+            <Campo nombre="compra" etiqueta="Qué compraste y cuándo" ayuda="Por ejemplo: Masterclass 1 a 1 del martes 29." />
           </Formulario>
           <p className="texto-2 text-sm mt-10">
             Plazos y condiciones de cada producto en la{" "}
