@@ -12,9 +12,13 @@ el penúltimo capítulo había quedado dentro de la sección de la transición, 
 encabezado ni folio. Ahora cada capítulo es su propia sección, empieza en
 página nueva, y la transición es una sección aparte, sin encabezado ni folio.
 
-Lo mismo en los tres libros. No toca las versiones vigentes: escribe
-«(edición integral con sitio, sin colofón, encabezados simples)» al lado
-(la Receta parte de la versión con la portada negra).
+Lo mismo en los tres libros. No toca las versiones vigentes: escribe al lado
+(la Receta parte de la versión con la portada negra):
+  · «(edición integral con sitio, sin colofón, encabezados simples)»: todo lo de arriba;
+  · «(edición integral con sitio, sin colofón, apertura limpia)»: solo la apertura
+    sin encabezado y los cortes arreglados; en el texto siguen los títulos
+    alternados (el del libro en las pares, el del capítulo en las impares),
+    como pidió Lucas por ahora.
 Uso:  python3 herramientas/encabezados_simples.py
 """
 import copy, os, re, zipfile
@@ -27,7 +31,7 @@ LIBROS = {
     'El Pensamiento es Tu Fe': ('edición integral con sitio, sin colofón', 'Logré atravesar el tiempo con éxito'),
     'La Biografía': ('edición integral con sitio, sin colofón', 'Detrás del que está llorando'),
 }
-SALIDA = 'edición integral con sitio, sin colofón, encabezados simples'
+MODOS = {'encabezados simples': True, 'apertura limpia': False}   # ¿sacar los títulos del texto?
 W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 R = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
 q = lambda t: f'{{{W}}}{t}'
@@ -83,9 +87,9 @@ def sacar_salto(p):
     ppr.remove(salto)
 
 
-def procesar(nombre, version, frase_transicion):
+def procesar(nombre, version, frase_transicion, modo):
     origen = os.path.join(MS, f'{nombre} ({version}).docx')
-    destino = os.path.join(MS, f'{nombre} ({SALIDA}).docx')
+    destino = os.path.join(MS, f'{nombre} (edición integral con sitio, sin colofón, {modo}).docx')
     with zipfile.ZipFile(origen) as z:
         infos = z.infolist()
         partes = {i.filename: z.read(i.filename) for i in infos}
@@ -95,7 +99,7 @@ def procesar(nombre, version, frase_transicion):
 
     # 1) encabezados de las páginas de texto: solo el emblema
     for f in sorted(partes):
-        if re.fullmatch(r'word/headerJB(par|impar)\d+\.xml', f):
+        if MODOS[modo] and re.fullmatch(r'word/headerJB(par|impar)\d+\.xml', f):
             xml, titulo = sin_titulo(partes[f].decode('utf-8'))
             partes[f] = xml.encode('utf-8')
             cambios.append(f'{os.path.basename(f)}: sin «{titulo}»')
@@ -143,8 +147,10 @@ def procesar(nombre, version, frase_transicion):
 
 
 if __name__ == '__main__':
-    for n, (v, frase) in LIBROS.items():
-        d, c = procesar(n, v, frase)
-        print(os.path.basename(d))
-        for x in c:
-            print('  ', x)
+    for modo in MODOS:
+        for n, (v, frase) in LIBROS.items():
+            d, c = procesar(n, v, frase, modo)
+            print(os.path.basename(d))
+            for x in c:
+                if 'sin «' not in x:
+                    print('  ', x)
