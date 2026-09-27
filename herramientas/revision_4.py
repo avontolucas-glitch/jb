@@ -4,6 +4,7 @@ Revisión 4 de la trilogía: lo esencial de la conferencia en vivo de Julián (a
 correcciones pedidas por Lucas. Las portadas de Pensamiento y Biografía, sin el rombo
 del fondo (la de la Receta ya es negra pura). En Pensamiento, la apertura de cada capítulo
 en la misma página que el comienzo del texto, como en los otros dos (apertura_unida.py).
+En la Receta, la letra capital de cada capítulo en blanco (antes, vainilla).
 
 Parte de la revisión 3 («edición integral con sitio, revisión 3») y escribe, al lado,
 sin tocarla:
@@ -116,6 +117,19 @@ def procesar(k, nombre, registro, agregados, respiros):
     if k == 'pensamiento':
         unidas = apertura_unida.unir(raiz, partes)
         assert unidas == list(range(7)), unidas
+
+    # 3b) Receta: la letra capital de cada capítulo, blanca (antes, vainilla #E6D8B4), para que
+    #     contraste con la de Pensamiento, que es negra sobre blanco (pedido de Lucas)
+    if k == 'receta':
+        capitales = 0
+        for p in raiz.iter(q('p')):
+            f = p.find(f'{q("pPr")}/{q("framePr")}')
+            if f is not None and f.get(q('dropCap')):
+                for col in p.iter(q('color')):
+                    assert col.get(q('val')).upper() == 'E6D8B4', col.get(q('val'))
+                    col.set(q('val'), 'FFFFFF')
+                    capitales += 1
+        assert capitales == 6, capitales
 
     # 4) las páginas de respiro (lo que Julián escribió en THE CHANNEL), al final de sus capítulos
     for n, palabras in respiro.agregar(k, raiz, partes, RESPIRO):
