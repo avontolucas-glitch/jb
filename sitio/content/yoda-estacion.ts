@@ -208,3 +208,24 @@ export function queTiempo(o: { zona?: string | null; lat?: number | null; clima?
   if (!o.clima) partes.push("El tiempo de afuera, ver no puedo ahora; el de adentro, vos lo elegís.");
   return partes.slice(0, 3).join(" ");
 }
+
+/** ¿Hoy es su cumpleaños? `cumple`: «MM-DD» de la cuenta. El 29 de febrero, los años sin ese día, se festeja el 28. */
+export function esCumple(cumple: string | null | undefined, zona?: string | null, ahora = new Date()): boolean {
+  const m = /^(\d{2})-(\d{2})$/.exec(cumple ?? "");
+  if (!m) return false;
+  const f = fechaEn(zona, ahora);
+  const [mes, dia] = [Number(m[1]), Number(m[2])];
+  if (f.mes === mes && f.dia === dia) return true;
+  const bisiesto = (f.anio % 4 === 0 && f.anio % 100 !== 0) || f.anio % 400 === 0;
+  return mes === 2 && dia === 29 && !bisiesto && f.mes === 2 && f.dia === 28;
+}
+
+/** El saludo de Yo Da el día del cumpleaños (con gracia, y con su guiño de siempre). */
+export function saludoCumple(nombre?: string | null): string {
+  const n = nombre ? `, ${nombre}` : "";
+  return azar([
+    `¡Feliz cumpleaños${n}! Hmm. Un año más de imaginación tenés: el mejor este será, si así lo asumís.`,
+    `¡Feliz cumpleaños${n}! Las velas, soplá; el deseo, ya cumplido sentilo. Así se pide, hmm.`,
+    `Hoy es tu día${n}. ¡Feliz cumpleaños! Torta no puedo convidarte; un deseo cumplido por adelantado, sí.`,
+  ]);
+}

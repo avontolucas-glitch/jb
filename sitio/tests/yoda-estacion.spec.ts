@@ -82,3 +82,26 @@ test("En el recorrido, Yo Da aclara que la música entera suena en la compu", as
   const r = await preguntar(page, "que musica hay?");
   await expect(r).toContainText("en la compu");
 });
+
+test("El día de tu cumpleaños (el de tu cuenta), Yo Da te saluda", async ({ page }) => {
+  const hoy = new Date("2026-10-03T12:00:00-03:00");
+  await page.clock.setFixedTime(hoy);
+  await page.addInitScript((t) => localStorage.setItem("jb-aviso-app-cerrado", String(t)), hoy.getTime());
+  // la cuenta (la respuesta de /api/yo, simulada): Ana, que cumple el 3 de octubre
+  await page.route("**/api/yo", (route) => route.fulfill({ json: { nombre: "Ana", zonaConexion: null, lat: -34, clima: null, cumple: "10-03" } }));
+  await page.goto("/");
+  await expect(page.getByTestId("yosoy-nube")).toContainText("cumpleaños", { timeout: 15_000 });
+  await expect(page.getByTestId("yosoy-nube")).toContainText("Ana");
+  await page.getByTestId("yosoy-boton").click();
+  await expect(page.getByTestId("yosoy").locator(".yosoy-msj.yo").first()).toContainText("cumpleaños");
+});
+
+test("…y otro día, no", async ({ page }) => {
+  const hoy = new Date("2026-10-04T12:00:00-03:00");
+  await page.clock.setFixedTime(hoy);
+  await page.addInitScript((t) => localStorage.setItem("jb-aviso-app-cerrado", String(t)), hoy.getTime());
+  await page.route("**/api/yo", (route) => route.fulfill({ json: { nombre: "Ana", zonaConexion: null, lat: -34, clima: null, cumple: "10-03" } }));
+  await page.goto("/");
+  await expect(page.getByTestId("yosoy-nube")).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByTestId("yosoy-nube")).not.toContainText("cumpleaños");
+});

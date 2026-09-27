@@ -15,7 +15,7 @@ import { activarSonido, sonidoActivo } from "@/lib/sonido";
 import { cosquillas, despacio, interpretar, ESFUERZO_TICKET, horariosEnPausa, pausaAviso, pausaCuenta, pausaFin, ritmo, ofrecerTicket, ticketSinCuenta, invitacionQuieto, nombreBot, ofrecerRecorrido, nombreDicho, noEntendi, pedirCuenta, puertasCuenta, respuestaDe, resultadoAtrapar, saludo, saludoCon, saludoHora, temas, type Accion, type Interpretacion, type Tema } from "@/content/yosoy";
 import { cargarRegiones, regionDelDispositivo } from "@/content/yoda-habla";
 import { contextoEn, queHora, saludoConHora } from "@/content/yoda-hora";
-import { extraDelDia, queTiempo, type Clima } from "@/content/yoda-estacion";
+import { esCumple, extraDelDia, queTiempo, saludoCumple, type Clima } from "@/content/yoda-estacion";
 import { desfase } from "@/lib/zona";
 
 type Mensaje = { de: "yo" | "vos"; texto: string; acciones?: Accion[]; chips?: boolean; sugerencias?: string[] };
@@ -82,6 +82,15 @@ const nombreGuardado = () => {
     return null;
   }
 };
+
+/** La zona horaria del dispositivo (null si no se puede saber). */
+function zonaPropia(): string | null {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    return null;
+  }
+}
 
 /** Cuántas veces se jugó en esta visita (para que el juego tenga un límite). */
 function contarVisita(clave: string, sumar = false): number {
@@ -388,6 +397,7 @@ export default function YoSoy() {
 
   // la latitud aproximada (grados enteros: solo para la estación) y el tiempo que hace, de /api/yo
   const lugar = useRef<{ lat: number | null; clima: Clima | null }>({ lat: null, clima: null });
+  const cumpleHoy = useRef(false);
   // mientras suena la música, Yo Da asiente, escuchando con vos
   const [escuchando, setEscuchando] = useState(false);
   useEffect(() => {
@@ -399,16 +409,18 @@ export default function YoSoy() {
   const quienEs = () =>
     fetch("/api/yo")
       // con 429 (o cualquier error) no se toca nada: sigue como estaba (sin sesión, si no se sabía)
-      .then((r) => (r.ok ? (r.json() as Promise<{ nombre?: string | null; zonaConexion?: string | null; lat?: number | null; clima?: Clima | null }>) : null))
+      .then((r) => (r.ok ? (r.json() as Promise<{ nombre?: string | null; zonaConexion?: string | null; lat?: number | null; clima?: Clima | null; cumple?: string | null }>) : null))
       .then((d) => {
         if (!d) return;
         setZonaConexion(d.zonaConexion ?? null);
         lugar.current = { lat: d.lat ?? null, clima: d.clima ?? null };
+        // el cumpleaños, de la cuenta («MM-DD»): ese día, Yo Da saluda
+        cumpleHoy.current = !!d.nombre && esCumple(d.cumple, zonaPropia());
         nombre.current = d.nombre ?? null;
         setConSesion(d.nombre ?? null);
         const guardado = nombreGuardado();
         const inicial: Mensaje = d.nombre
-          ? { de: "yo", texto: saludoCon(d.nombre), chips: true }
+          ? { de: "yo", texto: cumpleHoy.current ? `${saludoCumple(d.nombre.split(" ")[0])} ¿En qué ayudarte puedo?` : saludoCon(d.nombre), chips: true }
           : guardado
             ? { de: "yo", texto: `Hmm. De vuelta estás, ${guardado}. ${saludo.replace(/^Hmm\. Llegado has\. /, "")}`, chips: true, acciones: puertasCuenta }
             : { de: "yo", texto: saludo, chips: true, acciones: puertasCuenta };
@@ -891,6 +903,7 @@ export default function YoSoy() {
     } catch {}
     const delDia = extraDelDia({ zona, lat: lugar.current.lat, clima: lugar.current.clima, region: region.current });
     const extra = delDia ? ` ${delDia}` : "";
+    if (conSesion && cumpleHoy.current) return `${saludoCumple(conSesion)} ¿En qué ayudarte puedo?`;
     if (conSesion) return `${saludoConHora(ctx, conSesion, region.current)}${extra} ¿En qué ayudarte puedo?`;
     // quien llega por primera vez: el saludo corto, así entra el recorrido
     if (nuevo) return `${saludoHora(ctx.hora, nombreVisto, region.current)} Yo Da soy. ${ofrecerRecorrido} Para acceder a más funciones, crearte una cuenta debés.`;
