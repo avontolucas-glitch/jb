@@ -4,13 +4,20 @@
  * un curador por libro y un jurado). Todas son TEXTUALES de los manuscritos
  * («edición integral con sitio, revisión 3»), verificadas palabra por palabra. No se reescriben: si se cambia el libro, se
  * vuelven a verificar. Para sumar una, copiala exacta del manuscrito.
+ *
+ * Además, lo que Julián escribió en su canal de Instagram («The Channel»), que
+ * pasó Lucas (fuente «canal»; en `capitulo`, la fecha del mensaje). Esas van como
+ * las escribió él (con su «tú» de lo escrito): solo se corrigieron tildes, signos
+ * de apertura (¿ ¡) y algún error de tipeo del teclado del celular («casa» por
+ * «cada»). No aparecen en la página de los libros.
  */
-export type Frase = { texto: string; libro: "receta" | "pensamiento" | "biografia"; capitulo: string };
+export type Frase = { texto: string; libro: "receta" | "pensamiento" | "biografia" | "canal"; capitulo: string };
 
 export const tituloLibro = {
   receta: "La Receta de la Manifestación",
   pensamiento: "El Pensamiento es Tu Fe",
   biografia: "Biografía",
+  canal: "desde su canal",
 };
 
 export const frases: Frase[] = [
@@ -48,4 +55,35 @@ export const frases: Frase[] = [
   { libro: "biografia", capitulo: "Cap. 2 — El Desastre", texto: "Realmente la conversación mental crea la realidad y hablar tres o cuatro veces ya del mismo problema no tiene ningún tipo de sentido positivo." },
   { libro: "biografia", capitulo: "Cap. 2 — El Desastre", texto: "Podés llorar todo lo que quieras, pero detrás del que está llorando hay alguien que está muy tranquilo observando cómo vos estás llorando. Y yo siempre fui esa conciencia." },
   { libro: "biografia", capitulo: "Cap. 3 — Poner a Prueba", texto: "Entonces el día que bajé de peso físicamente y empecé a sentirme mejor conmigo mismo, muchas imágenes mentales se abrieron en mi mente de un buen futuro porque empecé a creer que eso ya podía ser posible de verdad." },
+  // desde su canal de Instagram («The Channel»), escritas por Julián
+  { libro: "canal", capitulo: "16 de agosto de 2024", texto: "Cuando veas este mensaje, aprovecha el tiempo presente y aplica ahora lo aprendido." },
+  { libro: "canal", capitulo: "16 de agosto de 2024", texto: "La lengua es la única llave que con sus combinaciones de palabras y tonos es capaz de abrir cualquier puerta. Debes poner en tu lengua lo que quieres que la lengua ponga en tu mundo." },
+  { libro: "canal", capitulo: "18 de agosto de 2024", texto: "Eso que llaman Alma es el oído universal, solo tu Alma escucha tus conversaciones, eso debería parecerte algo importante para cuidar." },
+  { libro: "canal", capitulo: "14 de agosto de 2024", texto: "Es importante que mantengas la motivación como aquel día que te enteraste acerca de la ley. Con un mundo de posibilidades por delante y un sentimiento completamente renovado y esperanzador." },
+  { libro: "canal", capitulo: "14 de agosto de 2024", texto: "La paradoja de la ley de la asunción es que funciona si asumes que la imaginación crea la realidad." },
+  { libro: "canal", capitulo: "14 de agosto de 2024", texto: "La mayoría cree que el dinero se genera “haciendo” y en realidad el dinero se genera “siendo”." },
+  { libro: "canal", capitulo: "14 de agosto de 2024", texto: "Saber quién sos genera más energía emocional y con el tiempo encuentras las ganancias correspondientes en tu mundo dependiendo de quién sentís que sos." },
+  { libro: "canal", capitulo: "14 de marzo de 2025", texto: "Créeme, la abundancia encontrará la manera de entrar a tu día a día, como el agua, encontrará el camino hacia vos. Los caminos serán súper lógicos. Cambia ahora tu conversación mental e imagina que las personas que conoces te felicitan." },
+  { libro: "canal", capitulo: "31 de marzo de 2025", texto: "Cuando las personas hacen de un tema una moda, naturalmente después de un tiempo pierden el encanto. Pero el principio fisicoquímico con el que se hace un huevo frito es y será por siempre. Lo mismo con la ley de la conciencia: puedes creer que es viejo, que es antiguo, que los tiempos cambiaron, pero nadie puede quitar la piedra angular." },
+  { libro: "canal", capitulo: "31 de marzo de 2025", texto: "La conciencia crea la realidad desde el origen del tiempo y cuando el tiempo deje de existir, también seguirá creando." },
+  { libro: "canal", capitulo: "4 de abril de 2025", texto: "La vida puede insistir en los mismos escenarios, pero tu actitud siempre tiene el poder de cambiar el guion." },
+  { libro: "canal", capitulo: "10 de abril de 2025", texto: "Juan es tu entendimiento. Dile a Juan que ahora puedes hacer lo que antes no podías." },
+  { libro: "canal", capitulo: "canal exclusivo", texto: "En el espacio exterior los objetos pesan todos lo mismo. Si en el vacío (sin aire) lanzas una bola de bowling y una pluma, los dos caen a la misma velocidad y tocan el piso al mismo tiempo. La realidad no discrimina los objetos." },
+  { libro: "canal", capitulo: "canal exclusivo", texto: "70 veces 7, perdonar, orar, pedir por otros, el verdadero amor no vence ni se cansa." },
+  { libro: "canal", capitulo: "canal exclusivo", texto: "El mundo material así como lo llamas, o vida, o realidad es tu subconsciente exterior, de hecho no hay interior o exterior en verdad, todo es uno." },
+  { libro: "canal", capitulo: "canal exclusivo", texto: "Quítale el concepto de “mis sueños” y entiende que los sueños son una realidad vista por uno que luego es vista por todos." },
+  { libro: "canal", capitulo: "canal exclusivo", texto: "Te recomiendo que empieces ahora a festejar que se te está dando todo mejor de lo que querías, suponías. Agradece de antemano que la vida premia a los campeones." },
+  { libro: "canal", capitulo: "canal exclusivo", texto: "Todo lo que digo es para que simplemente entiendan que la vida puede cambiar en los próximos 10 minutos y que la única forma que tenemos de contribuir con eso es ayudando con nuestros sentimientos." },
+  { libro: "canal", capitulo: "canal exclusivo", texto: "A mí me gustan las sorpresas y tengo en mí las emociones correspondientes a una vida llena de sorpresas, una cada 10 minutos." },
+  { libro: "canal", capitulo: "canal exclusivo", texto: "La vida nos dio a todos y cada uno de nosotros las herramientas y la capacidad de crear herramientas para solucionarnos a nosotros mismos." },
+  { libro: "canal", capitulo: "canal exclusivo", texto: "Lo mejor para mí es darte cuenta qué es lo que querés, bendecir a quien te inspiró que lo tiene y reconocer que de él no quieres nada más que ese ejemplo." },
+  { libro: "canal", capitulo: "The Channel", texto: "Al fin de cuentas, el ego es verdaderamente nuestro amigo, él cree en nosotros mismos inclusive cuando nosotros dudamos." },
+  { libro: "canal", capitulo: "The Channel", texto: "Los que dicen que el Ego es malo son como los que dicen que el dinero es malo. Solo no lo tienen, por eso dicen que es malo." },
+  { libro: "canal", capitulo: "The Channel", texto: "Para ser lo que querés ser, sin fallar, tenés que ser consciente de ser eso. Cuando sos consciente de ser eso es cuando al mismo tiempo se exterioriza." },
+  { libro: "canal", capitulo: "13 de mayo", texto: "¿Qué es una asunción? Asumir que algo sucedió. Asumir es un recuerdo. Asumir es dar algo por hecho, pasado." },
+  { libro: "canal", capitulo: "4 de mayo", texto: "¡Sin miedo al éxito!" },
+  { libro: "canal", capitulo: "9 de mayo", texto: "No te dejes llevar por las noticias, sigue tu vida con normalidad en tu éxito, porque las noticias tratan de hacer lo que vienen a hacer en este mundo, que es sembrar el miedo. Pero no pueden sembrar donde ya fue sembrada la paz, el amor y el triunfo. Sé un buen jardinero de tu mente." },
+  { libro: "canal", capitulo: "9 de marzo", texto: "Imagina ahora mismo, estés donde estés, que te encontraste un sobre de papel madera, adentro tiene dinero fresco." },
+  { libro: "canal", capitulo: "The Channel", texto: "Ten más pensamientos de abundancia que de carencia y habrás compensado la balanza." },
+  { libro: "canal", capitulo: "18 de febrero", texto: "Con ayer no basta, tenés que hacerlo hoy también." },
 ];
