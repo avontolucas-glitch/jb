@@ -79,13 +79,14 @@ test("Música: si no arranca, avisa qué hacer (tocar el ▶ de adentro, o la ap
   const aviso = page.getByTestId("musica-trabado");
   await expect(aviso).toBeVisible({ timeout: 10_000 });
   await expect(aviso).toContainText("¿No arranca?");
-  await expect(aviso.getByRole("link", { name: "Escuchar en tu app" })).toBeVisible();
+  await expect(aviso.getByTestId("musica-trabado-app")).toHaveAttribute("href", /open\.spotify\.com\/playlist\//);
   // «Probar de nuevo» lo rearma y lo hace sonar (hubo un toque)
   await aviso.getByRole("button", { name: "Probar de nuevo" }).click();
   await expect.poll(() => llamadas(page)).toEqual(["crear", "play", "destruir", "crear", "play"]);
 });
 
-test("Música: al volver de iniciar sesión se rearma, pero no suena solo (el celular lo trababa)", async ({ page }) => {
+test("Música: al volver de iniciar sesión se rearma, pero no suena solo", async ({ page, isMobile }) => {
+  test.skip(isMobile, "en el celular no se ofrece iniciar sesión (ver la prueba de abajo)");
   await spotifyFalso(page, "fragmentos");
   await abrirPanel(page);
   await page.getByTestId("musica-play").click();
@@ -103,4 +104,28 @@ test("Música: al volver de iniciar sesión se rearma, pero no suena solo (el ce
   await boton.click();
   await expect(boton).toHaveText("Pausa");
   await expect(page.getByTestId("musica-sesion-lista")).toHaveCount(0);
+});
+
+test("Música en el celular: fragmentos y la app, sin «iniciar sesión» (con la sesión en el navegador, Spotify no suena dentro de la página)", async ({ page, isMobile }) => {
+  test.skip(!isMobile, "solo en el celular");
+  await spotifyFalso(page, "fragmentos");
+  await abrirPanel(page);
+  await page.getByTestId("musica-play").click();
+  const panel = page.getByTestId("musica-fragmentos");
+  await expect(panel).toBeVisible();
+  await expect(page.getByTestId("musica-ayuda")).toContainText("solo en su app");
+  await expect(page.getByTestId("musica-sesion")).toHaveCount(0);
+  await expect(page.getByTestId("musica-app")).toHaveText("Escuchar entera en la app");
+  await expect(page.getByTestId("musica-app")).toHaveAttribute("href", /open\.spotify\.com\/playlist\//);
+});
+
+test("Música en el celular: si no arranca, lleva a la app", async ({ page, isMobile }) => {
+  test.skip(!isMobile, "solo en el celular");
+  await spotifyFalso(page, "trabado");
+  await abrirPanel(page);
+  await page.getByTestId("musica-play").click();
+  const aviso = page.getByTestId("musica-trabado");
+  await expect(aviso).toBeVisible({ timeout: 10_000 });
+  await expect(aviso).toContainText("solo para su app");
+  await expect(aviso.getByTestId("musica-trabado-app")).toHaveText("Escuchar en la app");
 });

@@ -88,7 +88,7 @@ export function comentarTema(t: TemaSonando, ahora = new Date()): { texto: strin
     enAmerica = Intl.DateTimeFormat().resolvedOptions().timeZone.startsWith("America/");
   } catch {}
   const c: Contexto = { hora: ahora.getHours(), diaSemana: ahora.getDay(), enAmerica };
-  if (t.fragmento) return { texto: `«${t.titulo}»… treinta segundos, nomás. Poco es, para asumir nada. Spotify no te reconoce en este navegador: en la música, cómo arreglarlo te dejé.`, especial: true };
+  if (t.fragmento) return { texto: `«${t.titulo}»… treinta segundos, nomás. Poco es, para asumir nada. Enteros los querés: en la música, el camino te dejé.`, especial: true };
   const g = guinos[t.titulo];
   if (g) return { texto: g(c), especial: true };
   const artista = t.artista.split(",")[0].trim();

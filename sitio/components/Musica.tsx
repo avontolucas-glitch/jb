@@ -76,7 +76,15 @@ export { abrirMusica } from "@/lib/musica";
 
 const PLAYLIST_WEB = `https://open.spotify.com/playlist/${playlist}`;
 
-/** Por qué da fragmentos y qué hacer, según el navegador. */
+/**
+ * En el celular, Spotify deja los temas enteros solo en su app: dentro de una página
+ * suenan fragmentos, y con la sesión iniciada en el navegador a veces ni eso (el
+ * reproductor muestra «Muestra» y no arranca). Por eso ahí no se ofrece iniciar sesión.
+ */
+const AYUDA_CELULAR =
+  "En el celular, Spotify deja escuchar los temas enteros solo en su app; dentro de una página suenan 30 segundos de cada uno. Enteros, en tu app: un toque.";
+
+/** Por qué da fragmentos y qué hacer, según el navegador (en la computadora). */
 const AYUDA: Record<Navegador, string> = {
   ios: "En el iPhone y el iPad, ningún navegador deja que Spotify reconozca tu sesión dentro de otra página: acá suenan fragmentos sí o sí. Entera, en tu app.",
   safari: "Safari no deja que Spotify reconozca tu sesión dentro de otras páginas: acá suenan fragmentos. Entera, en tu app (o con Chrome, Edge o Firefox y tu sesión iniciada).",
@@ -99,6 +107,7 @@ export default function Musica() {
   const anunciado = useRef("");
   const esperandoSesion = useRef(false);
   const [nav, setNav] = useState<Navegador>("otro");
+  const [movil, setMovil] = useState(false);
   const [probando, setProbando] = useState(false);
   const [noAbrio, setNoAbrio] = useState(false);
   // se tocó «Escuchar» y no arrancó (en el celular, a veces hay que tocar la primera vez el ▶ de adentro del reproductor)
@@ -112,6 +121,7 @@ export default function Musica() {
 
   useEffect(() => {
     setNav(navegador());
+    setMovil(!esEscritorio());
     const abrir = () => setAbierta(true);
     // cuando se silencia el sitio (desde Yo Da), la música también se detiene
     const pausar = () => {
@@ -314,38 +324,64 @@ export default function Musica() {
         {trabado && (
           <div className="mt-3 border-t borde pt-3 text-sm" role="status" data-testid="musica-trabado">
             <p className="leading-snug">¿No arranca?</p>
-            <p className="texto-2 text-xs mt-1 leading-relaxed">
-              En el celular, la primera vez a veces hay que tocar el ▶ de adentro del reproductor de Spotify, acá arriba. Y Spotify deja sonar tu cuenta en un
-              solo lugar a la vez: si la estás escuchando en la computadora o en la app, se frena acá (pausala allá y probá de nuevo).
-            </p>
+            {movil ? (
+              <p className="texto-2 text-xs mt-1 leading-relaxed">
+                En el celular, Spotify deja los temas enteros solo para su app, y si iniciaste sesión de Spotify en este navegador, dentro de la página a veces
+                no suena nada. Escuchala en tu app (y, si querés los fragmentos acá, cerrá la sesión de Spotify en este navegador).
+              </p>
+            ) : (
+              <p className="texto-2 text-xs mt-1 leading-relaxed">
+                A veces hay que tocar una vez el ▶ de adentro del reproductor de Spotify, acá arriba. Y Spotify deja sonar tu cuenta en un solo lugar a la
+                vez: si la estás escuchando en otro lado (el celular, la app), se frena acá; pausala allá y probá de nuevo.
+              </p>
+            )}
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              <button type="button" className="boton py-1 px-3 text-sm" onClick={() => recargar()}>
-                Probar de nuevo
-              </button>
-              <a href={PLAYLIST_WEB} target="_blank" rel="noopener noreferrer" className="enlace texto-2 text-sm" onClick={abrirEnApp}>
-                Escuchar en tu app
-              </a>
+              {movil ? (
+                <>
+                  <a href={PLAYLIST_WEB} target="_blank" rel="noopener noreferrer" className="boton py-1 px-3 text-sm" onClick={abrirEnApp} data-testid="musica-trabado-app">
+                    Escuchar en la app
+                  </a>
+                  <button type="button" className="enlace texto-2 text-sm" onClick={() => recargar()}>
+                    Probar de nuevo
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button type="button" className="boton py-1 px-3 text-sm" onClick={() => recargar()}>
+                    Probar de nuevo
+                  </button>
+                  <a href={PLAYLIST_WEB} target="_blank" rel="noopener noreferrer" className="enlace texto-2 text-sm" onClick={abrirEnApp} data-testid="musica-trabado-app">
+                    Escuchar en tu app
+                  </a>
+                </>
+              )}
             </div>
           </div>
         )}
         {fragmentos && (
           <div className="mt-3 border-t borde pt-3 text-sm" data-testid="musica-fragmentos">
             <p className="leading-snug">
-              Suenan fragmentos de 30 segundos: Spotify no reconoce tu sesión <em>en este navegador</em>.
+              {movil ? (
+                "Suenan fragmentos de 30 segundos."
+              ) : (
+                <>
+                  Suenan fragmentos de 30 segundos: Spotify no reconoce tu sesión <em>en este navegador</em>.
+                </>
+              )}
             </p>
             <p className="texto-2 text-xs mt-2 leading-relaxed" data-testid="musica-ayuda">
-              {AYUDA[nav]}
+              {movil ? AYUDA_CELULAR : AYUDA[nav]}
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              {nav !== "ios" && nav !== "safari" && (
+              {!movil && nav !== "safari" && (
                 <button type="button" className="boton py-1 px-3 text-sm" onClick={iniciarSesion} data-testid="musica-sesion">
                   Iniciar sesión en Spotify
                 </button>
               )}
               <a href={PLAYLIST_WEB} target="_blank" rel="noopener noreferrer" className="boton py-1 px-3 text-sm" onClick={abrirEnApp} data-testid="musica-app">
-                Escuchar en tu app
+                {movil ? "Escuchar entera en la app" : "Escuchar en tu app"}
               </a>
-              {nav !== "ios" && nav !== "safari" && (
+              {!movil && nav !== "safari" && (
                 <button type="button" className="enlace texto-2 text-sm" onClick={() => recargar()}>
                   {probando ? "Probando…" : "Probar de nuevo"}
                 </button>
@@ -366,8 +402,9 @@ export default function Musica() {
           <p className="texto-2 text-xs mt-3">No se pudo conectar con Spotify. Probá de nuevo en un rato.</p>
         ) : (
           <p className="texto-2 text-xs mt-3 leading-relaxed">
-            El volumen, desde tu dispositivo. Con tu sesión de Spotify en este navegador (gratis o Premium), los temas suenan enteros; si no, 30
-            segundos de cada uno.
+            {movil
+              ? "El volumen, desde tu celular. Acá suenan 30 segundos de cada tema; enteros, en la app de Spotify."
+              : "El volumen, desde tu dispositivo. Con tu sesión de Spotify en este navegador (gratis o Premium), los temas suenan enteros; si no, 30 segundos de cada uno."}
             {!fragmentos && (
               <>
                 {" "}
