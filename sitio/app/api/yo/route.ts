@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { usuarioActual } from "@/lib/auth";
 
-/** Si hay sesión y el nombre de pila, para que YoDa salude y sepa si puede ayudar con temas de la cuenta. */
+/** Si hay sesión y el nombre de pila, para que Yo Da salude y sepa si puede ayudar con temas de la cuenta. */
 export const dynamic = "force-dynamic";
 
 export async function GET() {

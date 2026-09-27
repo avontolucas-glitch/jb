@@ -1,6 +1,6 @@
 /**
  * Foto de Julián como lámina de libro: marco fino, se descubre de arriba hacia
- * abajo al llegar a la pantalla y lleva el pie en versalitas.
+ * abajo (una cortina) al llegar a la pantalla y lleva el pie en versalitas.
  * Las fotos están en public/fotos/ en dos anchos (herramientas/fotos_web.py).
  */
 const FOTOS = {
@@ -33,13 +33,15 @@ export default function Foto({
   const chica = nombre === "julian-mirada" ? `/fotos/${nombre}-1200.webp 1200w` : `/fotos/${nombre}-720.webp 720w`;
   const grande = nombre === "julian-mirada" ? `/fotos/${nombre}-2000.webp` : `/fotos/${nombre}-1200.webp`;
   return (
-    <figure className={`foto ${className}`} style={{ ["--giro" as string]: `${inclinada}deg` }} data-testid={`foto-${nombre}`}>
-      <div className="foto-marco revelar cortina" style={{ ["--retardo" as string]: `${retardo}s` }}>
+    // Se observa la figura entera (sin recorte): si la cortina estuviera en el elemento observado,
+    // el navegador lo daría por invisible y nunca la abriría ni cargaría la foto.
+    <figure className={`foto revelar ${className}`} style={{ ["--giro" as string]: `${inclinada}deg`, ["--retardo" as string]: `${retardo}s` }} data-testid={`foto-${nombre}`}>
+      <div className="foto-marco">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={grande} srcSet={`${chica}, ${grande} ${f.w}w`} sizes={sizes} width={f.w} height={f.h} alt={f.alt} loading="lazy" decoding="async" />
       </div>
       {pie && (
-        <figcaption className="foto-pie firma texto-2 revelar" style={{ ["--retardo" as string]: `${retardo + 0.5}s` }}>
+        <figcaption className="foto-pie firma texto-2">
           {pie}
         </figcaption>
       )}

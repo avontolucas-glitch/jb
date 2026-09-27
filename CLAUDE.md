@@ -90,7 +90,7 @@ Prototipo de julianbermudez.com (Next.js). El nombre va «Julián Bermúdez», c
 - **Fotos de Julián**: originales en `diseño/fotos/`; las versiones web en blanco y negro salen con `herramientas/fotos_web.py` a `sitio/public/fotos/`.
 - **Agenda de la Masterclass 1 a 1**: Julián carga horarios en hora de Argentina; cada visitante los ve en su hora, con la de Julián al lado (`sitio/lib/zona.ts`).
 - **App instalable**: un solo botón «Instalar la app» que detecta sistema y navegador (`sitio/lib/instalar.ts`).
-- **YoDa** (`sitio/content/yosoy.ts`): la guía del sitio, un ojo pixelado que habla a lo Yoda con tono místico; es soporte, nunca la voz de Julián. **Música de fondo**: temas al azar de su playlist de Spotify (`sitio/content/musica.ts`).
+- **Yo Da** (`sitio/content/yosoy.ts`): la guía del sitio, un ojo pixelado que habla a lo Yoda con tono místico; es soporte, nunca la voz de Julián. **Música de fondo**: temas al azar de su playlist de Spotify (`sitio/content/musica.ts`).
 
 Las rutas de trabajo están fijadas a la sesión donde se crearon: para reusarlos hay que ajustarlas.
 

@@ -435,7 +435,11 @@ html.guia-abierta { overflow: hidden; }
 .cal-julian { display: block; font-size: 0.72rem; letter-spacing: 0.04em; color: var(--texto-2); margin-top: 0.15rem; }
 
 /* Fotos de Julián: láminas con marco fino, apenas inclinadas, como pegadas en el libro */
-.foto { transform: rotate(var(--giro, 0deg)); }
+.foto-marco { transform: rotate(var(--giro, 0deg)); }
+html.js .foto .foto-marco { clip-path: inset(0 0 100% 0); transition: clip-path 2s var(--lento) calc(var(--retardo, 0s) + 0.15s); }
+html.js .foto.visto .foto-marco { clip-path: inset(0 0 0 0); }
+html.js .foto .foto-pie { opacity: 0; transition: opacity 1.2s var(--lento) calc(var(--retardo, 0s) + 1.2s); }
+html.js .foto.visto .foto-pie { opacity: 1; }
 .foto-marco { position: relative; padding: 0.45rem; border: 1px solid var(--linea); background: var(--negro-hondo); }
 .foto-marco::after { content: ""; position: absolute; inset: 0.45rem; box-shadow: inset 0 0 0 1px rgba(239, 233, 220, 0.08), inset 0 0 60px rgba(0, 0, 0, 0.45); pointer-events: none; }
 .foto-marco img { display: block; width: 100%; height: auto; filter: grayscale(1) contrast(1.04); transition: filter 1.6s var(--lento), transform 2.4s var(--lento); }
@@ -443,7 +447,7 @@ html.guia-abierta { overflow: hidden; }
 .foto-pie { margin-top: 0.7rem; font-size: 0.8rem; text-align: center; }
 .laminas { display: grid; gap: 2.2rem 1.6rem; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
 @media (max-width: 639px) { .laminas { grid-template-columns: repeat(2, minmax(0, 1fr)); } .laminas > :last-child { grid-column: 1 / -1; max-width: 70%; margin-inline: auto; } }
-@media (prefers-reduced-motion: reduce) { .foto-marco img { transition: none; } .foto:hover .foto-marco img { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .foto-marco img { transition: none; } .foto:hover .foto-marco img { transform: none; } html.js .foto .foto-marco { clip-path: none; } html.js .foto .foto-pie { opacity: 1; } }
 
 /* Música de fondo: un botón chico abajo a la izquierda, tres barras que respiran cuando suena */
 .musica-boton, .yosoy-boton { position: fixed; bottom: 1rem; z-index: 45; width: 2.75rem; height: 2.75rem; border-radius: 999px; border: 1px solid var(--linea); background: rgba(8, 8, 8, 0.82); backdrop-filter: blur(4px); color: var(--crema); display: flex; align-items: center; justify-content: center; transition: border-color 0.6s var(--lento), transform 0.6s var(--lento); }
@@ -462,7 +466,7 @@ html.guia-abierta { overflow: hidden; }
 .musica-reproductor iframe { display: block; border-radius: 10px; }
 @media (prefers-reduced-motion: reduce) { .musica-boton.sonando .musica-ondas i { animation: none; } }
 
-/* YoDa: el ojo que guía, abajo a la derecha */
+/* Yo Da: el ojo que guía, abajo a la derecha */
 .yosoy-boton { right: 1rem; width: 3.6rem; height: 3.6rem; }
 .yosoy-boton::before { content: ""; position: absolute; inset: -5px; border-radius: 999px; border: 1px solid var(--crema); opacity: 0; animation: yosoy-aura 5.5s ease-out 3s infinite; pointer-events: none; }
 .yosoy-boton.abierto::before { animation: none; }
@@ -495,7 +499,7 @@ html.guia-abierta { overflow: hidden; }
 .yosoy-enviar { width: 2.2rem; height: 2.2rem; border: 1px solid var(--linea); border-radius: 999px; color: var(--crema); }
 .yosoy-enviar:disabled { opacity: 0.35; }
 @media (prefers-reduced-motion: reduce) { .yosoy-boton::before, .yosoy-ojo, .yosoy-msj, .yosoy-pensando span { animation: none !important; } }
-/* El ojo pixelado de YoDa: parpadea cada tanto, de golpe, como en los juegos de antes */
+/* El ojo pixelado de Yo Da: parpadea cada tanto, de golpe, como en los juegos de antes */
 .ojo-pixel { image-rendering: pixelated; }
 .ojo-pixel-cerrado { opacity: 0; }
 .ojo-pixel-abierto, .ojo-pixel-cerrado { animation: pixel-parpadeo 6.5s steps(1, end) infinite; }
@@ -505,16 +509,21 @@ html.guia-abierta { overflow: hidden; }
 .yosoy-boton .ojo-pixel { transition: transform 0.5s steps(3, end); }
 .yosoy-boton:hover .ojo-pixel { transform: translateY(-1px) scale(1.08); }
 @media (prefers-reduced-motion: reduce) { .ojo-pixel-abierto, .ojo-pixel-cerrado { animation: none; } }
-/* YoDa se hace presente: aparece unos segundos después de entrar, como materializándose */
+/* Yo Da se hace presente: aparece unos segundos después de entrar, como materializándose */
 .yosoy-boton { opacity: 0; visibility: hidden; transform: translateY(14px) scale(0.6); filter: blur(6px); transition: opacity 1.4s var(--lento), transform 1.4s var(--lento), filter 1.4s var(--lento), visibility 0s linear 1.4s, border-color 0.6s var(--lento); }
 .yosoy-boton.presente { opacity: 1; visibility: visible; transform: none; filter: none; transition: opacity 1.4s var(--lento), transform 1.4s var(--lento), filter 1.4s var(--lento), border-color 0.6s var(--lento); }
 .yosoy-boton.presente:hover, .yosoy-boton.presente:focus-visible { transform: translateY(-2px); }
 .yosoy-boton.presente .ojo-pixel { animation: pixel-llega 1.6s steps(6, end) both; }
 @keyframes pixel-llega { from { clip-path: inset(0 50% 0 50%); } to { clip-path: inset(0 0 0 0); } }
-.yosoy-nube { position: fixed; right: 5.1rem; bottom: 1.9rem; z-index: 45; max-width: 13rem; padding: 0.45rem 0.8rem; background: var(--negro-hondo); border: 1px solid var(--linea); color: var(--crema); font-style: italic; font-size: 0.92rem; line-height: 1.35; animation: nube 7s var(--lento) both; }
+.yosoy-nube { position: fixed; right: 5.3rem; bottom: 1.3rem; z-index: 45; width: min(16.5rem, calc(100vw - 7rem)); padding: 0.6rem 1.9rem 0.6rem 0.85rem; background: var(--negro-hondo); border: 1px solid var(--linea); color: var(--crema); font-style: italic; font-size: 0.95rem; line-height: 1.4; animation: nube 16s var(--lento) both; }
+.yosoy-nube-texto { text-align: left; min-height: 2.8em; }
+.yosoy-nube-cerrar { position: absolute; top: 0.2rem; right: 0.45rem; color: var(--gris); font-style: normal; font-size: 1rem; line-height: 1; padding: 0.2rem; }
+.yosoy-nube-cerrar:hover { color: var(--crema); }
 .yosoy-nube::after { content: ""; position: absolute; right: -6px; bottom: 0.9rem; width: 10px; height: 10px; background: var(--negro-hondo); border-right: 1px solid var(--linea); border-top: 1px solid var(--linea); transform: rotate(45deg); }
-@keyframes nube { 0% { opacity: 0; transform: translateX(8px); } 10%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+@keyframes nube { 0% { opacity: 0; transform: translateX(8px); } 4%, 94% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .yosoy-boton, .yosoy-boton.presente { transition: none; filter: none; transform: none; } .yosoy-boton.presente .ojo-pixel, .yosoy-nube { animation: none; } }
-/* YoDa: el ojo dorado, las orejas blancas */
+/* Yo Da: el ojo dorado, las orejas blancas */
 .ojo-pixel-ojo { fill: #c9a45c; }
 .ojo-pixel-orejas { fill: #ffffff; }
+.yosoy-nube-cuenta { display: inline-block; margin-top: 0.5rem; font-style: normal; font-size: 0.82rem; padding: 0.2rem 0.65rem; border: 1px solid var(--gris); transition: border-color 0.4s var(--lento); }
+.yosoy-nube-cuenta:hover, .yosoy-nube-cuenta:focus-visible { border-color: var(--crema); }

@@ -59,7 +59,7 @@ Todo está en **un solo archivo**: `content/config.ts`. Se abre con cualquier ed
 - **Legales:** en `content/legales.ts` (privacidad y reembolsos ya tienen un borrador; revisalos con un abogado y completá los datos «a definir»).
 - **Redes:** en `redes` (Instagram, YouTube y Spotify). Para sumar otra, agregá su link.
 - **Frases de los epígrafes:** en `content/frases.ts`. Son textuales de los libros, verificadas palabra por palabra, y rotan: cada vez que se entra a una página aparece otra (con el nombre del libro), y «Otra frase» trae la siguiente. En la primera visita cada página muestra la suya. Para sumar una, copiala exacta del manuscrito.
-- **YoDa, la guía del sitio:** sus respuestas están en `content/yosoy.ts` (ver la sección 11).
+- **Yo Da, la guía del sitio:** sus respuestas están en `content/yosoy.ts` (ver la sección 11).
 - **Música de fondo:** los temas salen de la playlist de Julián en Spotify (`content/musica.ts`). Para actualizarla: `python3 herramientas/musica_playlist.py`.
 - **Fotos:** los originales van en `diseño/fotos/` y `python3 herramientas/fotos_web.py` hace las versiones web. Cada foto se ubica con el componente `Foto` (retrato de chef y doble exposición en «Quién es», con el trofeo de El Gran Premio de la Cocina y la de emplatando; en movimiento, en Masterclass; la mirada, antes del cierre del inicio).
 - **Quién es Julián:** en `inicio.quienEs` y `inicio.trayectoria` (datos de fuentes públicas, a confirmar con él).
@@ -74,7 +74,7 @@ Los colores y las tipografías están en `app/globals.css` (al principio, en "To
 
 ## 4. La app instalable
 
-El sitio se instala como app en cualquier sistema, sin tiendas, con **un solo botón: «Instalar la app»** (arriba en el menú, en el menú del celular, en el aviso de las primeras visitas, en /app y en YoDa). El botón detecta el sistema y el navegador y hace lo que corresponde:
+El sitio se instala como app en cualquier sistema, sin tiendas, con **un solo botón: «Instalar la app»** (arriba en el menú, en el menú del celular, en el aviso de las primeras visitas, en /app y en Yo Da). El botón detecta el sistema y el navegador y hace lo que corresponde:
 
 - **Chrome, Edge o Android:** abre directo la ventana de instalación del navegador.
 - **iPhone y iPad:** abre una guía animada que señala dónde está **Compartir** y lleva a **Agregar a pantalla de inicio**.
@@ -161,7 +161,7 @@ npm run build
 npm test
 ```
 
-Recorren solos, en tamaño celular y computadora: el cuadro de bienvenida, el aviso al entrar sin sesión, crear cuenta, ingresar y cerrar sesión, la cuenta sin compras, la compra de la masterclass (con progreso y preguntas), la compra de una entrada privada (y que no habilite nada más), la reserva de un directo a voluntad (con el mínimo), la marca de agua, la sala en una sola pantalla, el canje del código del libro (una sola vez), la compra y lectura del libro digital, la Masterclass 1 a 1 (reserva, horario ocupado para los demás, la dirección vieja `/sesiones`) y la agenda de Julián (agregar, quitar y bloquear horarios, también con anticipación; que un bloqueo frene un pago ya abierto; ver las reservas con su nota y su sala; que otra cuenta no entre al panel; que el `.ics` y el link de Google Calendar de una reserva sean solo de quien la hizo, y que el panel entre en un celular de 360 px), los formularios públicos, que ninguna página se desborde en el celular, la app instalable (el botón único en cada sistema, también desde Instagram), las frases que rotan, las zonas horarias (España, Japón, México y Nueva York), YoDa y la música de fondo. Usan datos de prueba aparte: no tocan los del prototipo.
+Recorren solos, en tamaño celular y computadora: el cuadro de bienvenida, el aviso al entrar sin sesión, crear cuenta, ingresar y cerrar sesión, la cuenta sin compras, la compra de la masterclass (con progreso y preguntas), la compra de una entrada privada (y que no habilite nada más), la reserva de un directo a voluntad (con el mínimo), la marca de agua, la sala en una sola pantalla, el canje del código del libro (una sola vez), la compra y lectura del libro digital, la Masterclass 1 a 1 (reserva, horario ocupado para los demás, la dirección vieja `/sesiones`) y la agenda de Julián (agregar, quitar y bloquear horarios, también con anticipación; que un bloqueo frene un pago ya abierto; ver las reservas con su nota y su sala; que otra cuenta no entre al panel; que el `.ics` y el link de Google Calendar de una reserva sean solo de quien la hizo, y que el panel entre en un celular de 360 px), los formularios públicos, que ninguna página se desborde en el celular, la app instalable (el botón único en cada sistema, también desde Instagram), las frases que rotan, las zonas horarias (España, Japón, México y Nueva York), Yo Da y la música de fondo. Usan datos de prueba aparte: no tocan los del prototipo.
 
 ## 9. Subirlo para tener un link y mostrarlo
 
@@ -197,7 +197,7 @@ Este prototipo **no está listo para producción**. Falta:
 
 ## 11. Detalles del sitio
 
-- **YoDa, la guía:** el ojo pixelado (con dos orejas anchas en punta: el guiño de «yo-da») que se hace presente abajo a la derecha unos segundos después de entrar, con un saludo breve la primera vez. Habla con las palabras dadas vuelta y un tono místico, pero da datos concretos: la agenda (los próximos horarios libres en la hora de cada persona), la masterclass, los libros, las conferencias, la app, la cuenta y los reembolsos, con opciones para tocar o escribiendo. Con sesión, saluda por el nombre; para los problemas de una compra, un encuentro o el acceso, primero pide ingresar o crear la cuenta. No habla por Julián ni enseña en su nombre. Si no entiende, deriva a una persona. Sus textos están en `content/yosoy.ts`; más adelante se le puede conectar una IA (por ejemplo Claude) con las mismas reglas. Ojo: «Yoda» es marca de Lucasfilm; el nombre conviene revisarlo con el abogado (se cambia en `nombreBot`).
+- **Yo Da, la guía:** el ojo pixelado (con dos orejas anchas en punta: el guiño de «yo-da») que se hace presente abajo a la derecha unos segundos después de entrar, con un saludo breve la primera vez. Habla con las palabras dadas vuelta y un tono místico, pero da datos concretos: la agenda (los próximos horarios libres en la hora de cada persona), la masterclass, los libros, las conferencias, la app, la cuenta y los reembolsos, con opciones para tocar o escribiendo. Con sesión, saluda por el nombre; para los problemas de una compra, un encuentro o el acceso, primero pide ingresar o crear la cuenta. No habla por Julián ni enseña en su nombre. Si no entiende, deriva a una persona. Sus textos están en `content/yosoy.ts`; más adelante se le puede conectar una IA (por ejemplo Claude) con las mismas reglas. El nombre va separado, «Yo Da» (yo doy); igual conviene que el abogado lo mire, porque «Yoda» es marca de Lucasfilm (se cambia en `nombreBot`).
 - **Música de fondo:** el botón de abajo a la izquierda. Temas al azar de la playlist de Julián («The Way It Is»), con el reproductor oficial de Spotify: suena solo si la persona lo pide y sigue al cambiar de página. El volumen se maneja desde el dispositivo (Spotify no deja cambiarlo desde afuera) y, sin sesión abierta en Spotify, suenan 30 segundos de cada tema.
 - **Sonidos:** cada clic suena suave (cuenco, campana o toque, sintetizados en el navegador: `lib/sonido.ts`). Se silencian con el interruptor del pie o del menú del celular.
 - **Emblemas:** los de cada capítulo flotan por la página (`components/Flotantes.tsx`, con los tres clavos y el surf) y acompañan cada sección del menú.
@@ -209,7 +209,7 @@ Este prototipo **no está listo para producción**. Falta:
 | Carpeta | Qué hay |
 |---|---|
 | `content/config.ts` | Precios, fechas y textos |
-| `content/frases.ts`, `content/yosoy.ts`, `content/musica.ts` | Frases de los libros, respuestas de YoDa y temas de la música |
+| `content/frases.ts`, `content/yosoy.ts`, `content/musica.ts` | Frases de los libros, respuestas de Yo Da y temas de la música |
 | `app/` | Las páginas del sitio |
 | `app/mi-espacio/` | El área de cada persona |
 | `components/` | Piezas que se repiten (el ojo, el cuadro de bienvenida, la sala, formularios, aviso de la app) |

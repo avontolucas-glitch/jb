@@ -20,18 +20,25 @@ export type Accion =
   | { tipo: "musica" }
   | { tipo: "horarios" };
 
-/** `cuenta: true`: tema de una compra, un encuentro o el acceso; sin sesión, YoDa primero pide ingresar o crear la cuenta. */
+/** `cuenta: true`: tema de una compra, un encuentro o el acceso; sin sesión, Yo Da primero pide ingresar o crear la cuenta. */
 export type Tema = { id: string; chip?: string; claves: string[]; respuesta: string; acciones: Accion[]; cuenta?: boolean };
 
-export const nombreBot = "YoDa";
+export const nombreBot = "Yo Da";
 
 export const CONTACTO = "(mail de contacto, a definir)";
 
-export const saludo = "Hmm. Llegado has. YoDa soy, el ojo que guía este lugar. La agenda, la masterclass, los libros… en qué ayudarte puedo, decime.";
+export const saludo = "Hmm. Llegado has. Yo Da soy, el ojo que guía este lugar. Para acceder a más funciones, crearte una cuenta debés: un minuto es, nada más. La agenda, la masterclass, los libros… en qué ayudarte puedo, decime.";
+/** Sin sesión, el saludo trae las dos puertas. */
+export const puertasCuenta: Accion[] = [
+  { tipo: "link", texto: "Crear cuenta", href: "/crear-cuenta" },
+  { tipo: "link", texto: "Ingresar", href: "/ingresar" },
+];
 export const saludoCon = (nombre: string) => `Hmm. De vuelta estás, ${nombre}. Contento el ojo está. En qué ayudarte puedo, decime.`;
 
-/** El globito que aparece junto al ojo al entrar (una vez por visita). */
-export const aviso = "Hmm… ayudarte, puedo.";
+/** Lo que Yo Da dice solo, apenas se entra (una vez por visita). */
+export const aviso = "Hmm. Llegado has. Yo Da soy. Para acceder a más funciones, crearte una cuenta debés. ¿En qué ayudarte puedo?";
+/** Con sesión, el saludo al entrar es otro. */
+export const avisoCon = (nombre: string) => `Hmm. De vuelta estás, ${nombre}. ¿En qué ayudarte puedo?`;
 
 export const noEntendi = `Claro no lo veo, eso. Con alguna de estas puertas probá, o a ${CONTACTO} escribí: una persona te responderá.`;
 

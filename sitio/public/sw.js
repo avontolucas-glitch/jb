@@ -1,7 +1,7 @@
 /* Service worker del prototipo.
    - Guarda solo lo público, para abrir rápido y mostrar "Sin conexión".
    - NUNCA guarda el área de miembros, el checkout ni las respuestas del servidor privado. */
-const VERSION = "jb-v2";
+const VERSION = "jb-v3";
 const PRECARGA = ["/sin-conexion", "/icons/icon-192.png", "/icons/icon-512.png"];
 const PRIVADO = ["/mi-espacio", "/checkout", "/api", "/ingresar", "/crear-cuenta", "/canjear"];
 

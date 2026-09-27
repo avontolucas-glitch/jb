@@ -1,5 +1,5 @@
 /**
- * El ojo de YoDa en pixel art: el ojo de la trilogía con dos orejas anchas y en punta
+ * El ojo de Yo Da en pixel art: el ojo de la trilogía con dos orejas anchas y en punta
  * (el guiño de «yo-da»), dibujado de a un píxel: el ojo en dorado, las orejas
  * en blanco. Parpadea cada tanto.
  * Cada tramo es [x, y, ancho] en una grilla de 32 × 9.
