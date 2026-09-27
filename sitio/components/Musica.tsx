@@ -276,6 +276,8 @@ export default function Musica() {
           if (!isPaused && position > 0) setTrabado(false);
           if (duration > 0) setFragmentos(duration <= 31000);
           contar(!isPaused, duration);
+          // para que Yo Da asienta a tiempo: en qué punto del tema va
+          window.dispatchEvent(new CustomEvent(EVENTO_ESTADO, { detail: { sonando: !isPaused, pos: position } }));
           // terminó el tema (o el fragmento de 30 s): otro al azar
           if (isPaused && ultimo.current.dur > 0 && ultimo.current.pos >= ultimo.current.dur - 1500) siguiente();
           else ultimo.current = { pos: position, dur: duration };

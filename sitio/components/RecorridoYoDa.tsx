@@ -140,7 +140,14 @@ export default function RecorridoYoDa() {
 
   // empezar: lo pide Yo Da (el saludo o el chat)
   useEffect(() => {
-    const empezar = (e: Event) => {
+    const empezar = async (e: Event) => {
+      // la barra de arriba no queda fija: si la página está bajada, primero se sube (si no, sus paradas no se ven y se saltean)
+      if (window.scrollY > 4) {
+        const suave = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        window.scrollTo({ top: 0, behavior: suave ? "smooth" : "auto" });
+        const hasta = performance.now() + 1200;
+        while (window.scrollY > 2 && performance.now() < hasta) await new Promise((r) => requestAnimationFrame(r));
+      }
       const lista = recorrido.filter((p) => !p.donde || cajaDe(p.donde));
       if (!lista.length) return;
       quieto.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

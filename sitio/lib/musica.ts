@@ -23,7 +23,7 @@ declare global {
 
 /** Avisa cuando empieza un tema nuevo (detail: TemaSonando). */
 export const EVENTO_TEMA = "jb:musica-tema";
-/** Avisa si la música suena o no (detail: { sonando: boolean }): Yo Da asiente mientras suena. */
+/** Avisa si la música suena o no (detail: { sonando: boolean; pos?: ms del tema }): Yo Da asiente al ritmo mientras suena. */
 export const EVENTO_ESTADO = "jb:musica-estado";
 
 export const ficha = (id: string) => {

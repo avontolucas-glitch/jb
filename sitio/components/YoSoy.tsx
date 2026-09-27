@@ -9,6 +9,7 @@ import { abrirMusica } from "./Musica";
 import { instalar } from "@/lib/instalar";
 import { empezarRecorrido, recorridoVisto } from "@/lib/recorrido";
 import { EVENTO_ATRAPAR_FIN, VUELTAS_MAX, empezarAtrapar, vueltasJugadas, type Resultado } from "@/lib/atrapar";
+import { periodoAsentir } from "@/content/musica-bpm";
 import { EVENTO_ESTADO, EVENTO_TEMA, otroTema, pausarMusica, ponerMusica, temaActual, type TemaSonando } from "@/lib/musica";
 import { comentarTema, queSuena } from "@/content/yoda-musica";
 import { activarSonido, sonidoActivo } from "@/lib/sonido";
@@ -400,8 +401,27 @@ export default function YoSoy() {
   const cumpleHoy = useRef(false);
   // mientras suena la música, Yo Da asiente, escuchando con vos
   const [escuchando, setEscuchando] = useState(false);
+  // al ritmo del tema (su BPM): cada cuánto asiente y en qué punto del ciclo arranca, para caer en el tiempo
+  const [compas, setCompas] = useState<{ dur: number; retraso: number } | null>(null);
+  const ritmoDe = useRef<string | null>(null);
   useEffect(() => {
-    const oir = (e: Event) => setEscuchando(!!(e as CustomEvent<{ sonando: boolean }>).detail?.sonando);
+    const oir = (e: Event) => {
+      const d = (e as CustomEvent<{ sonando: boolean; pos?: number }>).detail;
+      setEscuchando(!!d?.sonando);
+      if (!d?.sonando) {
+        ritmoDe.current = null;
+        return;
+      }
+      if (typeof d.pos !== "number") return;
+      const t = temaActual();
+      const clave = t?.id ?? "?";
+      if (ritmoDe.current === clave) return; // una vez por tema (o al volver de la pausa): cambiarlo a cada rato lo haría saltar
+      ritmoDe.current = clave;
+      const p = periodoAsentir(t?.titulo);
+      // el golpe de cabeza (al 16 % del ciclo) cae en cada tiempo del tema
+      const fase = (((d.pos / 1000) % p) + 0.16 * p) % p;
+      setCompas({ dur: p, retraso: -fase });
+    };
     window.addEventListener(EVENTO_ESTADO, oir);
     return () => window.removeEventListener(EVENTO_ESTADO, oir);
   }, []);
@@ -924,7 +944,7 @@ export default function YoSoy() {
         data-recorrido="yoda"
         data-sonido="cuenco"
       >
-        <span className="yosoy-asiente">
+        <span className="yosoy-asiente" style={escuchando && compas ? { animationDuration: `${compas.dur}s`, animationDelay: `${compas.retraso}s` } : undefined}>
           <OjoPixel size={48} mira={mira} />
         </span>
       </button>
@@ -1016,7 +1036,7 @@ export default function YoSoy() {
               setMensajes((m) => [...m, { de: "yo", texto: cosquillas[Math.floor(Math.random() * cosquillas.length)] }]);
             }}
           >
-            <span className="yosoy-asiente">
+            <span className="yosoy-asiente" style={escuchando && compas ? { animationDuration: `${compas.dur}s`, animationDelay: `${compas.retraso}s` } : undefined}>
               <OjoPixel size={40} mira={mira} />
             </span>
           </button>

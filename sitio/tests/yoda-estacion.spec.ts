@@ -105,3 +105,25 @@ test("…y otro día, no", async ({ page }) => {
   await expect(page.getByTestId("yosoy-nube")).toBeVisible({ timeout: 15_000 });
   await expect(page.getByTestId("yosoy-nube")).not.toContainText("cumpleaños");
 });
+
+test("Yo Da asiente al ritmo del tema que suena (su BPM)", async ({ page }) => {
+  await page.goto("/");
+  const cabeza = page.getByTestId("yosoy-boton").locator(".yosoy-asiente");
+  // «Estallando Desde el Océano», de Sumo: 167 BPM → asiente cada dos tiempos (0,72 s)
+  await expect
+    .poll(async () => {
+      await page.evaluate(() => {
+        (window as unknown as { __jbTema: unknown }).__jbTema = { id: "sumo", titulo: "Estallando Desde el Océano", artista: "Sumo", sonando: true, fragmento: false };
+        window.dispatchEvent(new CustomEvent("jb:musica-estado", { detail: { sonando: true, pos: 12_000 } }));
+      });
+      return cabeza.evaluate((e) => parseFloat(getComputedStyle(e).animationDuration));
+    })
+    .toBeCloseTo((60 / 167) * 2, 2);
+  // y un tema lento, «Tudo Vai Dar Certo» (72 BPM): una vez por tiempo (0,83 s)
+  await page.evaluate(() => {
+    window.dispatchEvent(new CustomEvent("jb:musica-estado", { detail: { sonando: false } }));
+    (window as unknown as { __jbTema: unknown }).__jbTema = { id: "natiruts", titulo: "Tudo Vai Dar Certo", artista: "Natiruts", sonando: true, fragmento: false };
+    window.dispatchEvent(new CustomEvent("jb:musica-estado", { detail: { sonando: true, pos: 0 } }));
+  });
+  await expect.poll(() => cabeza.evaluate((e) => parseFloat(getComputedStyle(e).animationDuration))).toBeCloseTo(60 / 72, 2);
+});

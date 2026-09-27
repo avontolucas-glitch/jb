@@ -194,3 +194,17 @@ test("Recorrido: al salir, Yo Da no deja una copia en su lugar (un solo ojo en c
   expect(cuadros.length).toBeGreaterThan(1);
   expect(cuadros.filter((n) => n !== 1)).toEqual([]);
 });
+
+test("Recorrido: aunque la página esté bajada, muestra también las secciones de arriba", async ({ page }, info) => {
+  test.skip(info.project.name !== "computadora", "las secciones de arriba, en la compu (en el celular van en el menú)");
+  await page.goto("/");
+  await page.evaluate(() => window.scrollTo(0, 1500));
+  await page.getByTestId("yosoy-boton").click();
+  const campo = page.getByTestId("yosoy").getByLabel("Escribile a Yo Da");
+  await campo.fill("mostrame el lugar");
+  await campo.press("Enter");
+  await page.getByTestId("yosoy-recorrido").click();
+  await expect(page.getByTestId("recorrido-globo")).toContainText("1 de 8");
+  await page.getByTestId("recorrido-seguir").click();
+  await expect(page.getByTestId("recorrido")).toHaveAttribute("data-parada", "libros");
+});

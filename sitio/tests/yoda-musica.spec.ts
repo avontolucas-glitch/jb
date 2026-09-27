@@ -1,5 +1,6 @@
 import { test, expect } from "./ayuda";
 import type { Page } from "@playwright/test";
+import { comentariosPorTema } from "../content/yoda-musica";
 
 /** Simula que empieza a sonar un tema (lo que avisa components/Musica.tsx). */
 async function empiezaTema(page: Page, t: { id: string; titulo: string; artista: string; fragmento?: boolean }) {
@@ -34,7 +35,8 @@ test("Yo Da comenta el tema que empieza, y tocándolo dice qué suena", async ({
   await cerrarSaludo(page);
   await empiezaTema(page, { id: "5YSI1311X8t31PBjkBG4CZ", titulo: "Somebody's Watching Me", artista: "Rockwell" });
   const nube = page.getByTestId("yosoy-nube");
-  await expect(nube).toContainText("Alguien te mira");
+  // uno de sus dos comentarios propios (se alternan)
+  await expect(nube).toContainText(new RegExp(comentariosPorTema["Somebody's Watching Me"].map((c) => c.slice(0, 24).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")));
   // un comentario de música no invita a crear la cuenta
   await expect(nube.getByRole("link", { name: "Crear cuenta" })).toHaveCount(0);
   await nube.locator(".yosoy-nube-texto").click();
