@@ -60,7 +60,8 @@ export async function crearCuenta(page: Page, email: string, nombre = "Prueba") 
   await page.getByLabel("Nombre").fill(nombre);
   await page.getByLabel("Mail").fill(email);
   await page.getByLabel("Clave").fill("clave-segura-1");
-  await page.getByRole("button", { name: "Crear cuenta" }).click();
+  // con Enter desde el campo: el saludo de Yo Da (la nube) puede tapar el botón en el celular
+  await page.getByLabel("Clave").press("Enter");
   await page.waitForURL("**/mi-espacio");
 }
 

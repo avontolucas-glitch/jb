@@ -326,15 +326,20 @@ test("Yo Da frena el spam de mensajes con una pausa serena", async ({ page }) =>
   await page.getByTestId("yosoy-boton").click();
   const yo = page.getByTestId("yosoy");
   const campo = yo.getByLabel("Escribile a Yo Da");
-  for (let i = 1; i <= 5; i++) {
-    await campo.fill(`hola ${i}`);
+  // La ráfaga es de 4 y se recarga una ficha cada 1,2 s: con la máquina cargada, 5 envíos
+  // pueden tardar más que eso. Se sigue escribiendo (hasta 12) hasta que aparezca la pausa.
+  let ultimo = "";
+  for (let i = 1; i <= 12; i++) {
+    ultimo = `hola ${i}`;
+    await campo.fill(ultimo);
     await campo.press("Enter");
+    if (await yo.getByTestId("yosoy-pausa").isVisible()) break;
   }
   await expect(yo).toContainText("Despacio");
   await expect(yo.getByTestId("yosoy-pausa")).toBeVisible();
   await expect(yo.getByRole("button", { name: "Enviar" })).toBeDisabled();
   // lo escrito no se pierde
-  await expect(campo).toHaveValue("hola 5");
+  await expect(campo).toHaveValue(ultimo);
   // pasada la pausa, se puede seguir
   await expect(yo.getByTestId("yosoy-pausa")).toBeHidden({ timeout: 35_000 });
   await expect(yo.getByRole("button", { name: "Enviar" })).toBeEnabled();
