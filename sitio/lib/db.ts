@@ -71,7 +71,8 @@ async function escribirYa<T>(nombre: string, datos: T): Promise<void> {
   const dir = await carpeta();
   const final = path.join(dir, `${nombre}.json`);
   const temporal = `${final}.${process.pid}.${crypto.randomUUID()}.tmp`;
-  await fs.writeFile(temporal, JSON.stringify(datos, null, 2));
+  // sin sangría: cada reescritura cuesta menos (los archivos se leen con cualquier visor de JSON)
+  await fs.writeFile(temporal, JSON.stringify(datos));
   await fs.rename(temporal, final);
 }
 

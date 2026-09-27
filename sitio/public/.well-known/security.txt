@@ -1,0 +1,7 @@
+# Para avisar de un problema de seguridad en julianbermudez.com.
+# Antes de publicar: reemplazar el contacto por «mailto:» y el mail real, y renovar
+# «Expires» antes de que venza (como máximo, un año).
+Contact: (mail de contacto, a definir)
+Expires: 2027-09-27T00:00:00.000Z
+Preferred-Languages: es, en
+Canonical: https://julianbermudez.com/.well-known/security.txt

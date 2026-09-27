@@ -1,4 +1,4 @@
-import { test as base, expect, type BrowserContext, type Page } from "@playwright/test";
+import { test as base, expect, type BrowserContext, type Page, type TestInfo } from "@playwright/test";
 
 /** En las pruebas se entra directo, salteando el cuadro de bienvenida (se prueba aparte). */
 function saltearAvisos() {
@@ -9,19 +9,38 @@ function saltearAvisos() {
   } catch {}
 }
 
+/**
+ * Un valor distinto por prueba para el encabezado «x-jb-prueba». El servidor (solo con
+ * JB_PRUEBAS=1, que pone playwright.config.ts) lo suma a la clave de los límites: así
+ * cada prueba tiene su propio cupo aunque todas salgan de la misma IP. `extra` separa
+ * los navegadores de otras personas dentro de una misma prueba.
+ */
+export function idPrueba(info: TestInfo, extra = ""): string {
+  const titulo = info.titlePath.slice(1).join("-").normalize("NFD").replace(/[^\w]+/g, "_").slice(0, 60);
+  const azar = Math.floor(Math.random() * 1e9).toString(36);
+  return `${titulo}.${info.project.name}.${info.retry}.${azar}${extra ? `.${extra}` : ""}`.slice(0, 120);
+}
+
+/** Opciones para un navegador nuevo creado a mano dentro de una prueba (con su propio cupo). */
+export const cupoPropio = (info: TestInfo, extra: string) => ({ extraHTTPHeaders: { "x-jb-prueba": idPrueba(info, extra) } });
+
 /** Otra persona, con su propia cuenta, en otro navegador. */
 export type Persona = { ctx: BrowserContext; p: Page; email: string };
 
 export const test = base.extend<{ otraPersona: (prefijo: string, nombre?: string) => Promise<Persona> }>({
+  // cada prueba con su propio cupo en los límites del servidor
+  extraHTTPHeaders: async ({ extraHTTPHeaders }, use, info) => {
+    await use({ ...(extraHTTPHeaders ?? {}), "x-jb-prueba": idPrueba(info) });
+  },
   context: async ({ context }, use) => {
     await context.addInitScript(saltearAvisos);
     await use(context);
   },
   // Los navegadores de las otras personas se cierran solos al terminar la prueba, aunque falle.
-  otraPersona: async ({ browser, locale, timezoneId }, use) => {
+  otraPersona: async ({ browser, locale, timezoneId }, use, info) => {
     const abiertos: BrowserContext[] = [];
     await use(async (prefijo, nombre = "Prueba") => {
-      const ctx = await browser.newContext({ locale, timezoneId });
+      const ctx = await browser.newContext({ locale, timezoneId, ...cupoPropio(info, `persona${abiertos.length + 1}`) });
       abiertos.push(ctx);
       await ctx.addInitScript(saltearAvisos);
       const p = await ctx.newPage();
@@ -55,7 +74,7 @@ export async function ingresar(page: Page, email: string, clave: string) {
 
 export async function cerrarSesion(page: Page) {
   await page.goto("/mi-espacio/cuenta");
-  await page.getByRole("button", { name: "Cerrar sesión" }).click();
+  await page.getByRole("button", { name: "Cerrar sesión", exact: true }).click();
   await page.waitForURL("**/?sesion=cerrada");
   await expect(page.getByText("Cerraste la sesión.")).toBeVisible();
 }

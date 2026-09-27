@@ -263,7 +263,8 @@ test.describe("celular chico", () => {
     const reservado = await agregarHorario(page, dia(info, 29), hora(info, "45"));
     const libre = await agregarHorario(page, dia(info, 32), hora(info, "45"));
 
-    const quien = await otraPersona("una-persona-con-un-mail-bastante-largo-para-probar", "Persona Con Un Nombre Bastante Largo");
+    // (la parte de antes de la @ puede tener hasta 64 caracteres: lib/validar.ts)
+    const quien = await otraPersona("persona-con-un-mail-bastante-largo", "Persona Con Un Nombre Bastante Largo");
     await reservar(quien.p, reservado, "Una nota con varias líneas.\nPara ver cómo se acomoda en un teléfono chico, sin cortarse.");
 
     // Julián: reservas con mail largo, sala, calendario y la fila de botones

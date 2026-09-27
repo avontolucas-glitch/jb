@@ -137,15 +137,153 @@ export async function disponible(id: string, ahora = new Date()): Promise<boolea
   return (await horarios(ahora)).some((h) => h.id === id);
 }
 
-/** id de horario → id del usuario que lo reservó (si hubiera dos compras de un horario, vale la primera). */
+/**
+ * Una compra de la Masterclass 1 a 1, con lo que le puede pasar después:
+ * - `cancelada`: fecha (ISO) en que se canceló; desde ahí no cuenta para nada
+ *   (ni ocupa el horario, ni da acceso). La compra no se borra: queda el registro.
+ * - `canceladaPor`: «cliente» (avisó con tiempo) o «julian» (la liberó él).
+ * - `reembolso`: lo que se devuelve, por el mismo medio del pago.
+ * - `reprogramaciones`: los cambios de horario, del más viejo al más nuevo.
+ */
+export type CompraSesion = Compra & {
+  cancelada?: string;
+  canceladaPor?: "cliente" | "julian";
+  reembolso?: { monto: number; moneda: string; medio: string; estado: "simulado" | "pendiente" | "hecho" };
+  reprogramaciones?: { de: string; a: string; fecha: string }[];
+};
+
+/** ¿La compra sigue en pie? (no está cancelada) */
+export const vigente = (c: { cancelada?: string }) => !c.cancelada;
+
+/** Con cuántas horas de aviso, como mínimo, se puede reprogramar o cancelar (la política de reembolsos). */
+export const HORAS_CAMBIO = 48;
+
+/** ¿Falta más que el aviso mínimo para el encuentro? Solo así se puede reprogramar o cancelar desde el sitio. */
+export const sePuedeCambiar = (h: Horario, ahora = new Date()) => h.fecha.getTime() - ahora.getTime() > HORAS_CAMBIO * 3600_000;
+
+const PREFIJO = "sesion:";
+const idDeCompra = (c: Compra) => (c.producto.startsWith(PREFIJO) ? c.producto.slice(PREFIJO.length) : null);
+
+/**
+ * id de horario → id del usuario que lo reservó (si hubiera dos compras de un
+ * horario, vale la primera). Las canceladas no cuentan: ese horario queda libre.
+ */
 export async function ocupados(): Promise<Map<string, string>> {
-  const compras = await leer<Compra[]>("compras");
+  const compras = await leer<CompraSesion[]>("compras");
   const tomados = new Map<string, string>();
   for (const c of compras) {
-    const id = c.producto.startsWith("sesion:") ? c.producto.slice("sesion:".length) : null;
-    if (id && !tomados.has(id)) tomados.set(id, c.usuario);
+    const id = idDeCompra(c);
+    if (id && vigente(c) && !tomados.has(id)) tomados.set(id, c.usuario);
   }
   return tomados;
+}
+
+/** Los horarios que reservó una persona y siguen en pie (sin los cancelados), en orden. */
+export async function reservasDe(uid: string): Promise<Horario[]> {
+  const compras = await leer<CompraSesion[]>("compras");
+  const ids = new Set(
+    compras
+      .filter((c) => c.usuario === uid && vigente(c))
+      .map(idDeCompra)
+      .filter((id): id is string => !!id),
+  );
+  return ordenar([...ids].map(horarioDesdeId).filter((h): h is Horario => !!h));
+}
+
+/** Por qué no se pudo reprogramar o cancelar. El texto sale de `TEXTOS_RESERVA` (así viaja en la dirección sin que nadie lo invente). */
+export type CodigoReserva = "limite" | "horario" | "mismo" | "tarde" | "agenda" | "tomado" | "ajena" | "terminado" | "ya";
+export const TEXTOS_RESERVA: Record<CodigoReserva, string> = {
+  limite: "Hiciste muchos cambios seguidos. Esperá un momento y probá de nuevo.",
+  horario: "Revisá el horario.",
+  mismo: "Ese ya es el horario de tu encuentro. Elegí otro.",
+  tarde: `Faltan menos de ${HORAS_CAMBIO} horas para ese encuentro: ya no se puede cambiar desde acá.`,
+  agenda: "Ese horario ya no está en la agenda. Elegí otro.",
+  tomado: "Ese horario se acaba de reservar. Elegí otro.",
+  ajena: "No encontramos ese encuentro entre tus reservas.",
+  terminado: "Ese encuentro ya terminó.",
+  ya: "Esa reserva ya no está.",
+};
+/** El texto de un código que vino en la dirección (o nada, si no es uno de los nuestros). */
+export const textoReserva = (c?: string | null) => (c && Object.hasOwn(TEXTOS_RESERVA, c) ? TEXTOS_RESERVA[c as CodigoReserva] : null);
+
+export type ResultadoReserva = { ok: string; id: string } | { error: string; codigo: CodigoReserva };
+const falla = (codigo: CodigoReserva) => ({ error: TEXTOS_RESERVA[codigo], codigo });
+
+type Nota = { usuario: string; horario: string; nota: string; fecha?: string };
+
+/**
+ * Pasa una reserva de un horario a otro, en un solo paso: mirar que el nuevo
+ * esté libre y registrar el cambio pasan juntos (lib/db.ts), así nadie lo
+ * reserva en el medio. El nuevo tiene que estar en la agenda, libre y con la
+ * anticipación mínima; el viejo, a más de `HORAS_CAMBIO` horas. Lo que la
+ * persona había contado para el encuentro pasa también al horario nuevo.
+ * NO chequea la sesión: la llama lib/acciones-reservas.ts, que ya lo hizo.
+ * PRODUCCIÓN: una transacción en la base de datos.
+ */
+export async function reprogramarReserva(uid: string, viejo: string, nuevo: string, ahora = new Date()): Promise<ResultadoReserva> {
+  const hv = horarioDesdeId(viejo);
+  const hn = horarioDesdeId(nuevo);
+  if (!hv || !hn) return falla("horario");
+  if (viejo === nuevo) return falla("mismo");
+  if (!sePuedeCambiar(hv, ahora)) return falla("tarde");
+  if (!(await disponible(nuevo, ahora))) return falla("agenda");
+  const r = await modificar<CompraSesion[], ResultadoReserva>("compras", (compras) => {
+    const i = compras.findIndex((c) => c.usuario === uid && vigente(c) && idDeCompra(c) === viejo);
+    if (i < 0) return { resultado: falla("ajena") };
+    if (compras.some((c) => vigente(c) && idDeCompra(c) === nuevo)) return { resultado: falla("tomado") };
+    const c = compras[i];
+    const cambiada: CompraSesion = {
+      ...c,
+      producto: `${PREFIJO}${nuevo}`,
+      reprogramaciones: [...(c.reprogramaciones ?? []), { de: viejo, a: nuevo, fecha: ahora.toISOString() }],
+    };
+    return { datos: compras.map((x, j) => (j === i ? cambiada : x)), resultado: { ok: `Listo, tu encuentro pasó al ${hn.etiqueta}.`, id: nuevo } };
+  });
+  if ("ok" in r) {
+    await modificar<Nota[], void>("notas_sesion", (notas) =>
+      notas.some((n) => n.usuario === uid && n.horario === viejo)
+        ? { datos: notas.map((n) => (n.usuario === uid && n.horario === viejo ? { ...n, horario: nuevo } : n)), resultado: undefined }
+        : { resultado: undefined },
+    );
+  }
+  return r;
+}
+
+/**
+ * Cancela una reserva y libera el horario. La compra queda marcada como
+ * cancelada (con fecha, quién la canceló y el reembolso), no se borra.
+ * - `por: "cliente"`: solo su dueño (`uid`) y a más de `HORAS_CAMBIO` horas: reembolso total.
+ * - `por: "julian"`: cualquier reserva que todavía no terminó: reembolso total, porque cancela él.
+ * NO chequea la sesión: la llama lib/acciones-reservas.ts, que ya lo hizo.
+ * PRODUCCIÓN: el reembolso se pide al medio de pago (Mercado Pago, PayPal…) y se le avisa por mail.
+ */
+export async function cancelarReserva(
+  id: string,
+  quien: { por: "cliente"; uid: string } | { por: "julian" },
+  ahora = new Date(),
+): Promise<ResultadoReserva> {
+  const h = horarioDesdeId(id);
+  if (!h) return falla("horario");
+  if (quien.por === "cliente" && !sePuedeCambiar(h, ahora)) return falla("tarde");
+  if (quien.por === "julian" && fin(h) <= ahora.getTime()) return falla("terminado");
+  return modificar<CompraSesion[], ResultadoReserva>("compras", (compras) => {
+    const i = compras.findIndex((c) => vigente(c) && idDeCompra(c) === id && (quien.por === "julian" || c.usuario === quien.uid));
+    if (i < 0) return { resultado: falla(quien.por === "julian" ? "ya" : "ajena") };
+    const c = compras[i];
+    const cancelada: CompraSesion = {
+      ...c,
+      cancelada: ahora.toISOString(),
+      canceladaPor: quien.por,
+      reembolso: { monto: c.monto, moneda: c.moneda, medio: c.medio, estado: c.medio === "simulado" ? "simulado" : "pendiente" },
+    };
+    return {
+      datos: compras.map((x, j) => (j === i ? cancelada : x)),
+      resultado: {
+        ok: quien.por === "julian" ? `Liberaste ${h.etiqueta}.` : `Cancelaste tu encuentro del ${h.etiqueta}.`,
+        id,
+      },
+    };
+  });
 }
 
 export type EstadoAgenda = "libre" | "reservado" | "bloqueado";

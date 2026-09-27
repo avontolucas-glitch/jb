@@ -29,7 +29,7 @@ export default async function Encabezado() {
             <NavEnlace key={e.href} e={e} nota={i} />
           ))}
           <InstalarCabecera />
-          <Link href={cuenta.href} className="boton py-1.5 px-4 ml-1">
+          <Link href={cuenta.href} className="boton py-1.5 px-4 ml-1" data-recorrido="cuenta">
             {cuenta.texto}
           </Link>
         </nav>

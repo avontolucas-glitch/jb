@@ -2,14 +2,20 @@
  * Límites de frecuencia y bloqueos temporales. Corre en edge y en node.
  *
  * Almacenamiento:
- *  - Sin variables: memoria del proceso (un Map con tope de 10.000 claves; se barren
- *    las vencidas cada minuto y, si se llena, se descartan las más viejas). En Vercel
+ *  - Sin variables: memoria del proceso. Los contadores van en un Map con tope de
+ *    10.000 claves (se barren los vencidos cada minuto y, si se llena, se descartan los
+ *    más viejos). Los bloqueos, las marcas de un solo uso y las alertas van en otro Map
+ *    aparte, con su propio tope (20.000), del que solo se descartan las vencidas, nunca
+ *    las vigentes: si se llena, unaVez() responde que no (falla cerrada). En Vercel
  *    cada instancia tiene su propia memoria (y el middleware edge otra distinta), así
  *    que es aproximado: un ataque repartido entre N instancias tiene N veces el cupo.
+ *    Para el sitio publicado, Upstash es obligatorio (ver SEGURIDAD.md).
  *  - Con UPSTASH_REDIS_REST_URL y UPSTASH_REDIS_REST_TOKEN: Upstash por su API REST,
  *    un solo fetch a /pipeline por consulta, con 400 ms de tope. Si falla o tarda, se
  *    usa la memoria por 15 s (nunca se abre la puerta del todo). Una caché local de
  *    «bloqueado hasta» evita gastar comandos pagos en claves que ya pasaron el límite.
+ *    El límite global del middleware («paginas» y «api») va siempre en memoria local
+ *    ({ soloMemoria: true }): no gasta un comando de Upstash por cada página vista.
  *
  * Ventana deslizante con dos cubetas: se cuenta en la cubeta actual y se suma la
  * anterior pesada por lo que queda de ella (como Cloudflare y Upstash Ratelimit).
@@ -84,8 +90,9 @@ export const LIMITES = {
       { por: "ip", cuenta: "fallos", ventanaSeg: HORA, max: 30, bloqueoSeg: 15 * MIN },
       { por: "mail", cuenta: "fallos", ventanaSeg: 15 * MIN, verificarTras: 5 },
       { por: "global", cuenta: "fallos", ventanaSeg: 10 * MIN, verificarTras: 200, alertaSeg: 30 * MIN },
-      // Tope de CPU: cada intento corre PBKDF2 (60-280 ms).
-      { por: "ip", cuenta: "intentos", ventanaSeg: MIN, max: 20 },
+      // Tope de CPU: cada intento corre PBKDF2 (150-300 ms). Además, lib/auth.ts no corre
+      // más de 4 a la vez por instancia.
+      { por: "ip", cuenta: "intentos", ventanaSeg: MIN, max: 10 },
     ],
   },
   /** Además de «login», cuando el mail es ADMIN_EMAIL: verificación desde el 2.º intento. */
@@ -97,8 +104,11 @@ export const LIMITES = {
     reglas: [
       { por: "ip", cuenta: "exitos", ventanaSeg: HORA, verificarTras: 1, max: 3 },
       { por: "ip", cuenta: "exitos", ventanaSeg: DIA, max: 10 },
-      { por: "ip", cuenta: "fallos", ventanaSeg: 10 * MIN, verificarTras: 10 },
+      // un mail que ya tenía cuenta pesa 3 (accionCrearCuenta): probar mails ajenos cuesta
+      { por: "ip", cuenta: "fallos", ventanaSeg: 10 * MIN, verificarTras: 3 },
       { por: "global", cuenta: "exitos", ventanaSeg: HORA, verificarTras: 30, alertaSeg: HORA },
+      // tope duro para todo el sitio: un ataque repartido no llena usuarios.json
+      { por: "global", cuenta: "exitos", ventanaSeg: HORA, max: 200 },
       { por: "ip", cuenta: "intentos", ventanaSeg: MIN, max: 20 },
     ],
   },
@@ -119,8 +129,17 @@ export const LIMITES = {
       { por: "ip", cuenta: "intentos", ventanaSeg: DIA, max: 10 },
       { por: "destino", cuenta: "intentos", ventanaSeg: DIA, max: 3 },
       { por: "global", cuenta: "intentos", ventanaSeg: HORA, verificarTras: 50, alertaSeg: HORA },
+      // tope duro para todo el sitio (primeroLibre no lo saltea: el tope corta antes)
+      { por: "global", cuenta: "intentos", ventanaSeg: HORA, max: 500 },
     ],
     primeroLibre: true,
+  },
+  /**
+   * Arrepentimientos que parecen de un bot (campo trampa lleno): igual se guardan, marcados
+   * como sospechosos, para que no se pierda el de una persona con autocompletar. Con tope propio.
+   */
+  arrepentimientoSospechoso: {
+    reglas: [{ por: "global", cuenta: "intentos", ventanaSeg: HORA, max: 300 }],
   },
   /** Lista de avisos. destino = el mail o el WhatsApp. */
   lista: {
@@ -129,6 +148,7 @@ export const LIMITES = {
       { por: "ip", cuenta: "intentos", ventanaSeg: DIA, max: 20 },
       { por: "destino", cuenta: "intentos", ventanaSeg: DIA, max: 3 },
       { por: "global", cuenta: "intentos", ventanaSeg: HORA, verificarTras: 100, alertaSeg: HORA },
+      { por: "global", cuenta: "intentos", ventanaSeg: HORA, max: 1000 },
     ],
   },
   /** Preguntas de la masterclass. En cuentas demo, usar cuenta+IP (sujetosDe con demo: true). */
@@ -198,9 +218,17 @@ export const LIMITES = {
       { por: "ip", cuenta: "intentos", ventanaSeg: HORA, max: 300 },
     ],
   },
-  /** Páginas (si algún día se limita en el middleware). Alto a propósito: CGNAT y prefetch de Next. */
+  /** Páginas (el middleware, siempre en memoria local). Alto a propósito: CGNAT y prefetch de Next. */
   paginas: {
     reglas: [{ por: "ip", cuenta: "intentos", ventanaSeg: MIN, max: 600 }],
+  },
+  /** Consultas a una persona desde Yo Da (tickets). Solo con cuenta; registrar cada una con exito(). */
+  ticket: {
+    reglas: [
+      { por: "cuenta", cuenta: "exitos", ventanaSeg: DIA, max: 3 },
+      { por: "ip", cuenta: "exitos", ventanaSeg: DIA, verificarTras: 2, max: 10 },
+      { por: "ip", cuenta: "intentos", ventanaSeg: MIN, max: 10 },
+    ],
   },
   /** Cualquier otra ruta de /api. */
   api: {
@@ -222,7 +250,12 @@ type Cmd = (string | number)[];
 type Valor = { v: string; vence: number }; // vence 0 = sin vencimiento
 
 type Mem = {
+  /** Contadores (se pueden descartar los más viejos si se llena). */
   datos: Map<string, Valor>;
+  /** Bloqueos, marcas de un solo uso y alertas: nunca se descartan mientras estén vigentes. */
+  criticas: Map<string, Valor>;
+  /** Último barrido de `criticas` por estar llena (a lo sumo uno por segundo). */
+  barridoCriticas: number;
   /** Caché local de «no pasa hasta» (ms), para no gastar comandos de Upstash. */
   hasta: Map<string, number>;
   barrido: number;
@@ -230,19 +263,43 @@ type Mem = {
   avisoUpstash: number;
 };
 const g = globalThis as { __jbLimites?: Mem };
-const mem: Mem = (g.__jbLimites ??= { datos: new Map(), hasta: new Map(), barrido: 0, pausaUpstash: 0, avisoUpstash: 0 });
+const mem: Mem = (g.__jbLimites ??= { datos: new Map(), criticas: new Map(), barridoCriticas: 0, hasta: new Map(), barrido: 0, pausaUpstash: 0, avisoUpstash: 0 });
+// (si el módulo se recargó con una versión anterior del objeto)
+mem.criticas ??= new Map();
+mem.barridoCriticas ??= 0;
 const TOPE_CLAVES = 10_000;
+const TOPE_CRITICAS = 20_000;
 
 /** Prefijo de las claves: separa producción, preview y local si comparten Upstash. */
 const PREFIJO = `jb:${process.env.VERCEL_ENV ?? "local"}:`;
 
+/** ¿Es un bloqueo, una marca de un solo uso o una alerta? (esas no se descartan nunca vigentes) */
+const esCritica = (k: string) => k.startsWith(`${PREFIJO}b:`) || k.startsWith(`${PREFIJO}u:`) || k.startsWith(`${PREFIJO}a:`) || k.endsWith(":bloqueo");
+const mapaDe = (k: string) => (esCritica(k) ? mem.criticas : mem.datos);
+
+function barrerVencidas(m: Map<string, Valor>, ahora: number) {
+  for (const [k, x] of m) if (x.vence && x.vence <= ahora) m.delete(k);
+}
+
+/** ¿Hay lugar en las críticas? Si está llena, primero se barren las vencidas (a lo sumo una vez por segundo). */
+function hayLugarCritico(ahora: number): boolean {
+  if (mem.criticas.size < TOPE_CRITICAS) return true;
+  if (ahora - mem.barridoCriticas >= 1000) {
+    mem.barridoCriticas = ahora;
+    barrerVencidas(mem.criticas, ahora);
+  }
+  return mem.criticas.size < TOPE_CRITICAS;
+}
+
 function barrer(ahora: number) {
   if (ahora - mem.barrido >= 60_000) {
     mem.barrido = ahora;
-    for (const [k, x] of mem.datos) if (x.vence && x.vence <= ahora) mem.datos.delete(k);
+    barrerVencidas(mem.datos, ahora);
+    barrerVencidas(mem.criticas, ahora);
     for (const [k, t] of mem.hasta) if (t <= ahora) mem.hasta.delete(k);
   }
-  // Si se llena (IPs rotadas), se descartan las más viejas: el Map guarda el orden de alta.
+  // Si se llena (IPs rotadas), se descartan los contadores más viejos: el Map guarda el
+  // orden de alta. `mem.hasta` es solo una caché (lo vigente sigue en `criticas`).
   for (const m of [mem.datos, mem.hasta] as Map<string, unknown>[]) {
     while (m.size > TOPE_CLAVES) {
       const primera = m.keys().next().value;
@@ -253,10 +310,11 @@ function barrer(ahora: number) {
 }
 
 function vivo(k: string, ahora: number): Valor | undefined {
-  const x = mem.datos.get(k);
+  const m = mapaDe(k);
+  const x = m.get(k);
   if (!x) return undefined;
   if (x.vence && x.vence <= ahora) {
-    mem.datos.delete(k);
+    m.delete(k);
     return undefined;
   }
   return x;
@@ -274,18 +332,23 @@ function enMemoria(cmds: Cmd[]): unknown[] {
         return vivo(k, ahora)?.v ?? null;
       case "SET": {
         const opciones = c.slice(3).map((x) => String(x).toUpperCase());
-        if (opciones.includes("NX") && vivo(k, ahora)) return null;
+        const nx = opciones.includes("NX");
+        if (nx && vivo(k, ahora)) return null;
         const px = opciones.indexOf("PX");
         const vence = px >= 0 ? ahora + Number(c[3 + px + 1]) : 0;
-        mem.datos.delete(k); // al final del orden: es lo más nuevo
-        mem.datos.set(k, { v: String(c[2]), vence });
+        const m = mapaDe(k);
+        // Llena de marcas vigentes: un «solo una vez» responde que no (falla cerrada). Los
+        // bloqueos y las alertas se guardan igual (dejarlos afuera abriría la puerta).
+        if (m === mem.criticas && !m.has(k) && !hayLugarCritico(ahora) && nx) return null;
+        m.delete(k); // al final del orden: es lo más nuevo
+        m.set(k, { v: String(c[2]), vence });
         return "OK";
       }
       case "INCRBY": {
         const x = vivo(k, ahora);
         const n = (x ? Number(x.v) || 0 : 0) + Number(c[2]);
         if (x) x.v = String(n);
-        else mem.datos.set(k, { v: String(n), vence: 0 });
+        else mapaDe(k).set(k, { v: String(n), vence: 0 });
         return n;
       }
       case "PTTL": {
@@ -299,7 +362,7 @@ function enMemoria(cmds: Cmd[]): unknown[] {
         return 1;
       }
       case "DEL":
-        return c.slice(1).reduce<number>((n, x) => n + (mem.datos.delete(String(x)) ? 1 : 0), 0);
+        return c.slice(1).reduce<number>((n, x) => n + (mapaDe(String(x)).delete(String(x)) ? 1 : 0), 0);
       default:
         throw new Error(`Comando no emulado: ${op}`);
     }
@@ -344,9 +407,13 @@ async function enUpstash(cmds: Cmd[]): Promise<unknown[] | null> {
   }
 }
 
-/** Ejecuta comandos de Redis en Upstash (si está) o en memoria. Devuelve un resultado por comando. */
-export async function ejecutar(cmds: Cmd[]): Promise<unknown[]> {
+/**
+ * Ejecuta comandos de Redis en Upstash (si está) o en memoria. Devuelve un resultado por comando.
+ * `soloMemoria`: nunca va a Upstash (el límite global del middleware, en cada pedido).
+ */
+export async function ejecutar(cmds: Cmd[], o: { soloMemoria?: boolean } = {}): Promise<unknown[]> {
   if (!cmds.length) return [];
+  if (o.soloMemoria) return enMemoria(cmds);
   return (await enUpstash(cmds)) ?? enMemoria(cmds);
 }
 
@@ -518,7 +585,16 @@ function aplicar(funciones: Funcion[], s: Sujetos): Aplicada[] {
   return out;
 }
 
-const claveAlerta = (funcion: Funcion, s: Sujetos) => `${PREFIJO}a:${funcion}${s.prueba ? `~${s.prueba}` : ""}`;
+const claveAlerta = (funcion: Funcion, s: Pick<Sujetos, "prueba">) => `${PREFIJO}a:${funcion}${s.prueba ? `~${s.prueba}` : ""}`;
+
+/**
+ * ¿Está vigente la alerta global de `funcion` (por ejemplo, muchos fallos de login en
+ * todo el sitio)? Sirve para endurecer la verificación mientras dura.
+ */
+export async function alertaVigente(funcion: Funcion, h?: Headers): Promise<boolean> {
+  const [ms] = await ejecutar([["PTTL", claveAlerta(funcion, { prueba: h ? clavePrueba(h) : null })]]);
+  return num(ms) > 0;
+}
 const claveBloqueo = (a: Aplicada) => `${a.base}:bloqueo`;
 
 function mensajeDe(funciones: Funcion[], reintentoSeg: number): string {
@@ -533,8 +609,9 @@ function mensajeDe(funciones: Funcion[], reintentoSeg: number): string {
  * Revisa los límites de una o varias funciones antes de hacer el trabajo caro.
  * Suma 1 a las reglas de «intentos»; las de «fallos» y «exitos» solo se miran.
  *   const v = await revisar(esMailAdmin ? ["login", "loginAdmin"] : "login", s);
+ * `soloMemoria`: cuenta en la memoria de la instancia, sin ir a Upstash (el middleware).
  */
-export async function revisar(funcion: Funcion | Funcion[], s: Sujetos): Promise<Veredicto> {
+export async function revisar(funcion: Funcion | Funcion[], s: Sujetos, o: { soloMemoria?: boolean } = {}): Promise<Veredicto> {
   const funciones = Array.isArray(funcion) ? funcion : [funcion];
   const reglas = aplicar(funciones, s);
   const ahora = Date.now();
@@ -570,7 +647,7 @@ export async function revisar(funcion: Funcion | Funcion[], s: Sujetos): Promise
   const alertas = funciones.filter((f) => (LIMITES[f].reglas as Regla[]).some((r) => r.por === "global" && r.alertaSeg));
   const posAlerta = cmds.length;
   for (const f of alertas) cmds.push(["PTTL", claveAlerta(f, s)]);
-  const r = await ejecutar(cmds);
+  const r = await ejecutar(cmds, o);
 
   // 3) Evaluar.
   let permitido = true;
@@ -633,7 +710,7 @@ export async function revisar(funcion: Funcion | Funcion[], s: Sujetos): Promise
       regla ??= `${f}:alerta`;
     }
   });
-  if (despues.length) await ejecutar(despues);
+  if (despues.length) await ejecutar(despues, o);
 
   if (!permitido) {
     const reintentoSeg = Math.max(1, Math.ceil(reintentoMs / 1000));

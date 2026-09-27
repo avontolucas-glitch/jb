@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { cerrarSesionEnTodos } from "@/lib/auth";
 import { miembro } from "@/lib/miembro";
 import { accionSalir } from "@/lib/acciones";
 import { horarioDesdeId } from "@/lib/sesiones";
@@ -19,6 +21,16 @@ function nombreProducto(p: string) {
   if (d) return `${enVivo.titulo} · ${d.titulo}`;
   const c = conferencias.find((x) => `conferencia:${x.id}` === p);
   return c ? `Entrada · ${c.titulo}` : p;
+}
+
+/**
+ * Sube la versión de sesión de la cuenta: todas las sesiones abiertas (otro teléfono,
+ * una computadora prestada) dejan de valer, esta también.
+ */
+async function salirDeTodos() {
+  "use server";
+  await cerrarSesionEnTodos();
+  redirect("/?sesion=cerrada");
 }
 
 export default async function Cuenta() {
@@ -49,6 +61,14 @@ export default async function Cuenta() {
               <span>{nombreProducto(c.producto)}</span>
               <span className="texto-2 text-sm">
                 {c.moneda} {c.monto} · {fecha(c.fecha)} · {c.medio === "simulado" ? "pago de prueba" : c.medio === "codigo" ? "código del libro impreso" : c.medio}
+                {c.cancelada && (
+                  <>
+                    {" · "}
+                    <span data-testid="compra-cancelada">
+                      cancelada · reembolso por el mismo medio{c.reembolso?.estado === "simulado" ? " (simulado)" : c.reembolso?.estado === "hecho" ? " (hecho)" : " (en camino)"}
+                    </span>
+                  </>
+                )}
               </span>
             </li>
           ))}
@@ -64,11 +84,22 @@ export default async function Cuenta() {
         .
       </p>
 
-      <form action={accionSalir} className="mt-14 border-t borde pt-8">
-        <button type="submit" className="boton">
-          Cerrar sesión
-        </button>
-      </form>
+      <div className="mt-14 border-t borde pt-8 flex flex-col sm:flex-row sm:flex-wrap gap-4">
+        <form action={accionSalir}>
+          <button type="submit" className="boton">
+            Cerrar sesión
+          </button>
+        </form>
+        <form action={salirDeTodos}>
+          <button type="submit" className="boton" data-testid="salir-de-todos">
+            Cerrar sesión en todos los dispositivos
+          </button>
+        </form>
+      </div>
+      <p className="texto-2 text-sm mt-4">
+        Si entraste desde un teléfono o una computadora que ya no usás, el segundo botón cierra la sesión en todos lados, también
+        acá.
+      </p>
     </>
   );
 }

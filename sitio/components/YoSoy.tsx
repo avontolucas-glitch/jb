@@ -2,35 +2,22 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import OjoPixel from "./OjoPixel";
+import TicketYoDa from "./TicketYoDa";
+import Tipeo from "./Tipeo";
 import Hora from "./Hora";
 import { abrirMusica } from "./Musica";
 import { instalar } from "@/lib/instalar";
+import { empezarRecorrido, recorridoVisto } from "@/lib/recorrido";
+import { EVENTO_TEMA, otroTema, pausarMusica, ponerMusica, temaActual, type TemaSonando } from "@/lib/musica";
+import { comentarTema, queSuena } from "@/content/yoda-musica";
 import { activarSonido, sonidoActivo } from "@/lib/sonido";
-import { cosquillas, entender, invitacionQuieto, nombreBot, nombreDicho, noEntendi, pedirCuenta, puertasCuenta, respuestaDe, saludo, saludoCon, saludoHora, temas, type Accion, type Tema } from "@/content/yosoy";
+import { cosquillas, despacio, interpretar, ESFUERZO_TICKET, horariosEnPausa, pausaAviso, pausaCuenta, pausaFin, ritmo, ofrecerTicket, ticketSinCuenta, invitacionQuieto, nombreBot, ofrecerRecorrido, nombreDicho, noEntendi, pedirCuenta, puertasCuenta, respuestaDe, saludo, saludoCon, saludoHora, temas, type Accion, type Interpretacion, type Tema } from "@/content/yosoy";
+import { regionDelDispositivo } from "@/content/yoda-habla";
 
 type Mensaje = { de: "yo" | "vos"; texto: string; acciones?: Accion[]; chips?: boolean; sugerencias?: string[] };
 type Libre = { id: string; inicio: string };
 
 const chips = temas.filter((t) => t.chip);
-
-/** La frase aparece de a una letra, como si Yo Da la estuviera diciendo. */
-function Tipeo({ texto }: { texto: string }) {
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setN(texto.length);
-      return;
-    }
-    const t = window.setInterval(() => setN((i) => (i >= texto.length ? (window.clearInterval(t), i) : i + 1)), 38);
-    return () => window.clearInterval(t);
-  }, [texto]);
-  return (
-    <>
-      <span className="sr-only">{texto}</span>
-      <span aria-hidden="true">{texto.slice(0, n)}</span>
-    </>
-  );
-}
 
 /** Apagar o prender el sonido del sitio (al apagar, también se pausa la música). */
 function useSonido(): [boolean, () => void] {
@@ -258,12 +245,26 @@ function Moneda() {
 /** Los próximos horarios libres de la 1 a 1, en la hora de quien pregunta. */
 function Horarios() {
   const [libres, setLibres] = useState<Libre[] | null>(null);
+  // sin respuesta (429 si el sitio pide un respiro, o sin conexión): no es que no haya horarios
+  const [sinRespuesta, setSinRespuesta] = useState(false);
   useEffect(() => {
     fetch("/api/horarios?n=3")
-      .then((r) => r.json())
-      .then((d) => setLibres(d.horarios ?? []))
-      .catch(() => setLibres([]));
+      .then(async (r) => {
+        if (!r.ok) return setSinRespuesta(true);
+        const d = (await r.json()) as { horarios?: Libre[] };
+        setLibres(d.horarios ?? []);
+      })
+      .catch(() => setSinRespuesta(true));
   }, []);
+  if (sinRespuesta)
+    return (
+      <p className="texto-2 text-sm" data-testid="yosoy-horarios-pausa">
+        {horariosEnPausa}{" "}
+        <Link href="/masterclass/1-a-1" className="enlace">
+          Ver la agenda
+        </Link>
+      </p>
+    );
   if (!libres) return <p className="texto-2 text-sm">Buscando horarios…</p>;
   if (!libres.length) return <p className="texto-2 text-sm">Por ahora no hay horarios libres. Julián carga nuevos cada semana.</p>;
   return (
@@ -299,12 +300,36 @@ export default function YoSoy() {
   const [cosquilla, setCosquilla] = useState(false);
   const [nubeTexto, setNubeTexto] = useState("");
   const [nubeJuego, setNubeJuego] = useState(false);
+  const [ofrecer, setOfrecer] = useState(false);
+  const [nubeMusica, setNubeMusica] = useState(false);
   const ultimaRespuesta = useRef<string>(saludo);
+  // cuántas vueltas dio la persona sin resolver (para ofrecer, recién ahí, escribirle a una persona)
+  const esfuerzo = useRef(0);
+  const ultimoTema = useRef<string | null>(null);
+  // de dónde es quien escribe (por cómo escribe; si no, por el dispositivo) y lo último que Yo Da ofreció
+  const region = useRef<string | null>(null);
+  const ofrecido = useRef<string[]>([]);
+  useEffect(() => {
+    try {
+      region.current = sessionStorage.getItem("jb-yoda-region") || regionDelDispositivo();
+    } catch {
+      region.current = regionDelDispositivo();
+    }
+  }, []);
+  // ritmo: fichas que se recargan de a una cada `ritmo.cadaMs` y los envíos del último minuto
+  const fichas = useRef<{ n: number; t: number }>({ n: ritmo.rafaga, t: 0 });
+  const envios = useRef<number[]>([]);
+  const pausaHasta = useRef(0);
+  const [pausa, setPausa] = useState(0);
+  const [avisoPausa, setAvisoPausa] = useState("");
+  const enPausa = pausa > 0;
 
   const quienEs = () =>
     fetch("/api/yo")
-      .then((r) => r.json())
+      // con 429 (o cualquier error) no se toca nada: sigue como estaba (sin sesión, si no se sabía)
+      .then((r) => (r.ok ? (r.json() as Promise<{ nombre?: string | null }>) : null))
       .then((d) => {
+        if (!d) return;
         nombre.current = d.nombre ?? null;
         setConSesion(d.nombre ?? null);
         const guardado = nombreGuardado();
@@ -333,10 +358,13 @@ export default function YoSoy() {
           sessionStorage.setItem("jb-yoda-nube", "1");
         } catch {}
         if (!visto) {
+          const nuevo = !recorridoVisto();
+          setOfrecer(nuevo);
           setNubeJuego(false);
+          setNubeMusica(false);
           setNubeTexto("");
           setNube(true);
-          t2 = window.setTimeout(() => setNube(false), 16000);
+          t2 = window.setTimeout(() => setNube(false), nuevo ? 30000 : 16000);
         }
       }, 700);
     };
@@ -347,6 +375,42 @@ export default function YoSoy() {
       window.clearTimeout(t);
       window.clearTimeout(t2);
       window.removeEventListener("umbral:abierto", aparecer);
+    };
+  }, []);
+
+  // cuando empieza un tema, Yo Da lo comenta (sin pesar: el primero, los que tienen guiño, y cada tanto otro)
+  const abiertoRef = useRef(abierto);
+  abiertoRef.current = abierto;
+  const nubeRef = useRef(nube);
+  nubeRef.current = nube;
+  const musica = useRef({ ultimo: 0, temas: 0 });
+  useEffect(() => {
+    let t: number | undefined;
+    const alEmpezar = (e: Event) => {
+      const tema = (e as CustomEvent<TemaSonando>).detail;
+      const m = musica.current;
+      m.temas += 1;
+      const { texto, especial } = comentarTema(tema);
+      const ahora = Date.now();
+      const decir = m.temas === 1 || (especial && ahora - m.ultimo > 90_000) || (m.temas % 3 === 0 && ahora - m.ultimo > 240_000);
+      if (!decir || abiertoRef.current || nubeRef.current || document.querySelector("[data-testid=recorrido]")) return;
+      m.ultimo = ahora;
+      setNubeJuego(false);
+      setNubeMusica(true);
+      setOfrecer(false);
+      setNubeTexto(texto);
+      setNube(true);
+      setHablando(true);
+      window.clearTimeout(t);
+      t = window.setTimeout(() => {
+        setNube(false);
+        setHablando(false);
+      }, 11000);
+    };
+    window.addEventListener(EVENTO_TEMA, alEmpezar);
+    return () => {
+      window.removeEventListener(EVENTO_TEMA, alEmpezar);
+      window.clearTimeout(t);
     };
   }, []);
 
@@ -388,6 +452,7 @@ export default function YoSoy() {
         } catch {}
         if (document.documentElement.classList.contains("en-umbral")) return;
         setNubeJuego(true);
+        setNubeMusica(false);
         setNubeTexto(invitacionQuieto);
         setNube(true);
         window.setTimeout(() => setNube(false), 14000);
@@ -433,7 +498,53 @@ export default function YoSoy() {
     lista.current?.scrollTo({ top: lista.current.scrollHeight, behavior: "smooth" });
   }, [mensajes, pensando]);
 
+  // la cuenta atrás de la pausa (con la hora de fin, así no se atrasa)
+  useEffect(() => {
+    if (!enPausa) return;
+    const t = window.setTimeout(() => {
+      const quedan = Math.max(0, Math.ceil((pausaHasta.current - Date.now()) / 1000));
+      setPausa(quedan);
+      if (quedan === 0) setAvisoPausa(pausaFin);
+    }, 1000);
+    return () => window.clearTimeout(t);
+  }, [pausa, enPausa]);
+
+  /**
+   * ¿Puede mandar otro mensaje ya? Si le escriben demasiado seguido, Yo Da pide calma
+   * y el campo queda en pausa unos segundos. Todo en el navegador: no cuesta nada.
+   * `escrito`: lo que se escribe en el campo pasa por la ráfaga y por el tope por minuto;
+   * los chips y las sugerencias, solo por la ráfaga (recorrer el menú no es spam).
+   */
+  const dejar = (escrito = true): boolean => {
+    const ahora = Date.now();
+    if (ahora < pausaHasta.current) return false;
+    const f = fichas.current;
+    f.n = Math.min(ritmo.rafaga, f.n + (ahora - f.t) / ritmo.cadaMs);
+    f.t = ahora;
+    envios.current = envios.current.filter((t) => ahora - t < 60_000);
+    let espera = 0;
+    if (escrito && envios.current.length >= ritmo.porMinuto) {
+      const libera = Math.ceil((envios.current[0] + 60_000 - ahora) / 1000);
+      espera = Math.min(ritmo.pausaMaxSeg, Math.max(ritmo.pausaSeg, libera));
+    } else if (f.n < 1) espera = ritmo.pausaSeg;
+    if (espera) {
+      pausaHasta.current = ahora + espera * 1000;
+      setPausa(espera);
+      setAvisoPausa(pausaAviso(espera));
+      setMensajes((m) => [...m, { de: "yo", texto: despacio }]);
+      return false;
+    }
+    f.n -= 1;
+    if (escrito) envios.current.push(ahora);
+    return true;
+  };
+
+  /** Chips, sugerencias y la nube: pasan solo por la ráfaga antes de contestar. */
   const responder = (pregunta: string, tema: Tema | null) => {
+    if (dejar(false)) contestar(pregunta, tema);
+  };
+
+  const contestar = (pregunta: string, tema: Tema | null, r?: Interpretacion) => {
     setMensajes((m) => [...m, { de: "vos", texto: pregunta }]);
     setPensando(true);
     // «me llamo Lucía»: Yo Da se lo guarda
@@ -460,15 +571,58 @@ export default function YoSoy() {
       }, 650);
       return;
     }
+    // con la música: qué suena, otro tema, pausa, play
+    if (tema?.efecto) {
+      const ef = tema.efecto;
+      if (ef === "otro-tema") otroTema();
+      if (ef === "pausar") pausarMusica();
+      if (ef === "poner") ponerMusica();
+      window.setTimeout(() => {
+        setPensando(false);
+        ultimoTema.current = tema.id;
+        if (ef !== "que-suena") return setMensajes((m) => [...m, { de: "yo", texto: respuestaDe(tema), sugerencias: ["que-suena"] }]);
+        const t = temaActual();
+        setMensajes((m) => [
+          ...m,
+          {
+            de: "yo",
+            texto: queSuena(t),
+            acciones: t
+              ? [{ tipo: "musica-otro" }, { tipo: "link", texto: "Abrir en Spotify", href: `https://open.spotify.com/track/${t.id}`, externo: true }]
+              : [{ tipo: "musica-poner" }],
+          },
+        ]);
+      }, 650);
+      return;
+    }
     // una pausa breve, como quien piensa antes de contestar
     window.setTimeout(() => {
       setPensando(false);
       const sinCuenta = tema?.cuenta && !nombre.current;
-      setMensajes((m) => [
-        ...m,
-        !tema
-          ? { de: "yo", texto: noEntendi, chips: true }
-          : sinCuenta
+      // ¿sigue trabada? no entendí, un problema, un enojo, pedir una persona o repetir lo mismo suman (la charla, no)
+      const trabada = r?.charla ? false : !!r?.enojo || !tema || !!tema.atasca || (!!tema && tema.id === ultimoTema.current && !tema.chip && !tema.respuestas);
+      if (trabada) esfuerzo.current += tema?.urgente ? 2 : 1;
+      ultimoTema.current = tema?.id ?? null;
+      const ofrecer = trabada && esfuerzo.current >= ESFUERZO_TICKET;
+      const oferta: Mensaje[] = ofrecer
+        ? [
+            nombre.current
+              ? { de: "yo", texto: ofrecerTicket, acciones: [{ tipo: "ticket" }] }
+              : {
+                  de: "yo",
+                  texto: ticketSinCuenta,
+                  acciones: [
+                    { tipo: "link", texto: "Ingresar", href: "/ingresar" },
+                    { tipo: "link", texto: "Crear cuenta", href: "/crear-cuenta" },
+                  ],
+                },
+          ]
+        : [];
+      const cerca = r?.cercanos?.length ? r.cercanos : undefined;
+      const principal: Mensaje =
+        !tema || (r?.texto && (r.charla || r.enojo))
+          ? { de: "yo", texto: r?.texto ?? noEntendi, chips: !tema && !r?.charla && !ofrecer && !cerca, sugerencias: tema?.siguientes ?? cerca }
+          : sinCuenta && !ofrecer
             ? {
                 de: "yo",
                 texto: pedirCuenta,
@@ -477,29 +631,74 @@ export default function YoSoy() {
                   { tipo: "link", texto: "Crear cuenta", href: "/crear-cuenta" },
                 ],
               }
-            : { de: "yo", texto: respuestaDe(tema), acciones: tema.acciones, sugerencias: tema.siguientes },
-      ]);
+            : { de: "yo", texto: `${r?.prefijo ? `${r.prefijo} ` : ""}${respuestaDe(tema)}`, acciones: sinCuenta ? [] : tema.acciones, sugerencias: tema.siguientes };
+      ofrecido.current = principal.sugerencias ?? [];
+      setMensajes((m) => [...m, principal, ...oferta]);
     }, 650);
   };
 
   const enviar = (e: React.FormEvent) => {
     e.preventDefault();
     const t = texto.trim();
-    if (!t) return;
+    if (!t || enPausa) return;
+    // si se pasa del ritmo, lo escrito queda en el campo para mandarlo después
+    if (!dejar()) return;
     setTexto("");
-    responder(t, entender(t));
+    const r = interpretar(t, { region: region.current, sugerencias: ofrecido.current });
+    if (r.detectada) {
+      region.current = r.region;
+      try {
+        if (r.region) sessionStorage.setItem("jb-yoda-region", r.region);
+      } catch {}
+    }
+    contestar(t, r.tema, r);
   };
 
   const accion = (a: Accion, i: number) => {
     if (a.tipo === "horarios") return <Horarios key={i} />;
     if (a.tipo === "sonido") return <BotonSonido key={i} />;
     if (a.tipo === "ppt") return <Ppt key={i} />;
+    if (a.tipo === "ticket")
+      return <TicketYoDa key={i} conversacion={mensajes.filter((m) => m.texto).map(({ de, texto }) => ({ de, texto }))} />;
     if (a.tipo === "moneda") return <Moneda key={i} />;
+    if (a.tipo === "link" && a.externo)
+      return (
+        <a key={i} href={a.href} target="_blank" rel="noopener noreferrer" className="yosoy-accion">
+          {a.texto}
+        </a>
+      );
     if (a.tipo === "link")
       return (
         <Link key={i} href={a.href} className="yosoy-accion" onClick={() => setAbierto(false)}>
           {a.texto}
         </Link>
+      );
+    if (a.tipo === "musica-otro")
+      return (
+        <button key={i} type="button" className="yosoy-accion" onClick={() => otroTema()} data-testid="yosoy-otro-tema">
+          Otro tema
+        </button>
+      );
+    if (a.tipo === "musica-poner")
+      return (
+        <button key={i} type="button" className="yosoy-accion" onClick={() => ponerMusica()} data-testid="yosoy-poner-musica">
+          Poner música
+        </button>
+      );
+    if (a.tipo === "recorrido")
+      return (
+        <button
+          key={i}
+          type="button"
+          className="yosoy-accion"
+          onClick={() => {
+            setAbierto(false);
+            empezarRecorrido({ sesion: !!conSesion });
+          }}
+          data-testid="yosoy-recorrido"
+        >
+          Empezar el recorrido
+        </button>
       );
     if (a.tipo === "instalar")
       return (
@@ -514,6 +713,9 @@ export default function YoSoy() {
     );
   };
 
+  // quien entra por primera vez, sin cuenta: Yo Da le ofrece el recorrido
+  const nuevo = ofrecer && !conSesion && !nubeJuego && !nubeMusica;
+
   return (
     <>
       <button
@@ -525,12 +727,13 @@ export default function YoSoy() {
         aria-controls="yosoy"
         aria-label={`${nombreBot}, la guía del sitio`}
         data-testid="yosoy-boton"
+        data-recorrido="yoda"
         data-sonido="cuenco"
       >
         <OjoPixel size={48} mira={mira} />
       </button>
       {nube && !abierto && (
-        <div className="yosoy-nube" role="status" data-testid="yosoy-nube">
+        <div className={`yosoy-nube ${nuevo ? "larga" : ""}`} role="status" data-testid="yosoy-nube">
           <button
             type="button"
             className="yosoy-nube-texto"
@@ -540,18 +743,37 @@ export default function YoSoy() {
                 const ppt = temas.find((t) => t.id === "ppt");
                 if (ppt) responder("Dale, juguemos", ppt);
               }
+              if (nubeMusica) {
+                const q = temas.find((t) => t.id === "que-suena");
+                if (q) responder("¿Qué suena?", q);
+              }
             }}
           >
             <Tipeo
               texto={
                 nubeTexto ||
                 (conSesion
-                  ? `${saludoHora(new Date().getHours(), conSesion)} ¿En qué ayudarte puedo?`
-                  : `${saludoHora(new Date().getHours(), nombreGuardado())} Yo Da soy. Para acceder a más funciones, crearte una cuenta debés. ¿En qué ayudarte puedo?`)
+                  ? `${saludoHora(new Date().getHours(), conSesion, region.current)} ¿En qué ayudarte puedo?`
+                  : nuevo
+                    ? `${saludoHora(new Date().getHours(), nombreGuardado(), region.current)} Yo Da soy. ${ofrecerRecorrido} Para acceder a más funciones, crearte una cuenta debés.`
+                    : `${saludoHora(new Date().getHours(), nombreGuardado(), region.current)} Yo Da soy. Para acceder a más funciones, crearte una cuenta debés. ¿En qué ayudarte puedo?`)
               }
             />
           </button>
-          {!conSesion && !nubeJuego && (
+          {nuevo && (
+            <button
+              type="button"
+              className="yosoy-nube-cuenta yosoy-nube-mostrar"
+              onClick={() => {
+                setNube(false);
+                empezarRecorrido({ sesion: false });
+              }}
+              data-testid="yosoy-nube-recorrido"
+            >
+              Mostrame el lugar
+            </button>
+          )}
+          {!conSesion && !nubeJuego && !nubeMusica && (
             <Link href="/crear-cuenta" className="yosoy-nube-cuenta" onClick={() => setNube(false)}>
               Crear cuenta
             </Link>
@@ -609,7 +831,7 @@ export default function YoSoy() {
                     .map((id) => temas.find((t) => t.id === id))
                     .filter((t): t is Tema => !!t)
                     .map((t) => (
-                      <button key={t.id} type="button" className="yosoy-sugerencia" onClick={() => responder(t.etiqueta ?? t.chip ?? t.id, t)} data-sonido="toque">
+                      <button key={t.id} type="button" className="yosoy-sugerencia disabled:opacity-40" disabled={enPausa} onClick={() => responder(t.etiqueta ?? t.chip ?? t.id, t)} data-sonido="toque">
                         {t.etiqueta ?? t.chip}
                       </button>
                     ))}
@@ -618,7 +840,7 @@ export default function YoSoy() {
               {m.chips && (
                 <div className="yosoy-chips">
                   {chips.map((c) => (
-                    <button key={c.id} type="button" className="yosoy-chip" onClick={() => responder(c.chip!, c)} data-sonido="toque">
+                    <button key={c.id} type="button" className="yosoy-chip disabled:opacity-40" disabled={enPausa} onClick={() => responder(c.chip!, c)} data-sonido="toque">
                       {c.chip}
                     </button>
                   ))}
@@ -635,6 +857,15 @@ export default function YoSoy() {
           )}
         </div>
 
+        {enPausa && (
+          <p id="yosoy-pausa" className="texto-2 text-sm px-3 pt-2" aria-live="off" data-testid="yosoy-pausa">
+            {pausaCuenta(pausa)}
+          </p>
+        )}
+        {/* Para lectores de pantalla: se anuncia al empezar y al terminar la pausa, no cada segundo. */}
+        <p className="sr-only" role="status" aria-live="polite">
+          {avisoPausa}
+        </p>
         <form onSubmit={enviar} className="yosoy-form">
           <label htmlFor="yosoy-campo" className="sr-only">
             {`Escribile a ${nombreBot}`}
@@ -647,8 +878,10 @@ export default function YoSoy() {
             placeholder={`Escribile a ${nombreBot}…`}
             autoComplete="off"
             maxLength={300}
+            readOnly={enPausa}
+            aria-describedby={enPausa ? "yosoy-pausa" : undefined}
           />
-          <button type="submit" className="yosoy-enviar" aria-label="Enviar" disabled={!texto.trim()}>
+          <button type="submit" className="yosoy-enviar" aria-label="Enviar" disabled={!texto.trim() || enPausa}>
             ↑
           </button>
         </form>

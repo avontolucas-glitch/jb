@@ -1,15 +1,18 @@
 import Link from "next/link";
-import Ojo from "@/components/Ojo";
+import Apertura from "@/components/Apertura";
 
+/** Página que no existe: portadilla con el ojo que llora (Biografía, cap. 2). */
 export default function NoEncontrada() {
   return (
-    <section className="px-5 py-24 text-center">
-      <Ojo size={40} className="mx-auto mb-8" />
-      <h1 className="titulo text-4xl">Esta página no existe</h1>
-      <p className="texto-2 mt-5">Puede que el link esté mal escrito o que la página se haya movido.</p>
+    <Apertura
+      titulo="Esta página no existe"
+      bajada="Puede que el link esté mal escrito o que la página se haya movido."
+      folio="XV"
+      grabado={{ src: "/grabados/biografia-ojo.webp", alt: "Grabado: el ojo que llora", pie: "El desastre · Biografía, cap. 2" }}
+    >
       <Link href="/" className="boton mt-10">
         Volver al inicio
       </Link>
-    </section>
+    </Apertura>
   );
 }

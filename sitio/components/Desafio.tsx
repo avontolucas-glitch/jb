@@ -15,7 +15,10 @@
  */
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
-type Fase = "inicial" | "cargando" | "trabajando" | "turnstile" | "listo" | "error";
+export type Fase = "inicial" | "cargando" | "trabajando" | "turnstile" | "listo" | "error";
+
+/** ¿La casilla está en el medio de verificar? (el formulario no deja enviar mientras tanto) */
+export const faseOcupada = (f: Fase) => f === "cargando" || f === "trabajando" || f === "turnstile";
 
 type DesafioCliente =
   | { modo: "trabajo"; sal: string; dificultad: number; exp: number; firma: string }
@@ -190,6 +193,7 @@ export default function Desafio({
   reinicio,
   texto = "Confirmá que sos una persona",
   alResolver,
+  alCambiarFase,
 }: {
   /** Nombre del campo oculto (el servidor lee «jb_desafio»). */
   nombre?: string;
@@ -197,6 +201,8 @@ export default function Desafio({
   reinicio?: unknown;
   texto?: string;
   alResolver?: (token: string) => void;
+  /** Avisa cada cambio de fase (el formulario deshabilita «Enviar» mientras se verifica). */
+  alCambiarFase?: (fase: Fase) => void;
 }) {
   const id = useId();
   const [fase, setFase] = useState<Fase>("inicial");
@@ -207,6 +213,13 @@ export default function Desafio({
   const corte = useRef<AbortController | null>(null);
   const vence = useRef<ReturnType<typeof setTimeout> | null>(null);
   const primero = useRef(true);
+  const avisarFase = useRef(alCambiarFase);
+  avisarFase.current = alCambiarFase;
+  useEffect(() => {
+    avisarFase.current?.(fase);
+  }, [fase]);
+  // al desmontarse (la acción ya no pide verificación), el formulario vuelve a quedar libre
+  useEffect(() => () => avisarFase.current?.("inicial"), []);
 
   const limpiar = useCallback(() => {
     corte.current?.abort();
@@ -304,7 +317,8 @@ export default function Desafio({
       widget.current = ts.render(cajaTs.current, {
         sitekey: d.siteKey,
         theme: "dark",
-        size: "flexible",
+        // «flexible» pide 300 px como mínimo: en un celular angosto (o dentro de Yo Da) va el compacto
+        size: cajaTs.current.clientWidth < 300 ? "compact" : "flexible",
         language: "es",
         appearance: "always",
         "response-field": false,
@@ -331,7 +345,7 @@ export default function Desafio({
   const mensaje = aviso || MENSAJES[fase];
 
   return (
-    <div className="border borde p-4 w-full max-w-sm min-w-0" data-testid="desafio" data-fase={fase}>
+    <div className="border borde p-3 sm:p-4 w-full max-w-sm min-w-0" data-testid="desafio" data-fase={fase}>
       <button
         type="button"
         role="checkbox"
@@ -357,7 +371,8 @@ export default function Desafio({
         </span>
         <span className="min-w-0 break-words">{texto}</span>
       </button>
-      <div ref={cajaTs} className={fase === "turnstile" || (listo && token.startsWith("ts.")) ? "mt-3 w-full overflow-hidden" : "hidden"} />
+      {/* Siempre montada (Turnstile no se dibuja bien en algo oculto); vacía no ocupa lugar. */}
+      <div ref={cajaTs} className="mt-3 w-full max-w-full overflow-visible empty:hidden" />
       <p id={`${id}-estado`} role="status" aria-live="polite" className="texto-2 text-sm mt-2 min-h-[1.25rem]">
         {mensaje}
       </p>

@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
-import Ojo from "@/components/Ojo";
+import Apertura from "@/components/Apertura";
 
 export const metadata: Metadata = { title: "Sin conexión" };
 
+/**
+ * La página que muestra la app sin internet (el service worker la guarda de
+ * antemano). Va sin grabado: la imagen puede no estar guardada en el teléfono.
+ */
 export default function SinConexion() {
   return (
-    <section className="px-5 py-24 text-center">
-      <Ojo size={40} className="mx-auto mb-8" />
-      <h1 className="titulo text-4xl">Sin conexión</h1>
-      <p className="texto-2 mt-5 prosa mx-auto">No hay internet en este momento. Cuando vuelva, tocá Reintentar.</p>
+    <Apertura titulo="Sin conexión" bajada="No hay internet en este momento. Cuando vuelva, tocá Reintentar." folio="XVI">
       <a href="/" className="boton mt-10">
         Reintentar
       </a>
-    </section>
+    </Apertura>
   );
 }

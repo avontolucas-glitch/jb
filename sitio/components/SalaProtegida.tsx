@@ -16,19 +16,34 @@ export default function SalaProtegida({ directo, email, fecha }: { directo: stri
   const [pos, setPos] = useState({ top: 12, left: 10 });
   const turnoRef = useRef<string | null>(null);
 
+  const reintento = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const abrir = useCallback(async () => {
-    const r = await fetch("/api/sala", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ directo }) });
+    if (reintento.current) clearTimeout(reintento.current);
+    reintento.current = null;
+    const r = await fetch("/api/sala", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ directo }) }).catch(() => null);
+    if (!r) return;
+    // «muchos pedidos» (429): se vuelve a probar pasado el tiempo que pide el servidor, así no queda sin turno
+    if (r.status === 429) {
+      const d = (await r.json().catch(() => ({}))) as { reintentoSeg?: number };
+      const seg = Math.min(120, Math.max(1, Number(r.headers.get("Retry-After")) || d.reintentoSeg || 10));
+      reintento.current = setTimeout(() => void abrirRef.current(), seg * 1000);
+      return;
+    }
     if (!r.ok) return;
     const d = (await r.json()) as { turno: string; permiso: string };
     turnoRef.current = d.turno;
     setTurno(d.turno);
     setPausada(false);
   }, [directo]);
+  const abrirRef = useRef(abrir);
+  abrirRef.current = abrir;
 
   const revisar = useCallback(async () => {
     if (!turnoRef.current) return;
     const r = await fetch(`/api/sala?directo=${encodeURIComponent(directo)}&turno=${turnoRef.current}`, { cache: "no-store" }).catch(() => null);
-    if (!r) return;
+    // sin red o con «muchos pedidos» (429) no se decide nada: solo «vigente: false» pausa la sala
+    if (!r || r.status === 429) return;
     const d = (await r.json().catch(() => ({ vigente: true }))) as { vigente: boolean };
     if (!d.vigente) setPausada(true);
   }, [directo]);
@@ -41,6 +56,7 @@ export default function SalaProtegida({ directo, email, fecha }: { directo: stri
     window.addEventListener("focus", revisar);
     return () => {
       clearInterval(t);
+      if (reintento.current) clearTimeout(reintento.current);
       document.removeEventListener("visibilitychange", alVolver);
       window.removeEventListener("focus", revisar);
     };

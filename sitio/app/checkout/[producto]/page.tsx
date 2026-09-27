@@ -1,15 +1,16 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
-import Ojo from "@/components/Ojo";
+import Apertura from "@/components/Apertura";
 import Precio from "@/components/Precio";
 import Formulario from "@/components/Formulario";
 import MontoVoluntad from "@/components/MontoVoluntad";
 import { usuarioActual } from "@/lib/auth";
 import { accesos } from "@/lib/access";
+import { portadillas } from "@/content/config";
 import { producto } from "@/lib/payments";
 import { accionPagar } from "@/lib/acciones";
-import { disponible, horarioDesdeId, ocupados } from "@/lib/sesiones";
+import { disponible, horarioDesdeId, ocupados, vigente, type CompraSesion } from "@/lib/sesiones";
 import Hora from "@/components/Hora";
 
 export const metadata: Metadata = { title: "Comprar", robots: { index: false } };
@@ -23,6 +24,15 @@ function destino(id: string) {
   return { href: "/mi-espacio/conferencias", texto: "mis conferencias" };
 }
 
+/** El grabado de la portadilla: el mismo de la página del producto. */
+function grabadoDe(id: string) {
+  if (id === "masterclass") return portadillas.grabada.grabado;
+  if (id.startsWith("directo:")) return portadillas.masterclass.grabado;
+  if (id.startsWith("sesion:")) return portadillas.sesiones.grabado;
+  if (id.startsWith("libro:")) return portadillas.libros.grabado;
+  return portadillas.conferencias.grabado;
+}
+
 export default async function Checkout({ params }: { params: Promise<{ producto: string }> }) {
   const { producto: id } = await params;
   const p = producto(id);
@@ -30,7 +40,8 @@ export default async function Checkout({ params }: { params: Promise<{ producto:
   const u = await usuarioActual();
   if (!u) redirect(`/ingresar?aviso=checkout&volver=/checkout/${id}`);
   const a = await accesos(u.id);
-  const yaLoTiene = a.compras.some((c) => c.producto === p.id);
+  // una reserva cancelada no cuenta: ese horario se puede volver a reservar
+  const yaLoTiene = a.compras.some((c) => c.producto === p.id && vigente(c as CompraSesion));
   const esSesion = p.id.startsWith("sesion:");
   const slot = p.id.slice("sesion:".length);
   const horario = esSesion ? horarioDesdeId(slot) : null;
@@ -39,90 +50,91 @@ export default async function Checkout({ params }: { params: Promise<{ producto:
   const ir = destino(p.id);
 
   return (
-    <section className="px-5 py-16 sm:py-24">
-      <div className="mx-auto max-w-md aparece">
-        <Ojo size={30} className="mb-6 parpadea" />
-        <h1 className="titulo text-4xl">Tu compra</h1>
-        <dl className="mt-8 border-t borde">
-          <div className="border-b borde py-4 flex justify-between gap-4">
-            <dt className="texto-2">Producto</dt>
-            <dd className="text-right">{p.titulo}</dd>
-          </div>
-          {esSesion && horario && (
+    <>
+      <Apertura titulo="Tu compra" bajada="Revisá los datos antes de confirmar." folio="XIV" grabado={grabadoDe(p.id)} />
+      <section className="hondo border-t borde px-5 py-16 sm:py-20">
+        <div className="mx-auto max-w-md">
+          <dl className="border-t borde">
             <div className="border-b borde py-4 flex justify-between gap-4">
-              <dt className="texto-2">Cuándo</dt>
-              <dd className="text-right" data-testid="cuando">
-                <Hora inicio={horario.fecha.toISOString()} />
+              <dt className="texto-2">Producto</dt>
+              <dd className="text-right">{p.titulo}</dd>
+            </div>
+            {esSesion && horario && (
+              <div className="border-b borde py-4 flex justify-between gap-4">
+                <dt className="texto-2">Cuándo</dt>
+                <dd className="text-right" data-testid="cuando">
+                  <Hora inicio={horario.fecha.toISOString()} />
+                </dd>
+              </div>
+            )}
+            <div className="border-b borde py-4 flex justify-between gap-4">
+              <dt className="texto-2">Precio</dt>
+              <dd>
+                {p.aVoluntad ? (
+                  <span>
+                    A voluntad, desde {p.moneda} {p.aVoluntad.minimo}
+                  </span>
+                ) : (
+                  <Precio monto={p.monto} moneda={p.moneda} aDefinir={p.aDefinir} />
+                )}
               </dd>
             </div>
-          )}
-          <div className="border-b borde py-4 flex justify-between gap-4">
-            <dt className="texto-2">Precio</dt>
-            <dd>
-              {p.aVoluntad ? (
-                <span>
-                  A voluntad, desde {p.moneda} {p.aVoluntad.minimo}
-                </span>
-              ) : (
-                <Precio monto={p.monto} moneda={p.moneda} aDefinir={p.aDefinir} />
-              )}
-            </dd>
-          </div>
-          <div className="border-b borde py-4 flex justify-between gap-4">
-            <dt className="texto-2">Cuenta</dt>
-            <dd className="break-all text-right">{u.email}</dd>
-          </div>
-        </dl>
+            <div className="border-b borde py-4 flex justify-between gap-4">
+              <dt className="texto-2">Cuenta</dt>
+              <dd className="break-all text-right">{u.email}</dd>
+            </div>
+          </dl>
 
-        {tomadoPorOtro ? (
-          <div className="mt-8" data-testid="horario-tomado">
-            <p>Ese horario ya está reservado.</p>
-            <Link href="/masterclass/1-a-1" className="boton boton-lleno mt-4">
-              Elegir otro horario
-            </Link>
-          </div>
-        ) : fueraDeAgenda ? (
-          <div className="mt-8" data-testid="horario-no-disponible">
-            <p>Ese horario ya no está en la agenda.</p>
-            <Link href="/masterclass/1-a-1" className="boton boton-lleno mt-4">
-              Elegir otro horario
-            </Link>
-          </div>
-        ) : yaLoTiene ? (
-          <div className="mt-8">
-            <p>Ya lo compraste.</p>
-            <Link href={ir.href} className="boton boton-lleno mt-4">
-              Ir a {ir.texto}
-            </Link>
-          </div>
-        ) : (
-          <div className="mt-8">
-            {/* PRODUCCIÓN: este formulario pasa a crear el pago en Mercado Pago
+          {tomadoPorOtro ? (
+            <div className="mt-8" data-testid="horario-tomado">
+              <p>Ese horario ya está reservado.</p>
+              <Link href="/masterclass/1-a-1" className="boton boton-lleno mt-4">
+                Elegir otro horario
+              </Link>
+            </div>
+          ) : fueraDeAgenda ? (
+            <div className="mt-8" data-testid="horario-no-disponible">
+              <p>Ese horario ya no está en la agenda.</p>
+              <Link href="/masterclass/1-a-1" className="boton boton-lleno mt-4">
+                Elegir otro horario
+              </Link>
+            </div>
+          ) : yaLoTiene ? (
+            <div className="mt-8">
+              <p>Ya lo compraste.</p>
+              <Link href={ir.href} className="boton boton-lleno mt-4">
+                Ir a {ir.texto}
+              </Link>
+            </div>
+          ) : (
+            <div className="mt-8">
+              {/* PRODUCCIÓN: este formulario pasa a crear el pago en Mercado Pago
                 (pesos) o a llevar al link de pago de Hotmart. Ver lib/payments.ts */}
-            <Formulario accion={accionPagar} boton="Pagar (simulado)" enviando="Procesando…">
-              <input type="hidden" name="producto" value={id} />
-              {p.aVoluntad && <MontoVoluntad moneda={p.moneda} {...p.aVoluntad} />}
-              {esSesion && (
-                <div>
-                  <label htmlFor="campo-nota" className="etiqueta">
-                    ¿Qué te gustaría trabajar en el encuentro? (opcional)
-                  </label>
-                  <textarea id="campo-nota" name="nota" maxLength={1500} className="campo" />
-                  <p className="texto-2 text-sm mt-1">Lo lee solo Julián, antes del encuentro.</p>
-                </div>
-              )}
-              <p className="border border-dashed borde p-4 texto-2 text-sm">
-                Pago de prueba: no se cobra nada. En la versión final acá se paga con el medio de pago elegido.
-              </p>
-            </Formulario>
-          </div>
-        )}
-        <p className="texto-2 text-sm mt-8">
-          <Link href="/legales/reembolsos" className="enlace">
-            Política de reembolsos
-          </Link>
-        </p>
-      </div>
-    </section>
+              <Formulario accion={accionPagar} boton="Pagar (simulado)" enviando="Procesando…">
+                <input type="hidden" name="producto" value={id} />
+                {p.aVoluntad && <MontoVoluntad moneda={p.moneda} {...p.aVoluntad} />}
+                {esSesion && (
+                  <div>
+                    <label htmlFor="campo-nota" className="etiqueta">
+                      ¿Qué te gustaría trabajar en el encuentro? (opcional)
+                    </label>
+                    <textarea id="campo-nota" name="nota" maxLength={800} className="campo" />
+                    <p className="texto-2 text-sm mt-1">Lo lee solo Julián, antes del encuentro. Hasta 800 caracteres.</p>
+                  </div>
+                )}
+                <p className="border border-dashed borde p-4 texto-2 text-sm">
+                  Pago de prueba: no se cobra nada. En la versión final acá se paga con el medio de pago elegido.
+                </p>
+              </Formulario>
+            </div>
+          )}
+          <p className="texto-2 text-sm mt-8">
+            <Link href="/legales/reembolsos" className="enlace">
+              Política de reembolsos
+            </Link>
+          </p>
+        </div>
+      </section>
+    </>
   );
 }

@@ -13,15 +13,20 @@
  * reglas y acceso a la agenda y a las compras de cada cuenta.
  */
 import { enVivo, precios } from "./config";
+import { frase, leer, limpiar, saludoCorto, type Intencion } from "./yoda-habla";
 
 export type Accion =
-  | { tipo: "link"; texto: string; href: string }
+  | { tipo: "link"; texto: string; href: string; externo?: boolean }
   | { tipo: "instalar" }
   | { tipo: "musica" }
   | { tipo: "sonido" }
   | { tipo: "ppt" }
   | { tipo: "moneda" }
-  | { tipo: "horarios" };
+  | { tipo: "horarios" }
+  | { tipo: "ticket" }
+  | { tipo: "recorrido" }
+  | { tipo: "musica-otro" }
+  | { tipo: "musica-poner" };
 
 /** `cuenta: true`: tema de una compra, un encuentro o el acceso; sin sesión, Yo Da primero pide ingresar o crear la cuenta. */
 export type Tema = {
@@ -39,6 +44,12 @@ export type Tema = {
   siguientes?: string[];
   /** Hablar en voz alta (lee la respuesta anterior). */
   voz?: boolean;
+  /** La persona está trabada con algo (suma para ofrecerle, recién después de varios intentos, escribirle a una persona). */
+  atasca?: boolean;
+  /** Problema serio (plata, acceso): cuenta doble para ofrecer, antes, escribirle a una persona. */
+  urgente?: boolean;
+  /** Algo que Yo Da hace además de contestar (con la música de fondo). */
+  efecto?: "que-suena" | "otro-tema" | "pausar" | "poner";
 };
 
 export const nombreBot = "Yo Da";
@@ -58,7 +69,13 @@ export const aviso = "Hmm. Llegado has. Yo Da soy. Para acceder a más funciones
 /** Con sesión, el saludo al entrar es otro. */
 export const avisoCon = (nombre: string) => `Hmm. De vuelta estás, ${nombre}. ¿En qué ayudarte puedo?`;
 
-export const noEntendi = `Claro no lo veo, eso. Con alguna de estas puertas probá, o a ${CONTACTO} escribí: una persona te responderá.`;
+export const noEntendi = "Claro no lo veo, eso. Con otras palabras probá, o elegí alguna de estas puertas.";
+
+/** Cuando ya dio varias vueltas y sigue trabada: recién ahí, una persona. */
+export const ofrecerTicket = "Hmm. Varias vueltas le dimos, y resuelto no está. Dejarle tu consulta a una persona, podés: por mail te responde.";
+export const ticketSinCuenta = "Para dejarle tu consulta a una persona, ingresar con tu cuenta debés. Así sabe a quién responderle.";
+/** Desde cuántos intentos sin resolver se ofrece la consulta a una persona. */
+export const ESFUERZO_TICKET = 3;
 
 export const pedirCuenta = "Hmm. Para esto, saber quién sos necesito. Ingresá con tu cuenta, o crearla debés: un minuto es, nada más. Después, aquí te espero.";
 
@@ -144,7 +161,7 @@ export const temas: Tema[] = [
     id: "cuenta",
     chip: "Mi cuenta",
     claves: ["cuenta", "ingres", "login", "iniciar sesion", "clave", "contrasena", "registr", "usuario", "mi espacio"],
-    respuesta: `Con tu cuenta, lo tuyo ves: tus compras, tus encuentros, tus libros. ¿Tu clave olvidaste? A ${CONTACTO} escribí.`,
+    respuesta: "Con tu cuenta, lo tuyo ves: tus compras, tus encuentros, tus libros. ¿Tu clave olvidaste? Contámelo: si aquí no se resuelve, a una persona te acerco.",
     acciones: [
       { tipo: "link", texto: "Ingresar", href: "/ingresar" },
       { tipo: "link", texto: "Crear cuenta", href: "/crear-cuenta" },
@@ -165,7 +182,7 @@ export const temas: Tema[] = [
   {
     id: "reembolso",
     etiqueta: "Reembolsos",
-    siguientes: ["contacto"],
+    siguientes: ["precios"],
     chip: "Reembolsos",
     claves: ["reembolso", "devol", "arrepent", "cancelar la compra", "cancelar mi compra"],
     respuesta: "Diez días tenés, desde la compra, para arrepentirte. Cada cosa sus plazos tiene. Desde el Botón de arrepentimiento, pedirlo podés.",
@@ -176,13 +193,58 @@ export const temas: Tema[] = [
   },
   {
     id: "problema",
-    claves: ["no funciona", "no anda", "error", "problema", "no puedo entrar", "no me deja", "no veo mi compra", "no aparece", "me cobraron", "pague y", "no me llego", "falla"],
-    respuesta: `Hmm. Un nudo hay. Tranquilo: todo nudo, desatarse puede. Contame qué pasó, con el mail de tu cuenta, a ${CONTACTO}: una persona te responderá. En tu espacio, tus compras y accesos ver podés.`,
+    claves: ["no funciona", "no anda", "error", "problema", "no me deja", "no veo mi compra", "no aparece", "no me llego", "falla", "ayuda", "ayudame", "socorro", "auxilio"],
+    respuesta: "Hmm. Un nudo hay. Tranquilo: todo nudo, desatarse puede. Contame más: qué pasó, en qué página, qué esperabas. En tu espacio, tus compras y accesos ver podés.",
     acciones: [
       { tipo: "link", texto: "Mi espacio", href: "/mi-espacio" },
       { tipo: "link", texto: "Mi cuenta", href: "/mi-espacio/cuenta" },
     ],
     cuenta: true,
+    atasca: true,
+  },
+  // ───────── problemas concretos: la solución primero, sin vueltas
+  {
+    id: "pago-problema",
+    claves: ["me cobraron", "me cobro", "cobro doble", "me cobraron dos veces", "pague y", "pague pero", "ya pague", "no se acredito", "no me acredito", "rechazada", "rechazaron", "rechazo el pago", "no pasa el pago", "no puedo pagar", "error al pagar", "no me deja pagar", "fallo el pago", "debitaron", "descontaron"],
+    respuesta: "Hmm. Con la plata, cuidado máximo. Si te cobraron y en «Mi espacio» la compra no aparece, una persona lo revisa: contame qué compraste y cuándo. Si el pago no pasa, otra tarjeta u otro medio probá.",
+    acciones: [{ tipo: "link", texto: "Mi espacio", href: "/mi-espacio" }],
+    cuenta: true,
+    atasca: true,
+    urgente: true,
+  },
+  {
+    id: "no-puedo-entrar",
+    claves: ["no puedo entrar", "no puedo ingresar", "no me deja entrar", "no me deja ingresar", "no puedo iniciar sesion", "no me deja iniciar sesion", "clave incorrecta", "dice que la clave", "mail incorrecto", "no reconoce mi mail", "bloquearon mi cuenta", "cuenta bloqueada"],
+    respuesta: "Hmm. La puerta, trabada. Revisá el mail (el mismo con que la cuenta creaste) y la clave, sin espacios. Tras muchos intentos seguidos, la puerta un rato se cierra: unos minutos esperá. ¿La clave olvidaste? Decímelo.",
+    acciones: [{ tipo: "link", texto: "Ingresar", href: "/ingresar" }],
+    atasca: true,
+    siguientes: ["clave-olvidada"],
+    etiqueta: "No puedo entrar",
+  },
+  {
+    id: "clave-olvidada",
+    etiqueta: "Olvidé mi clave",
+    claves: ["olvide mi clave", "olvide la clave", "me olvide la clave", "me olvide mi clave", "no me acuerdo la clave", "no me acuerdo mi clave", "no recuerdo la clave", "no recuerdo mi clave", "perdi la clave", "perdi mi clave", "recuperar la clave", "recuperar mi clave", "recuperar la cuenta", "restablecer", "resetear la clave", "cambiar la clave"],
+    respuesta: `Hmm. La clave, a todos se nos pierde alguna vez. Recuperarla sola, la página todavía no puede: desde el mail de tu cuenta, a ${CONTACTO} escribí, y una persona te la restablece.`,
+    acciones: [],
+    atasca: true,
+    urgente: true,
+  },
+  {
+    id: "video-problema",
+    claves: ["no se ve el video", "no carga el video", "no anda el video", "no funciona el video", "no se ve la clase", "no se ve el directo", "no se ve la masterclass", "no puedo ver la masterclass", "no puedo ver el video", "no se escucha", "no hay sonido", "sin sonido el video", "se corta el video", "se traba el video", "se congela", "pantalla negra", "no carga la sala", "no entra a la sala"],
+    respuesta: "Hmm. Imagen o sonido, fallando. Primero, la página recargá. Si sigue: otro navegador probá, el ahorro de datos apagá, y el volumen del dispositivo mirá. ¿Nada? En qué dispositivo estás, contame.",
+    acciones: [{ tipo: "link", texto: "Mi espacio", href: "/mi-espacio" }],
+    cuenta: true,
+    atasca: true,
+  },
+  {
+    id: "codigo-problema",
+    claves: ["codigo no funciona", "no funciona el codigo", "el codigo no anda", "no anda el codigo", "codigo invalido", "codigo incorrecto", "codigo ya usado", "codigo usado", "ya fue usado", "no acepta el codigo", "no me toma el codigo", "no me acepta el codigo", "no encuentro el codigo", "donde esta el codigo"],
+    respuesta: "Hmm. El código del libro, una sola vez sirve. Mayúsculas, guiones o espacios, no importan: copialo tal cual. Si «ya usado» dice y vos no lo usaste, una persona lo revisa: contame.",
+    acciones: [{ tipo: "link", texto: "Canjear el código", href: "/canjear" }],
+    cuenta: true,
+    atasca: true,
   },
   {
     id: "sonido",
@@ -201,6 +263,43 @@ export const temas: Tema[] = [
     acciones: [{ tipo: "musica" }],
   },
   {
+    id: "que-suena",
+    etiqueta: "¿Qué suena?",
+    claves: ["que suena", "que esta sonando", "que tema es", "que cancion es", "que musica es", "como se llama el tema", "como se llama la cancion", "como se llama esta cancion", "quien canta", "de quien es el tema", "de quien es la cancion", "que estoy escuchando", "que tema es este", "temazo", "que temon", "whats playing", "what song"],
+    respuesta: "",
+    acciones: [],
+    efecto: "que-suena",
+  },
+  {
+    id: "otro-tema",
+    claves: ["otro tema", "otra cancion", "pasa el tema", "pasa la cancion", "cambia el tema", "cambia la cancion", "siguiente tema", "siguiente cancion", "saltea", "salta el tema", "next", "skip", "no me gusta este tema", "no me gusta esta cancion"],
+    respuesta: "Hmm. Otro tema, al azar. A ver qué sale.",
+    acciones: [],
+    efecto: "otro-tema",
+  },
+  {
+    id: "pausar-musica",
+    claves: ["para la musica", "pausa la musica", "pausa", "pausar", "frena la musica", "deten la musica", "apaga la musica", "stop", "silencio por favor", "basta de musica"],
+    respuesta: "En pausa. El silencio, también música es.",
+    acciones: [],
+    efecto: "pausar",
+  },
+  {
+    id: "poner-musica",
+    claves: ["pone musica", "pon musica", "poneme musica", "ponme musica", "pone un tema", "pon un tema", "quiero musica", "quiero escuchar musica", "play", "dale play", "musica por favor", "algo de musica", "tira un tema", "mete musica"],
+    respuesta: "Hmm. Música, entonces. Abajo a la izquierda, el reproductor se abre. Si no suena, «Escuchar» tocá.",
+    acciones: [],
+    efecto: "poner",
+  },
+  {
+    id: "recorrido",
+    chip: "Recorrido",
+    etiqueta: "Un recorrido por el lugar",
+    claves: ["recorrido", "recorrer", "tour", "mostrame el lugar", "mostrame el sitio", "mostrame la pagina", "que hay en la pagina", "que hay en el sitio", "que hay aca", "como funciona la pagina", "como funciona el sitio", "como se usa", "soy nuevo", "soy nueva", "primera vez", "guiame"],
+    respuesta: "Hmm. Volando el lugar te muestro, sí. Un minuto es. Seguime.",
+    acciones: [{ tipo: "recorrido" }],
+  },
+  {
     id: "quien",
     etiqueta: "Quién es Julián",
     siguientes: ["libros", "en-vivo"],
@@ -210,13 +309,12 @@ export const temas: Tema[] = [
   },
   {
     id: "contacto",
-    etiqueta: "Hablar con una persona",
-    siguientes: ["cuenta"],
-    chip: "Hablar con una persona",
-    claves: ["persona", "humano", "contacto", "soporte", "ayuda", "whatsapp", "mail"],
-    respuesta: `Con una persona hablar querés. A ${CONTACTO} escribí: qué pasó contá, y con qué mail tu cuenta tenés.`,
+    claves: ["persona", "humano", "moderador", "reclamo", "queja", "hablar con alguien", "persona real", "contacto", "soporte", "atencion al cliente", "whatsapp", "mail"],
+    respuesta: "Con una persona hablar querés. Antes, contame qué pasa: quizás aquí mismo resolverlo podemos. ¿Es sobre una compra, un encuentro, tu cuenta o los libros?",
     acciones: [],
+    atasca: true,
   },
+
   // ───────── si alguien está mal de verdad: sin chistes, la línea de ayuda
   {
     id: "ayuda-urgente",
@@ -364,8 +462,6 @@ export const temas: Tema[] = [
   },
 ];
 
-const sinTildes = (t: string) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[¿?¡!.,;:]/g, " ");
-
 /** Distancia de edición (para perdonar errores de tipeo: «agnda», «masterclas»). */
 function distancia(a: string, b: string): number {
   if (Math.abs(a.length - b.length) > 1) return 2;
@@ -376,16 +472,17 @@ function distancia(a: string, b: string): number {
   return d[a.length][b.length];
 }
 
-/** El tema que mejor coincide con lo que escribió la persona (o null). */
-export function entender(texto: string): Tema | null {
-  const t = ` ${sinTildes(texto).replace(/\s+/g, " ")} `;
-  const palabras = t.trim().split(" ").filter((w) => w.length >= 5);
+/** El tema que mejor coincide con un texto ya limpio (content/yoda-habla.ts → limpiar), o null. */
+function temaDe(limpio: string): Tema | null {
+  // las claves se buscan al principio de una palabra: «reserv» encuentra «reservar», pero «app» no encuentra «happy»
+  const t = ` ${limpio} `;
+  const palabras = limpio.split(" ").filter((w) => w.length >= 5);
   let mejor: Tema | null = null;
   let puntos = 0;
   for (const tema of temas) {
     // las frases largas pesan más que las palabras sueltas; una palabra con un error de tipeo vale un poco menos
     const p = tema.claves.reduce((s, c) => {
-      if (t.includes(c)) return s + c.length;
+      if (t.includes(` ${c}`)) return s + c.length;
       if (!c.includes(" ") && c.length >= 5 && palabras.some((w) => distancia(w, c) === 1)) return s + c.length - 1;
       return s;
     }, 0);
@@ -396,6 +493,91 @@ export function entender(texto: string): Tema | null {
   }
   return mejor;
 }
+
+/** El tema que mejor coincide con lo que escribió la persona (o null). */
+export const entender = (texto: string): Tema | null => temaDe(leer(texto).limpio);
+
+const COMUNES = new Set(["como", "para", "quiero", "tengo", "esta", "este", "esto", "algo", "hola", "donde", "cuando", "porque", "sobre", "hacer", "puedo", "tiene", "tienen", "necesito", "saber", "favor", "gracias", "buenas", "bien", "todo", "nada", "mucho", "ahora", "entonces"]);
+
+/** Cuando no entendió: los temas que más se parecen (para ofrecerlos como opciones). */
+export function cercanos(limpio: string): string[] {
+  const ws = limpio.split(" ").filter((w) => w.length >= 4 && !COMUNES.has(w));
+  const puntos = new Map<string, number>();
+  for (const tema of temas) {
+    if (!tema.etiqueta && !tema.chip) continue;
+    let p = 0;
+    for (const c of tema.claves)
+      for (const cw of c.split(" "))
+        if (cw.length >= 4 && !COMUNES.has(cw)) for (const w of ws) if (w.slice(0, 4) === cw.slice(0, 4) || distancia(w, cw) === 1) p++;
+    if (p) puntos.set(tema.id, p);
+  }
+  return [...puntos.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([id]) => id);
+}
+
+/** Los temas de charla y la intención que les corresponde (se contestan en el registro de cada uno). */
+type DeCharla = Exclude<Intencion, "si" | "no" | "enojo">;
+const CHARLA: Partial<Record<string, DeCharla>> = { hola: "saludo", "como-estas": "comoEstas", gracias: "gracias", chau: "chau", jaja: "risa" };
+
+export const siSuelto = "Hmm. Sí… ¿a qué? Qué buscás, contame.";
+export const calmaConTema = "Hmm. Enojo siento, y razón tendrás. A lo concreto vamos:";
+export const calmaSola = "Hmm. Enojo siento. Razón quizás tenés: contame qué pasó, y lo arreglamos.";
+
+export type Interpretacion = {
+  tema: Tema | null;
+  /** Lo que contesta Yo Da en lugar de la respuesta del tema (la charla, en el registro de cada uno). */
+  texto?: string;
+  /** Va antes de la respuesta del tema («¡Wena!», «Órale.»). */
+  prefijo?: string;
+  /** Charla: no cuenta como que la persona está trabada. */
+  charla?: boolean;
+  /** Enojo: se contesta con calma, y cuenta como trabada. */
+  enojo?: boolean;
+  /** No entendió: los temas parecidos para ofrecer. */
+  cercanos?: string[];
+  /** De dónde es (por cómo escribe, o lo que se sabía antes). */
+  region: string | null;
+  /** La región se notó por cómo escribió en este mensaje. */
+  detectada: boolean;
+};
+
+/**
+ * Qué dijo la persona y cómo contestarle: el tema, y si es charla (un saludo,
+ * un gracias, un «¿cómo estás?», una risa), la respuesta en su registro. Un
+ * «sí» o un «no» sueltos se entienden según lo último que Yo Da ofreció.
+ */
+export function interpretar(texto: string, ctx: { region: string | null; sugerencias?: string[] }): Interpretacion {
+  const l = leer(texto);
+  const region = l.region ?? ctx.region;
+  const base = { region, detectada: !!l.region };
+  const i = l.intenciones;
+  const tema = temaDe(l.limpio);
+  const deCharla = tema ? CHARLA[tema.id] : undefined;
+  const concreto = tema && !deCharla && tema.id !== "te-quiero" ? tema : null;
+
+  if (i.has("enojo")) {
+    if (concreto) return { ...base, tema: concreto, prefijo: calmaConTema, enojo: true };
+    return { ...base, tema: null, texto: frase(region, "enojo") ?? calmaSola, enojo: true };
+  }
+  if (l.corto && !concreto) {
+    if (i.has("no")) return { ...base, tema: null, texto: frase(region, "no") ?? "Bueno. Aquí estoy, si algo necesitás.", charla: true };
+    if (i.has("si")) {
+      const sig = ctx.sugerencias?.length ? temas.find((t) => t.id === ctx.sugerencias![0]) : undefined;
+      if (sig) return { ...base, tema: sig, prefijo: frase(region, "dale") ?? undefined };
+      if (!tema) return { ...base, tema: null, texto: siSuelto, charla: true };
+    }
+  }
+  if (!concreto) {
+    const orden: DeCharla[] = ["comoEstas", "gracias", "chau", "genial", "risa", "saludo"];
+    const it = orden.find((x) => i.has(x)) ?? deCharla;
+    const f = it ? frase(region, it) : null;
+    if (f) return { ...base, tema, texto: f, charla: true };
+    if (tema) return { ...base, tema, charla: true };
+    return { ...base, tema: null, texto: frase(region, "noEntendi") ?? undefined, cercanos: cercanos(l.limpio) };
+  }
+  return { ...base, tema: concreto, prefijo: i.has("saludo") ? saludoCorto(region) ?? undefined : undefined };
+}
+
+export { limpiar };
 
 /** «me llamo Lucía», «mi nombre es Pedro», «decime Anto» → el nombre (o null). */
 export function nombreDicho(texto: string): string | null {
@@ -410,10 +592,10 @@ export function nombreDicho(texto: string): string | null {
 export const respuestaDe = (t: Tema) => (t.respuestas?.length ? t.respuestas[Math.floor(Math.random() * t.respuestas.length)] : t.respuesta);
 
 /** Saludo de la nube según la hora del visitante. */
-export function saludoHora(hora: number, nombre?: string | null): string {
+export function saludoHora(hora: number, nombre?: string | null, region?: string | null): string {
   const n = nombre ? `, ${nombre}` : "";
   if (hora < 6) return `Hmm. De madrugada, despierto estás${n}. Yo también.`;
-  if (hora < 13) return `Buen día${n}. Hmm.`;
+  if (hora < 13) return `${!region || ["ar", "uy", "py"].includes(region) ? "Buen día" : "Buenos días"}${n}. Hmm.`;
   if (hora < 20) return `Buenas tardes${n}. Hmm.`;
   return `Buenas noches${n}. Hmm.`;
 }
@@ -423,3 +605,59 @@ export const invitacionQuieto = "Hmm. Quieto estás. ¿Una de piedra, papel o ti
 
 /** Cosquillas: cuando le tocan el ojo en la cabecera. */
 export const cosquillas = ["¡Hmm! Cosquillas, eso me da.", "¡Ey! El ojo, no se toca. Hmm, hmm.", "Parpadear me hiciste. Otra vez, no. Bueno… sí.", "¡Ja! Las alas, solas se movieron."];
+
+/* ───────── Ritmo: que nadie sature a Yo Da ───────── */
+
+/**
+ * Cuánto se le puede escribir (en el navegador, no hace falta el servidor):
+ * en promedio un mensaje cada `cadaMs`, con una ráfaga corta de `rafaga`
+ * (quien escribe rápido dos cosas seguidas no choca), y no más de `porMinuto`.
+ * Si se pasa, Yo Da pide calma y el campo queda en pausa `pausaSeg` segundos
+ * (o hasta que se libere el minuto, con un tope de `pausaMaxSeg`).
+ * El tope por minuto cuenta solo lo que se escribe en el campo: los chips y las
+ * sugerencias pasan solo por la ráfaga (quien recorre el menú no está haciendo spam).
+ */
+export const ritmo = { cadaMs: 1200, rafaga: 4, porMinuto: 12, pausaSeg: 6, pausaMaxSeg: 30 } as const;
+
+/** Lo que dice Yo Da cuando le escriben demasiado seguido. */
+export const despacio = "Hmm. Despacio. Respirar, primero debés.";
+/** La cuenta atrás, a la vista, debajo de los mensajes. */
+export const pausaCuenta = (seg: number) => `Hmm. En ${seg} ${seg === 1 ? "segundo" : "segundos"}, seguir podemos.`;
+/** Para los lectores de pantalla: al empezar la pausa y al terminar (no cada segundo). */
+export const pausaAviso = (seg: number) => `El campo queda en pausa ${seg} segundos.`;
+export const pausaFin = "Listo, ya podés escribirle de nuevo.";
+/** Cuando el sitio pide un respiro (429) o no se pudo traer la agenda. */
+export const horariosEnPausa = "Hmm. Los horarios traer ahora no puedo. En un momento, probá de nuevo.";
+
+/**
+ * El recorrido (components/RecorridoYoDa.tsx): Yo Da vuela de parada en parada.
+ * `donde`: los `data-recorrido` que se iluminan juntos; si ninguno se ve en esta
+ * pantalla (en el celular, los enlaces están dentro del menú), la parada se saltea.
+ * `conSesion` / `sinSesion`: otro texto, o algo que se suma, según haya cuenta.
+ */
+export type Parada = { id: string; donde?: string[]; texto: string; conSesion?: string; sinSesion?: string };
+
+/** Lo que Yo Da le ofrece a quien entra por primera vez sin cuenta. */
+export const ofrecerRecorrido = "Nuevo aquí eres, parece. ¿El lugar te muestro? Volando, un minuto nomás.";
+
+export const recorrido: Parada[] = [
+  { id: "hola", texto: "Hmm. El lugar de Julián Bermúdez, este es. Volando te lo muestro: un minuto, nada más. Seguime." },
+  { id: "libros", donde: ["libros"], texto: "Los libros de Julián, aquí están. Tres son, y una sola obra: cómo funciona, por qué funciona, quién lo descubrió." },
+  { id: "masterclass", donde: ["masterclass"], texto: "La masterclass: en vivo, grabada, o a solas con Julián, uno a uno. Los horarios, en tu propia hora los ves." },
+  { id: "mas", donde: ["conferencias", "fragmentos", "lista"], texto: "Conferencias, fragmentos de su obra, y una lista para que de lo que viene te avisen. Todo, aquí arriba." },
+  { id: "menu", donde: ["menu"], texto: "En este menú, todo el lugar está: libros, masterclass, conferencias, fragmentos. Y la app, para instalar." },
+  { id: "musica", donde: ["musica"], texto: "Si aquí tocás, música suena: la playlist de Julián es. Con tu Spotify abierto en este navegador, los temas enteros escuchás; si no, un pedacito nomás." },
+  { id: "app", donde: ["instalar"], texto: "La app, instalar podés: en el teléfono o en la compu, a un toque la tenés." },
+  {
+    id: "cuenta",
+    donde: ["cuenta"],
+    texto: "Tu cuenta, aquí. Con ella, más puertas se abren: tus libros, tus encuentros, la agenda.",
+    conSesion: "Tu espacio, aquí: tus libros, tus encuentros, la agenda.",
+  },
+  {
+    id: "yoda",
+    donde: ["yoda"],
+    texto: "Y yo, aquí me quedo. Lo que sea preguntame: la agenda, la masterclass, los libros. Jugar también podemos. Y si el sonido molesta, callarlo desde mí podés.",
+    sinSesion: "Para acceder a más funciones, crearte una cuenta debés.",
+  },
+];

@@ -19,9 +19,9 @@ export default function Arrepentimiento() {
       <section className="hondo border-t borde px-5 py-16 sm:py-20">
         <div className="mx-auto max-w-md revelar">
           <Formulario accion={accionArrepentimiento} boton="Pedir la cancelación" ocultarAlTerminar>
-            <Campo nombre="nombre" etiqueta="Nombre" autoComplete="name" />
-            <Campo nombre="email" etiqueta="Mail de la compra" tipo="email" autoComplete="email" />
-            <Campo nombre="compra" etiqueta="Qué compraste y cuándo" ayuda="Por ejemplo: Masterclass 1 a 1 del martes 29." />
+            <Campo nombre="nombre" etiqueta="Nombre" autoComplete="name" maxLength={80} />
+            <Campo nombre="email" etiqueta="Mail de la compra" tipo="email" autoComplete="email" maxLength={120} />
+            <Campo nombre="compra" etiqueta="Qué compraste y cuándo" maxLength={500} ayuda="Por ejemplo: Masterclass 1 a 1 del martes 29." />
           </Formulario>
           <p className="texto-2 text-sm mt-10">
             Plazos y condiciones de cada producto en la{" "}

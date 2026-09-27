@@ -26,7 +26,9 @@ export default defineConfig({
     url: `http://localhost:${PUERTO}`,
     reuseExistingServer: false,
     // JB_ADMIN_DEMO: la cuenta demo de Julián (julian@demo.com) vale como la suya solo acá, en las pruebas.
-    env: { DATA_DIR, JB_ADMIN_DEMO: "1" },
+    // JB_PRUEBAS: el encabezado «x-jb-prueba» de cada prueba (tests/ayuda.ts) le da su propio cupo en los
+    // límites, y no se mira el tiempo mínimo de los formularios (Playwright completa en milisegundos).
+    env: { DATA_DIR, JB_ADMIN_DEMO: "1", JB_PRUEBAS: "1", SESSION_SECRET: "clave-de-pruebas-larga-solo-para-playwright-0123456789" },
     timeout: 60_000,
   },
 });

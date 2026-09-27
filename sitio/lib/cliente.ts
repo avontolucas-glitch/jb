@@ -21,12 +21,53 @@
  * un /64 entero, así que para los límites se usa el prefijo /64 (ver prefijoIp).
  *
  * Nunca se guarda la IP en claro: huellaIp() da un HMAC corto con SESSION_SECRET.
+ * Ojo: una IPv4 se puede reconstruir probando las 2^32 posibles si se conoce la llave;
+ * por eso la llave tiene que ser secreta de verdad (SESSION_SECRET, obligatoria en el
+ * sitio publicado).
  */
 
 const enc = new TextEncoder();
 
-/** Mismo respaldo que lib/session.ts: solo sirve para el prototipo. */
-const SECRETO = process.env.SESSION_SECRET || "prototipo-julianbermudez-cambiar-en-produccion";
+/** Mismo respaldo que lib/session.ts: solo sirve para el prototipo (es público). */
+const RESPALDO = "prototipo-julianbermudez-cambiar-en-produccion";
+let secretoElegido: string | null = null;
+let conRespaldoPublico = false;
+
+/**
+ * La llave de las huellas y de las firmas de la verificación.
+ *  - Con SESSION_SECRET: esa.
+ *  - En el prototipo (local, pruebas): el respaldo.
+ *  - En producción sin SESSION_SECRET: si hay otra variable secreta y compartida entre
+ *    servidores (UPSTASH_REDIS_REST_TOKEN o una TURNSTILE_SECRET_KEY real), una llave
+ *    derivada de ella; si no, el respaldo, con aviso en la consola y en el registro
+ *    (lib/auth.ts). No se usa una llave al azar por proceso: en Vercel la verificación
+ *    se pide en una función (/api/desafio) y se revisa en otra (la acción del
+ *    formulario), y con llaves distintas nunca coincidirían.
+ */
+function secreto(): string {
+  if (secretoElegido !== null) return secretoElegido;
+  const propio = process.env.SESSION_SECRET ?? "";
+  const produccion = process.env.NODE_ENV === "production" && !modoPruebas();
+  if (propio || !produccion) return (secretoElegido = propio || RESPALDO);
+  const ts = process.env.TURNSTILE_SECRET_KEY ?? "";
+  // las claves de prueba de Cloudflare (1x0000…, 2x0000…, 3x0000…) son públicas
+  const otro = process.env.UPSTASH_REDIS_REST_TOKEN || (/^[123]x0{8}/.test(ts) ? "" : ts);
+  if (otro.length >= 32) {
+    console.error("SEGURIDAD: falta SESSION_SECRET. Las huellas y la verificación usan una llave derivada de otra variable secreta; cargá SESSION_SECRET igual.");
+    return (secretoElegido = `jb-derivada:${otro}`);
+  }
+  console.error(
+    "SEGURIDAD: falta SESSION_SECRET en producción. Las huellas de IP y las firmas de la verificación usan el secreto de respaldo, que es público. Cargala (32 caracteres o más).",
+  );
+  conRespaldoPublico = true;
+  return (secretoElegido = RESPALDO);
+}
+
+/** ¿El sitio publicado está usando la llave pública de respaldo? (para el aviso y el panel) */
+export function respaldoPublicoEnUso(): boolean {
+  secreto();
+  return conRespaldoPublico;
+}
 
 /** ¿Hay una llave propia de verdad (32 caracteres o más)? */
 export const secretoPropio = (process.env.SESSION_SECRET ?? "").length >= 32;
@@ -58,7 +99,7 @@ function llave(uso: string): Promise<CryptoKey> {
   let k = llaves.get(uso);
   if (!k) {
     k = (async () => {
-      const base = await crypto.subtle.importKey("raw", enc.encode(SECRETO), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+      const base = await crypto.subtle.importKey("raw", enc.encode(secreto()), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
       const derivada = await crypto.subtle.sign("HMAC", base, enc.encode(`jb-uso:${uso}`));
       return crypto.subtle.importKey("raw", derivada, { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"]);
     })();

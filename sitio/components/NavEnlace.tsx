@@ -21,6 +21,7 @@ export default function NavEnlace({ e, nota, className = "" }: { e: Enlace; nota
       className={`nav-enlace ${activo ? "activo" : ""} ${className}`}
       data-sonido="nav"
       data-nota={nota}
+      data-recorrido={e.href.replace(/^\//, "") || undefined}
     >
       {e.emblema && (
         <span key={golpe} className={`nav-icono ${golpe ? "golpe" : ""}`} aria-hidden="true">

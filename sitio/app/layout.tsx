@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Crimson_Pro } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import Encabezado from "@/components/Encabezado";
 import Pie from "@/components/Pie";
@@ -7,6 +8,7 @@ import InstalarApp from "@/components/InstalarApp";
 import GuiaInstalar from "@/components/GuiaInstalar";
 import Musica from "@/components/Musica";
 import YoSoy from "@/components/YoSoy";
+import RecorridoYoDa from "@/components/RecorridoYoDa";
 import RegistrarSW from "@/components/RegistrarSW";
 import Revelar from "@/components/Revelar";
 import Umbral from "@/components/Umbral";
@@ -32,12 +34,16 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: "#0a0a0a", width: "device-width", initialScale: 1 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // El nonce de la política de contenidos (lo pone middleware.ts en cada pedido).
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <html lang="es-AR" className={crimson.variable} suppressHydrationWarning>
       <head>
         {/* Activa el revelado suave solo si hay JavaScript (sin él, todo se ve igual). */}
         <script
+          nonce={nonce}
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html:
               "var h=document.documentElement;h.classList.add('js');try{h.classList.add(sessionStorage.getItem('jb-umbral')?'umbral-visto':'en-umbral')}catch(e){h.classList.add('umbral-visto')}" +
@@ -70,6 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GuiaInstalar />
         <Musica />
         <YoSoy />
+        <RecorridoYoDa />
         <RegistrarSW />
         <Revelar />
         <Atencion />

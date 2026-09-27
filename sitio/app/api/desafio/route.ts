@@ -18,5 +18,5 @@ export async function GET(req: Request) {
   const v = await revisar("desafio", await sujetosDe(req.headers));
   if (!v.permitido) return respuestaLimite(v);
   const pedido = new URL(req.url).searchParams.get("modo") === "trabajo" ? "trabajo" : undefined;
-  return NextResponse.json(await desafioParaCliente(pedido), { headers: SIN_CACHE });
+  return NextResponse.json(await desafioParaCliente(pedido, req.headers), { headers: SIN_CACHE });
 }

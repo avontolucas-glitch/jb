@@ -17,8 +17,11 @@ const SEMANA = ["lu", "ma", "mi", "ju", "vi", "sá", "do"];
  * sus horarios. Todo en la hora de quien mira (se puede cambiar), con la hora
  * de Julián al lado de cada horario; un horario puede caer otro día que en
  * Argentina, y va en el día que corresponde a tu hora.
+ *
+ * Con `reprogramar` (el id de un encuentro tuyo), cada horario libre lleva a
+ * confirmar el cambio de ese encuentro en lugar de a comprar.
  */
-export default function Calendario({ turnos }: { turnos: Turno[] }) {
+export default function Calendario({ turnos, reprogramar }: { turnos: Turno[]; reprogramar?: string }) {
   const [zona] = useZona();
   const lista = useMemo(
     () =>
@@ -132,7 +135,17 @@ export default function Calendario({ turnos }: { turnos: Turno[] }) {
               return (
                 <li key={t.id}>
                   {t.estado === "libre" ? (
-                    <Link href={`/checkout/sesion-${t.id}`} className="boton text-center" data-testid={`horario-${t.id}`} data-estado="libre" data-hora={t.hora}>
+                    <Link
+                      href={
+                        reprogramar
+                          ? `/mi-espacio/sesiones/reprogramar?id=${encodeURIComponent(reprogramar)}&a=${encodeURIComponent(t.id)}`
+                          : `/checkout/sesion-${t.id}`
+                      }
+                      className="boton text-center"
+                      data-testid={`horario-${t.id}`}
+                      data-estado="libre"
+                      data-hora={t.hora}
+                    >
                       {t.hora} h{julian}
                     </Link>
                   ) : (

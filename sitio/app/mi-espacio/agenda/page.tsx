@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { miembro } from "@/lib/miembro";
 import { esAdmin, usuarios } from "@/lib/auth";
 import { reservasFuturas } from "@/lib/agenda";
-import { agendaCompleta, hoyEnArgentina } from "@/lib/sesiones";
+import { agendaCompleta, horarioDesdeId, hoyEnArgentina, textoReserva } from "@/lib/sesiones";
+import { accionLiberar } from "@/lib/acciones-reservas";
 import { linkSala } from "@/lib/ics";
 import { AgendaEditable } from "@/components/CalendarioAgenda";
 import { sesiones } from "@/content/config";
@@ -12,9 +14,12 @@ export const metadata: Metadata = { title: "Agenda", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
 /** Panel de Julián: reservas, horarios y el calendario de la Masterclass 1 a 1. Solo para su cuenta. */
-export default async function Agenda() {
+export default async function Agenda({ searchParams }: { searchParams: Promise<{ liberar?: string; liberada?: string; error?: string }> }) {
   const { u } = await miembro();
   if (!esAdmin(u)) notFound();
+  const sp = await searchParams;
+  const liberada = sp.liberada ? horarioDesdeId(sp.liberada) : null;
+  const error = textoReserva(sp.error);
   const [reservas, agenda, gente] = await Promise.all([reservasFuturas(), agendaCompleta(), usuarios()]);
   const nombres = new Map(gente.map((g) => [g.id, g.nombre]));
   const ahora = new Date();
@@ -42,12 +47,30 @@ export default async function Agenda() {
             </div>
           )}
         </div>
+        <div aria-live="polite">
+          {liberada && (
+            <div role="status" className="border borde p-4 mb-6" data-testid="liberada-ok">
+              <p>
+                Liberaste {liberada.etiqueta}: la reserva quedó cancelada y se le devuelve el total, por el mismo medio con el que pagó (en este
+                prototipo, simulado).
+              </p>
+              <p className="texto-2 text-sm mt-2">
+                El horario quedó libre para otra persona. Si no vas a poder, bloquealo en el calendario de abajo.
+              </p>
+            </div>
+          )}
+          {error && (
+            <p role="alert" className="border-l-2 pl-3 mb-6" style={{ borderColor: "currentColor" }} data-testid="reserva-error">
+              {error}
+            </p>
+          )}
+        </div>
         {reservas.length === 0 ? (
           <p className="texto-2 border-t borde pt-5">Todavía no hay reservas.</p>
         ) : (
           <ul className="border-t borde">
             {reservas.map((r) => (
-              <li key={r.horario.id} className="border-b borde py-6" data-testid={`reserva-${r.horario.id}`}>
+              <li key={r.horario.id} id={`reserva-${r.horario.id}`} className="border-b borde py-6" data-testid={`reserva-${r.horario.id}`}>
                 <p className="text-xl first-letter:uppercase">{r.horario.dia}</p>
                 <p className="texto-2 mt-1">{r.horario.hora} h</p>
                 <p className="mt-3">
@@ -74,6 +97,36 @@ export default async function Agenda() {
                     Entrar a la sala
                   </a>
                 </p>
+                {/* Liberar: cancela la reserva con reembolso total (cancela Julián). Pide confirmación antes. */}
+                {sp.liberar === r.horario.id ? (
+                  <div className="mt-4 border borde p-4" role="group" aria-labelledby={`liberar-${r.horario.id}`} data-testid="confirmar-liberacion">
+                    <p id={`liberar-${r.horario.id}`}>¿Liberás este horario?</p>
+                    <p className="texto-2 text-sm mt-2">
+                      Se cancela la reserva de {r.nombre} y se le devuelve el total, por el mismo medio con el que pagó. Conviene avisarle antes.
+                    </p>
+                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                      <form action={accionLiberar}>
+                        <input type="hidden" name="id" value={r.horario.id} />
+                        <button type="submit" className="boton boton-chico" data-testid="confirmar-liberar">
+                          Sí, liberar
+                        </button>
+                      </form>
+                      <Link href={`/mi-espacio/agenda#reserva-${r.horario.id}`} className="boton boton-chico">
+                        No, dejarla
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="mt-4">
+                    <Link
+                      href={`/mi-espacio/agenda?liberar=${encodeURIComponent(r.horario.id)}#reserva-${r.horario.id}`}
+                      className="boton boton-chico"
+                      data-testid={`liberar-${r.horario.id}`}
+                    >
+                      Liberar
+                    </Link>
+                  </p>
+                )}
               </li>
             ))}
           </ul>

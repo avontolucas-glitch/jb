@@ -16,6 +16,11 @@ export type Compra = {
   moneda: string;
   fecha: string;
   medio: string; // "simulado" | "codigo" (en producción: "mercadopago" | "paypal" | ...)
+  /** Masterclass 1 a 1 cancelada (fecha ISO): no da acceso ni ocupa el horario. Ver lib/sesiones.ts. */
+  cancelada?: string;
+  canceladaPor?: "cliente" | "julian";
+  reembolso?: { monto: number; moneda: string; medio: string; estado: "simulado" | "pendiente" | "hecho" };
+  reprogramaciones?: { de: string; a: string; fecha: string }[];
 };
 
 export async function comprasDe(uid: string) {
@@ -23,8 +28,14 @@ export async function comprasDe(uid: string) {
   return compras.filter((c) => c.usuario === uid);
 }
 
+/**
+ * Lo que habilitan las compras de una persona. Las canceladas no habilitan nada (un
+ * encuentro 1 a 1 cancelado no aparece como próximo), pero siguen en `compras`, para
+ * el historial de la cuenta.
+ */
 export async function accesos(uid: string) {
-  const mias = await comprasDe(uid);
+  const todas = await comprasDe(uid);
+  const mias = todas.filter((c) => !c.cancelada);
   const masterclass = mias.some((c) => c.producto === "masterclass");
   const conferencias = mias.filter((c) => c.producto.startsWith("conferencia:")).map((c) => c.producto.split(":")[1]);
   const directos = mias.filter((c) => c.producto.startsWith("directo:")).map((c) => c.producto.split(":")[1]);
@@ -39,7 +50,7 @@ export async function accesos(uid: string) {
     libros,
     sesiones,
     algo: mias.length > 0,
-    compras: mias,
+    compras: todas,
   };
 }
 

@@ -5,6 +5,7 @@ import Precio from "@/components/Precio";
 import { conferencias, encuentro, enVivo, libros, precios, sesiones } from "@/content/config";
 import { horarioDesdeId } from "@/lib/sesiones";
 import { esAdmin } from "@/lib/auth";
+import { deCuenta, esModerador, todos } from "@/lib/tickets";
 import { reservasFuturas } from "@/lib/agenda";
 
 export default async function Espacio() {
@@ -14,9 +15,30 @@ export default async function Espacio() {
   const directos = enVivo.directos.filter((d) => a.directos.includes(d.id));
   const admin = esAdmin(u);
   const reservas = admin ? (await reservasFuturas()).length : 0;
+  const moderador = esModerador(u);
+  const consultas = moderador ? (await todos()).filter((t) => t.estado === "abierto").length : 0;
+  const misConsultas = moderador ? [] : await deCuenta(u.id);
   return (
     <>
       <h1 className="titulo text-4xl">Hola, {nombre}.</h1>
+      {moderador && (
+        <div className="border borde p-5 mt-6" data-testid="acceso-consultas">
+          <Link href="/mi-espacio/consultas" className="text-xl enlace">
+            Consultas
+          </Link>
+          <p className="texto-2 mt-1">
+            {consultas === 0 ? "No hay consultas abiertas." : consultas === 1 ? "Una consulta abierta." : `${consultas} consultas abiertas.`} Lo que la gente dejó
+            desde Yo Da.
+          </p>
+        </div>
+      )}
+      {misConsultas.length > 0 && (
+        <p className="mt-6">
+          <Link href="/mi-espacio/consultas" className="enlace" data-testid="acceso-mis-consultas">
+            Mis consultas ({misConsultas.filter((t) => t.estado !== "resuelto").length} abiertas)
+          </Link>
+        </p>
+      )}
       {admin && (
         <div className="border borde p-5 mt-6" data-testid="acceso-agenda">
           <Link href="/mi-espacio/agenda" className="text-xl enlace">

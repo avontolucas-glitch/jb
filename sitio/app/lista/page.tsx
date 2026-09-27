@@ -16,7 +16,7 @@ export default async function Lista({ searchParams }: { searchParams: Promise<{ 
         <div className="mx-auto max-w-xl revelar">
           <Formulario accion={accionLista} boton="Sumarme" ocultarAlTerminar>
             <input type="hidden" name="interes" value={interes ?? "general"} />
-            <Campo nombre="nombre" etiqueta="Nombre" autoComplete="given-name" requerido={false} />
+            <Campo nombre="nombre" etiqueta="Nombre" autoComplete="given-name" requerido={false} maxLength={80} />
             <CanalContacto />
           </Formulario>
           <p className="texto-2 text-sm mt-10">

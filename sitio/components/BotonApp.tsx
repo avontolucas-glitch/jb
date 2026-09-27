@@ -12,7 +12,7 @@ export default function BotonApp({ variante = "boton", className = "", texto = "
   if (instalada) return null;
   const clase = { nav: "nav-enlace texto-2", menu: "enlace", boton: "boton boton-lleno" }[variante];
   return (
-    <button type="button" className={`${clase} ${className}`} data-sonido="campana" data-testid={`instalar-${variante}`} onClick={() => instalar()}>
+    <button type="button" className={`${clase} ${className}`} data-sonido="campana" data-testid={`instalar-${variante}`} data-recorrido={variante === "nav" ? "instalar" : undefined} onClick={() => instalar()}>
       {variante === "nav" ? <span className="nav-texto">{texto}</span> : texto}
     </button>
   );

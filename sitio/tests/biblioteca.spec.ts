@@ -1,4 +1,4 @@
-import { test, expect, crearCuenta, unico } from "./ayuda";
+import { test, expect, crearCuenta, cupoPropio, unico } from "./ayuda";
 
 // Cada código sirve una vez: cada corrida (celular y computadora) usa uno distinto.
 const casos = {
@@ -33,7 +33,7 @@ test("el código del libro impreso desbloquea solo ese libro, y una sola vez", a
   await expect(page.getByTestId("sin-acceso")).toBeVisible();
 
   // el mismo código no sirve para otra cuenta
-  const otro = await browser.newContext();
+  const otro = await browser.newContext(cupoPropio(test.info(), "otro"));
   await otro.addInitScript(() => sessionStorage.setItem("jb-umbral", "1"));
   const p2 = await otro.newPage();
   await crearCuenta(p2, unico("otro"));

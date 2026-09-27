@@ -23,7 +23,7 @@ import {
 export type NotaSesion = { usuario: string; horario: string; nota: string; fecha?: string };
 export type Reserva = { horario: Horario; nombre: string; email: string; nota?: string };
 
-/** Reservas que todavía no terminaron, en orden, con quién reservó y lo que contó. */
+/** Reservas que todavía no terminaron (sin las canceladas), en orden, con quién reservó y lo que contó. */
 export async function reservasFuturas(ahora = new Date()): Promise<Reserva[]> {
   const tomados = await ocupados();
   const gente = new Map((await usuarios()).map((u) => [u.id, u]));

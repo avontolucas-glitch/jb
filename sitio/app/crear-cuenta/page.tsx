@@ -20,9 +20,16 @@ export default async function CrearCuenta({ searchParams }: { searchParams: Prom
       <div className="mx-auto max-w-md revelar">
         <Formulario accion={accionCrearCuenta} boton="Crear cuenta" enviando="Creando…">
           <input type="hidden" name="volver" value={destino} />
-          <Campo nombre="nombre" etiqueta="Nombre" autoComplete="name" />
-          <Campo nombre="email" etiqueta="Mail" tipo="email" autoComplete="email" />
-          <Campo nombre="clave" etiqueta="Clave" tipo="password" autoComplete="new-password" ayuda="Al menos 8 caracteres." />
+          <Campo nombre="nombre" etiqueta="Nombre" autoComplete="name" maxLength={80} />
+          <Campo nombre="email" etiqueta="Mail" tipo="email" autoComplete="email" maxLength={120} />
+          <Campo
+            nombre="clave"
+            etiqueta="Clave"
+            tipo="password"
+            autoComplete="new-password"
+            maxLength={200}
+            ayuda="Al menos 10 caracteres. Que no sea tu mail ni una clave común."
+          />
         </Formulario>
         <p className="mt-8">
           ¿Ya tenés cuenta?{" "}

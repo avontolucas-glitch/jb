@@ -5,7 +5,8 @@
  */
 export type Legal = { titulo: string; bajada: string; partes: { titulo: string; parrafos: string[]; id?: string }[] };
 
-const CONTACTO = "(mail de contacto, a definir)";
+/** Mail de contacto del sitio (también lo usan otras páginas, por ejemplo Mi espacio → Masterclass 1 a 1). */
+export const CONTACTO = "(mail de contacto, a definir)";
 const RESPONSABLE = "Julián Bermúdez (nombre legal, CUIT y domicilio, a definir)";
 
 export const legales: Record<string, Legal> = {
@@ -35,7 +36,7 @@ export const legales: Record<string, Legal> = {
         parrafos: [
           "Tu cuenta: nombre, mail y la clave, que se guarda cifrada (nadie puede leerla, ni siquiera nosotros).",
           "Tus compras: qué compraste, cuándo, el monto y el medio de pago. Los datos de tu tarjeta los procesa el medio de pago; este sitio no los ve ni los guarda.",
-          "Lo que nos mandás: tus preguntas para el encuentro, lo que contás al reservar una Masterclass 1 a 1, tu inscripción a una conferencia y tu mail o WhatsApp si te sumás a la lista.",
+          "Lo que nos mandás: tus preguntas para el encuentro, lo que contás al reservar una Masterclass 1 a 1, tu entrada a una conferencia y tu mail o WhatsApp si te sumás a la lista.",
           "Lo mínimo para que el sitio funcione: una cookie que mantiene tu sesión abierta y algunas preferencias que quedan en tu dispositivo (por ejemplo, si silenciaste los sonidos).",
         ],
       },
@@ -43,6 +44,7 @@ export const legales: Record<string, Legal> = {
         titulo: "Para qué los usamos",
         parrafos: [
           "Para darte acceso a lo que compraste, avisarte lo que pediste que te avisemos, preparar tu Masterclass 1 a 1 o el encuentro de preguntas y cuidar la seguridad de tu cuenta.",
+          "Para cuidar el sitio de abusos: los formularios tienen un límite de intentos y, si se repiten demasiado, piden una verificación para confirmar que sos una persona (con Cloudflare Turnstile, cuando está activo, que recibe tu IP y los datos técnicos de tu navegador que necesita para eso). Llevamos un registro de seguridad de los ingresos, las cuentas creadas, los intentos fallidos, las verificaciones y los bloqueos, sin guardar tu IP en claro: solo una huella cifrada con una llave del sitio. Se guardan los últimos 3000 eventos.",
           "En los directos y en los libros digitales tu mail aparece como marca de agua: sirve para proteger el contenido y saber de quién era si alguien lo difunde.",
           "No vendemos ni alquilamos tus datos, y el sitio no tiene publicidad de terceros.",
         ],
@@ -50,7 +52,7 @@ export const legales: Record<string, Legal> = {
       {
         titulo: "Con quién los compartimos",
         parrafos: [
-          "Solo con los servicios que hacen falta para prestarte lo que pediste: el alojamiento del sitio, el medio de pago, la plataforma de video y el envío de mails. Cada uno los usa únicamente para eso.",
+          "Solo con los servicios que hacen falta para prestarte lo que pediste: el alojamiento del sitio, el medio de pago, la plataforma de video, el envío de mails y, cuando está activa, la verificación contra abusos (Cloudflare Turnstile). Cada uno los usa únicamente para eso.",
         ],
       },
       {
@@ -104,7 +106,7 @@ export const legales: Record<string, Legal> = {
         ],
       },
       {
-        titulo: "Conferencias privadas",
+        titulo: "Conferencias",
         parrafos: ["Te devolvemos la entrada si lo pedís hasta 48 horas antes. Si la conferencia se reprograma o se cancela, elegís entre la nueva fecha o el reembolso total."],
       },
       {

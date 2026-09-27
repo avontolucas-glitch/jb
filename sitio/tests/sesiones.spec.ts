@@ -1,4 +1,4 @@
-import { test, expect, crearCuenta, unico, elegirDia } from "./ayuda";
+import { test, expect, crearCuenta, cupoPropio, unico, elegirDia } from "./ayuda";
 
 const RUTA = "/masterclass/1-a-1";
 
@@ -63,7 +63,7 @@ test("reservar una sesión la deja en tu espacio y el horario queda ocupado para
   await expect(page.getByTestId(testid)).toHaveAttribute("data-estado", "tuya");
 
   // otra persona lo ve ocupado y no puede reservarlo ni entrando directo
-  const otro = await browser.newContext();
+  const otro = await browser.newContext(cupoPropio(test.info(), "otro"));
   await otro.addInitScript(() => sessionStorage.setItem("jb-umbral", "1"));
   const p2 = await otro.newPage();
   await crearCuenta(p2, unico("otra"));

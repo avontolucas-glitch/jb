@@ -51,7 +51,7 @@ test("Yo Da: entiende lo que se escribe y, si no, ofrece opciones y una persona"
 
   await campo.fill("xyzzy");
   await campo.press("Enter");
-  await expect(yo.locator(".yosoy-msj.yo").last()).toContainText("una persona te responderá");
+  await expect(yo.locator(".yosoy-msj.yo").last()).toContainText("Con otras palabras probá");
 
   // un problema con una compra, sin sesión: primero la cuenta
   await campo.fill("pagué y no veo mi compra");

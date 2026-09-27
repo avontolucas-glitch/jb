@@ -16,7 +16,7 @@ export default function MenuMovil({ enlaces, cuenta }: { enlaces: Enlace[]; cuen
   }, [ruta]);
   return (
     <div className="xl:hidden flex items-center gap-1.5 shrink-0">
-      <Link href={cuenta.href} className="boton !py-1 !px-2.5 !text-[0.92rem] whitespace-nowrap" data-testid="cuenta-movil">
+      <Link href={cuenta.href} className="boton !py-1 !px-2.5 !text-[0.92rem] whitespace-nowrap" data-testid="cuenta-movil" data-recorrido="cuenta">
         {cuenta.texto}
       </Link>
       <button
@@ -24,6 +24,7 @@ export default function MenuMovil({ enlaces, cuenta }: { enlaces: Enlace[]; cuen
         className="px-2 py-1 border borde min-w-[4.2rem] text-[0.95rem]"
         aria-expanded={abierto}
         aria-controls="menu-movil"
+        data-recorrido="menu"
         onClick={() => setAbierto((v) => !v)}
       >
         {abierto ? "Cerrar" : "Menú"}

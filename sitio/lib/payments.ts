@@ -14,7 +14,7 @@
 import { modificar } from "./db";
 import type { Compra } from "./access";
 import { conferencias, enVivo, libros, precios, sesiones } from "@/content/config";
-import { horarioDesdeId } from "./sesiones";
+import { horarioDesdeId, vigente, type CompraSesion } from "./sesiones";
 
 export type Producto = {
   id: string;
@@ -80,9 +80,10 @@ export function montoElegido(p: Producto, valor: string): { monto: number } | { 
  * PRODUCCIÓN: una restricción única en la base de datos (un horario, una compra).
  */
 export async function pagarSimulado(uid: string, p: Producto, monto = p.monto): Promise<{ ok: true } | { ok: false; motivo: "tomado" }> {
-  return modificar<Compra[], { ok: true } | { ok: false; motivo: "tomado" }>("compras", (compras) => {
-    if (compras.some((c) => c.usuario === uid && c.producto === p.id)) return { resultado: { ok: true } };
-    if (p.id.startsWith("sesion:") && compras.some((c) => c.producto === p.id && c.usuario !== uid)) {
+  // las compras canceladas no cuentan: un horario cancelado o liberado se puede volver a reservar
+  return modificar<CompraSesion[], { ok: true } | { ok: false; motivo: "tomado" }>("compras", (compras) => {
+    if (compras.some((c) => vigente(c) && c.usuario === uid && c.producto === p.id)) return { resultado: { ok: true } };
+    if (p.id.startsWith("sesion:") && compras.some((c) => vigente(c) && c.producto === p.id && c.usuario !== uid)) {
       return { resultado: { ok: false, motivo: "tomado" } };
     }
     const nueva: Compra = {

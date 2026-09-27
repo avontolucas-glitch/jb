@@ -5,7 +5,7 @@ import Apertura from "@/components/Apertura";
 import { portadillas } from "@/content/config";
 import Formulario, { Campo } from "@/components/Formulario";
 import { accionIngresar } from "@/lib/acciones";
-import { adminDemoActivo, usuarioActual } from "@/lib/auth";
+import { adminDemoActivo, cancelarPaso, pasoPendiente, usuarioActual } from "@/lib/auth";
 import { avisos, volverSeguro } from "@/components/Avisos";
 
 export const metadata: Metadata = { title: "Ingresar" };
@@ -24,11 +24,20 @@ const demoJulian = { email: "julian@demo.com", quien: "Cuenta de Julián (agenda
 
 type P = { searchParams: Promise<{ aviso?: string; volver?: string }> };
 
+/** «Volver a empezar» desde el paso del código: se olvida que la clave estuvo bien. */
+async function volverAEmpezar(f: FormData) {
+  "use server";
+  await cancelarPaso();
+  redirect(`/ingresar?volver=${encodeURIComponent(volverSeguro(String(f.get("volver") ?? "")))}`);
+}
+
 export default async function Ingresar({ searchParams }: P) {
   const { aviso, volver } = await searchParams;
   const destino = volverSeguro(volver);
   if (await usuarioActual()) redirect(destino);
   const cuentas = adminDemoActivo() ? [...demos, demoJulian] : demos;
+  // la cuenta de Julián ya puso bien la clave y falta el código de su app (ADMIN_TOTP_SECRET)
+  const paso = await pasoPendiente();
   return (
     <>
     <Apertura titulo="Ingresar" bajada="Tu espacio: lo que compraste, tus directos y tus lecturas." {...portadillas.ingresar} />
@@ -39,40 +48,68 @@ export default async function Ingresar({ searchParams }: P) {
             {avisos[aviso]}
           </p>
         )}
-        <Formulario accion={accionIngresar} boton="Ingresar" enviando="Ingresando…">
-          <input type="hidden" name="volver" value={destino} />
-          <Campo nombre="email" etiqueta="Mail" tipo="email" autoComplete="email" />
-          <Campo nombre="clave" etiqueta="Clave" tipo="password" autoComplete="current-password" />
-        </Formulario>
-        <p className="mt-8">
-          ¿No tenés cuenta?{" "}
-          <Link href={`/crear-cuenta?volver=${encodeURIComponent(destino)}`} className="enlace">
-            Creá una
-          </Link>
-          .
-        </p>
+        {paso ? (
+          <>
+            <p className="mb-8" data-testid="paso-codigo">
+              Tu clave está bien. Para terminar de entrar como <span className="break-all">{paso.email}</span>, escribí el código que
+              muestra ahora tu app de autenticación.
+            </p>
+            {/* Si la acción pide verificación, Formulario muestra la casilla adentro (estado.verificar). */}
+            <Formulario accion={accionIngresar} boton="Confirmar" enviando="Verificando…">
+              <input type="hidden" name="volver" value={destino} />
+              <Campo
+                nombre="codigo"
+                etiqueta="Código de tu app de autenticación"
+                autoComplete="one-time-code"
+                ayuda="Son 6 números y cambian cada 30 segundos."
+              />
+            </Formulario>
+            <form action={volverAEmpezar} className="mt-8">
+              <input type="hidden" name="volver" value={destino} />
+              <button type="submit" className="enlace">
+                Volver a empezar
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+          {/* Tras varios intentos la acción devuelve { error, verificar: true } y Formulario muestra la casilla adentro. */}
+          <Formulario accion={accionIngresar} boton="Ingresar" enviando="Ingresando…">
+            <input type="hidden" name="volver" value={destino} />
+            <Campo nombre="email" etiqueta="Mail" tipo="email" autoComplete="email" />
+            <Campo nombre="clave" etiqueta="Clave" tipo="password" autoComplete="current-password" />
+          </Formulario>
+          <p className="mt-8">
+            ¿No tenés cuenta?{" "}
+            <Link href={`/crear-cuenta?volver=${encodeURIComponent(destino)}`} className="enlace">
+              Creá una
+            </Link>
+            .
+          </p>
 
-        <aside className="mt-14 border-t borde pt-8" aria-labelledby="demos">
-          <h2 id="demos" className="text-xl mb-2">
-            Cuentas de prueba
-          </h2>
-          <p className="texto-2 text-sm mb-5">Solo existen en este prototipo. La clave de todas es demo1234.</p>
-          <ul className="space-y-4">
-            {cuentas.map((d) => (
-              <li key={d.email}>
-                <p>{d.quien}</p>
-                <p className="texto-2 text-sm">
-                  {d.email} · demo1234
-                </p>
-                <Formulario accion={accionIngresar} boton={`Entrar como ${d.email}`} enviando="Ingresando…" className="!space-y-0 mt-2">
-                  <input type="hidden" name="email" value={d.email} />
-                  <input type="hidden" name="clave" value="demo1234" />
-                  <input type="hidden" name="volver" value={destino} />
-                </Formulario>
-              </li>
-            ))}
-          </ul>
-        </aside>
+          <aside className="mt-14 border-t borde pt-8" aria-labelledby="demos">
+            <h2 id="demos" className="text-xl mb-2">
+              Cuentas de prueba
+            </h2>
+            <p className="texto-2 text-sm mb-5">Solo existen en este prototipo. La clave de todas es demo1234.</p>
+            <ul className="space-y-4">
+              {cuentas.map((d) => (
+                <li key={d.email}>
+                  <p>{d.quien}</p>
+                  <p className="texto-2 text-sm">
+                    {d.email} · demo1234
+                  </p>
+                  <Formulario accion={accionIngresar} boton={`Entrar como ${d.email}`} enviando="Ingresando…" className="!space-y-0 mt-2">
+                    <input type="hidden" name="email" value={d.email} />
+                    <input type="hidden" name="clave" value="demo1234" />
+                    <input type="hidden" name="volver" value={destino} />
+                  </Formulario>
+                </li>
+              ))}
+            </ul>
+          </aside>
+          </>
+        )}
       </div>
     </section>
     </>

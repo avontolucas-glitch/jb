@@ -23,7 +23,7 @@ export default async function Canjear({ searchParams }: { searchParams: Promise<
         <div className="mx-auto max-w-md revelar">
           {u ? (
             <Formulario accion={accionCanjear} boton="Desbloquear el libro" enviando="Revisando…">
-              <Campo nombre="codigo" etiqueta="Código del libro" autoComplete="off" defecto={codigo} ayuda="Por ejemplo: REC-7K3M-Q9TD-4HXA. Mayúsculas, minúsculas o guiones, da igual." />
+              <Campo nombre="codigo" etiqueta="Código del libro" autoComplete="off" maxLength={40} defecto={codigo?.slice(0, 40)} ayuda="Por ejemplo: REC-7K3M-Q9TD-4HXA. Mayúsculas, minúsculas o guiones, da igual." />
             </Formulario>
           ) : (
             <div className="border borde p-6">
