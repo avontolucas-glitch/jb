@@ -6,9 +6,9 @@ import Hora from "./Hora";
 import { abrirMusica } from "./Musica";
 import { instalar } from "@/lib/instalar";
 import { activarSonido, sonidoActivo } from "@/lib/sonido";
-import { aviso, avisoCon, entender, nombreBot, noEntendi, pedirCuenta, puertasCuenta, saludo, saludoCon, temas, type Accion, type Tema } from "@/content/yosoy";
+import { cosquillas, entender, invitacionQuieto, nombreBot, nombreDicho, noEntendi, pedirCuenta, puertasCuenta, respuestaDe, saludo, saludoCon, saludoHora, temas, type Accion, type Tema } from "@/content/yosoy";
 
-type Mensaje = { de: "yo" | "vos"; texto: string; acciones?: Accion[]; chips?: boolean };
+type Mensaje = { de: "yo" | "vos"; texto: string; acciones?: Accion[]; chips?: boolean; sugerencias?: string[] };
 type Libre = { id: string; inicio: string };
 
 const chips = temas.filter((t) => t.chip);
@@ -68,6 +68,99 @@ function BotonSonido() {
   );
 }
 
+/** Yo Da habla en voz alta (voz grave y pausada), si el navegador puede y el sonido está prendido. */
+function hablar(texto: string): boolean {
+  if (typeof window === "undefined" || !("speechSynthesis" in window) || !sonidoActivo()) return false;
+  const v = new SpeechSynthesisUtterance(texto.replace(/Hmm\.?/g, "Mmm."));
+  v.lang = "es-AR";
+  const voces = window.speechSynthesis.getVoices();
+  const es = voces.find((x) => x.lang?.startsWith("es-AR")) ?? voces.find((x) => x.lang?.startsWith("es"));
+  if (es) v.voice = es;
+  v.pitch = 0.55;
+  v.rate = 0.88;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(v);
+  return true;
+}
+
+const NOMBRE = "jb-yoda-nombre";
+const nombreGuardado = () => {
+  try {
+    return localStorage.getItem(NOMBRE);
+  } catch {
+    return null;
+  }
+};
+
+/** Piedra, papel o tijera, con la cuenta de la partida. */
+function Ppt() {
+  const OPC = ["Piedra", "Papel", "Tijera"] as const;
+  const [cuenta, setCuenta] = useState({ vos: 0, yo: 0 });
+  const [ultima, setUltima] = useState<string | null>(null);
+  const resultado = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (ultima) resultado.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [ultima, cuenta]);
+  const jugar = (i: number) => {
+    const mia = Math.floor(Math.random() * 3);
+    const r = (i - mia + 3) % 3; // 0 empate, 1 gana la persona, 2 gana Yo Da
+    const frases = [
+      [`${OPC[mia]} también. Empate. Pensamos igual, parece. Hmm.`, `Empate: ${OPC[mia].toLowerCase()} y ${OPC[mia].toLowerCase()}. Conectados estamos.`],
+      [`${OPC[mia]} elegí… ganaste. Hmm. Suerte de principiante, será.`, `Ganaste. ${OPC[i]} le gana a ${OPC[mia].toLowerCase()}. Aprendiendo estoy.`],
+      [`${OPC[mia]}. ¡Gané! Hmm, hmm. Ojo que todo lo ve, soy.`, `${OPC[mia]} le gana a ${OPC[i].toLowerCase()}. Perdón. Bueno, no tanto.`],
+    ][r];
+    setUltima(frases[Math.floor(Math.random() * 2)]);
+    setCuenta((c) => (r === 1 ? { ...c, vos: c.vos + 1 } : r === 2 ? { ...c, yo: c.yo + 1 } : c));
+  };
+  return (
+    <div className="w-full" data-testid="yosoy-ppt">
+      <div className="yosoy-acciones">
+        {OPC.map((o, i) => (
+          <button key={o} type="button" className="yosoy-accion" onClick={() => jugar(i)} data-sonido="toque">
+            {o}
+          </button>
+        ))}
+      </div>
+      {ultima && (
+        <p ref={resultado} className="mt-2 italic" aria-live="polite" data-testid="yosoy-ppt-resultado">
+          {ultima} <span className="texto-2 not-italic text-sm">(vos {cuenta.vos} · Yo Da {cuenta.yo})</span>
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Cara o ceca. */
+function Moneda() {
+  const [lado, setLado] = useState<string | null>(null);
+  const [girando, setGirando] = useState(false);
+  const caja = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (lado) caja.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [lado]);
+  const tirar = () => {
+    setGirando(true);
+    setLado(null);
+    window.setTimeout(() => {
+      setGirando(false);
+      setLado(Math.random() < 0.5 ? "Cara" : "Ceca");
+    }, 900);
+  };
+  return (
+    <div ref={caja} className="w-full flex flex-wrap items-center gap-2 mt-1" data-testid="yosoy-moneda">
+      <span className={`yosoy-moneda ${girando ? "girando" : ""}`} aria-hidden="true">
+        {lado ? lado[0] : "¤"}
+      </span>
+      <button type="button" className="yosoy-accion" onClick={tirar} disabled={girando} data-sonido="campana">
+        {lado ? "Otra vez" : "Tirar la moneda"}
+      </button>
+      <span aria-live="polite" className="italic" data-testid="yosoy-moneda-resultado">
+        {girando ? "Girando…" : lado ? `${lado}. ${lado === "Cara" ? "Hmm. La cara, el destino mostró." : "Ceca salió. Hmm. Así es."}` : ""}
+      </span>
+    </div>
+  );
+}
+
 /** Los próximos horarios libres de la 1 a 1, en la hora de quien pregunta. */
 function Horarios() {
   const [libres, setLibres] = useState<Libre[] | null>(null);
@@ -107,6 +200,12 @@ export default function YoSoy() {
   const nombre = useRef<string | null>(null);
   const [conSesion, setConSesion] = useState<string | null>(null);
   const [sonidoSi, cambiarSonido] = useSonido();
+  const [mira, setMira] = useState<-1 | 0 | 1>(0);
+  const [hablando, setHablando] = useState(false);
+  const [cosquilla, setCosquilla] = useState(false);
+  const [nubeTexto, setNubeTexto] = useState("");
+  const [nubeJuego, setNubeJuego] = useState(false);
+  const ultimaRespuesta = useRef<string>(saludo);
 
   const quienEs = () =>
     fetch("/api/yo")
@@ -114,9 +213,13 @@ export default function YoSoy() {
       .then((d) => {
         nombre.current = d.nombre ?? null;
         setConSesion(d.nombre ?? null);
-        setMensajes((m) =>
-          m.length === 1 ? [d.nombre ? { de: "yo", texto: saludoCon(d.nombre), chips: true } : { de: "yo", texto: saludo, chips: true, acciones: puertasCuenta }] : m,
-        );
+        const guardado = nombreGuardado();
+        const inicial: Mensaje = d.nombre
+          ? { de: "yo", texto: saludoCon(d.nombre), chips: true }
+          : guardado
+            ? { de: "yo", texto: `Hmm. De vuelta estás, ${guardado}. ${saludo.replace(/^Hmm\. Llegado has\. /, "")}`, chips: true, acciones: puertasCuenta }
+            : { de: "yo", texto: saludo, chips: true, acciones: puertasCuenta };
+        setMensajes((m) => (m.length === 1 ? [inicial] : m));
       })
       .catch(() => {});
   const lista = useRef<HTMLDivElement>(null);
@@ -136,6 +239,8 @@ export default function YoSoy() {
           sessionStorage.setItem("jb-yoda-nube", "1");
         } catch {}
         if (!visto) {
+          setNubeJuego(false);
+          setNubeTexto("");
           setNube(true);
           t2 = window.setTimeout(() => setNube(false), 16000);
         }
@@ -150,6 +255,68 @@ export default function YoSoy() {
       window.removeEventListener("umbral:abierto", aparecer);
     };
   }, []);
+
+  // la pupila sigue al puntero (o mira de reojo, cada tanto, en el celular)
+  useEffect(() => {
+    const fino = window.matchMedia("(pointer: fine)").matches;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!fino) {
+      const t = window.setInterval(() => setMira(([-1, 0, 0, 1] as const)[Math.floor(Math.random() * 4)]), 3200);
+      return () => window.clearInterval(t);
+    }
+    let raf = 0;
+    const mover = (e: PointerEvent) => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const r = boton.current?.getBoundingClientRect();
+        if (!r) return;
+        const dx = e.clientX - (r.left + r.width / 2);
+        setMira(dx < -90 ? -1 : dx > 90 ? 1 : 0);
+      });
+    };
+    window.addEventListener("pointermove", mover, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", mover);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // si alguien se queda quieto un rato, Yo Da lo invita a jugar (una vez por visita)
+  useEffect(() => {
+    let t: number | undefined;
+    const armar = () => {
+      window.clearTimeout(t);
+      t = window.setTimeout(() => {
+        try {
+          if (sessionStorage.getItem("jb-yoda-quieto")) return;
+          sessionStorage.setItem("jb-yoda-quieto", "1");
+        } catch {}
+        if (document.documentElement.classList.contains("en-umbral")) return;
+        setNubeJuego(true);
+        setNubeTexto(invitacionQuieto);
+        setNube(true);
+        window.setTimeout(() => setNube(false), 14000);
+      }, 45000);
+    };
+    const eventos = ["pointermove", "keydown", "scroll", "touchstart"] as const;
+    eventos.forEach((e) => window.addEventListener(e, armar, { passive: true }));
+    armar();
+    return () => {
+      window.clearTimeout(t);
+      eventos.forEach((e) => window.removeEventListener(e, armar));
+    };
+  }, []);
+
+  // cada vez que Yo Da contesta, aletea un momento
+  useEffect(() => {
+    const ultimo = mensajes[mensajes.length - 1];
+    if (mensajes.length < 2 || ultimo?.de !== "yo") return;
+    ultimaRespuesta.current = ultimo.texto;
+    setHablando(true);
+    const t = window.setTimeout(() => setHablando(false), 1300);
+    return () => window.clearTimeout(t);
+  }, [mensajes]);
 
   useEffect(() => {
     if (!abierto) return;
@@ -175,6 +342,30 @@ export default function YoSoy() {
   const responder = (pregunta: string, tema: Tema | null) => {
     setMensajes((m) => [...m, { de: "vos", texto: pregunta }]);
     setPensando(true);
+    // «me llamo Lucía»: Yo Da se lo guarda
+    const dicho = nombreDicho(pregunta);
+    if (dicho && (!tema || tema.id === "quien-sos" || tema.id === "hola")) {
+      try {
+        localStorage.setItem(NOMBRE, dicho);
+      } catch {}
+      window.setTimeout(() => {
+        setPensando(false);
+        setMensajes((m) => [...m, { de: "yo", texto: `Hmm. ${dicho}. Lindo nombre. Recordarte, voy.`, sugerencias: ["chiste", "ppt"] }]);
+      }, 650);
+      return;
+    }
+    if (tema?.voz) {
+      const dicha = ultimaRespuesta.current;
+      window.setTimeout(() => {
+        setPensando(false);
+        const pudo = hablar(dicha);
+        setMensajes((m) => [
+          ...m,
+          { de: "yo", texto: pudo ? `${respuestaDe(tema)} «${dicha}»` : "Hmm. Voz aquí no tengo: el sonido apagado está, o tu navegador no me deja hablar." },
+        ]);
+      }, 650);
+      return;
+    }
     // una pausa breve, como quien piensa antes de contestar
     window.setTimeout(() => {
       setPensando(false);
@@ -192,7 +383,7 @@ export default function YoSoy() {
                   { tipo: "link", texto: "Crear cuenta", href: "/crear-cuenta" },
                 ],
               }
-            : { de: "yo", texto: tema.respuesta, acciones: tema.acciones },
+            : { de: "yo", texto: respuestaDe(tema), acciones: tema.acciones, sugerencias: tema.siguientes },
       ]);
     }, 650);
   };
@@ -208,6 +399,8 @@ export default function YoSoy() {
   const accion = (a: Accion, i: number) => {
     if (a.tipo === "horarios") return <Horarios key={i} />;
     if (a.tipo === "sonido") return <BotonSonido key={i} />;
+    if (a.tipo === "ppt") return <Ppt key={i} />;
+    if (a.tipo === "moneda") return <Moneda key={i} />;
     if (a.tipo === "link")
       return (
         <Link key={i} href={a.href} className="yosoy-accion" onClick={() => setAbierto(false)}>
@@ -232,7 +425,7 @@ export default function YoSoy() {
       <button
         ref={boton}
         type="button"
-        className={`yosoy-boton ${abierto ? "abierto" : ""} ${presente ? "presente" : ""}`}
+        className={`yosoy-boton ${abierto ? "abierto" : ""} ${presente ? "presente" : ""} ${hablando || nube ? "hablando" : ""}`}
         onClick={() => setAbierto((a) => !a)}
         aria-expanded={abierto}
         aria-controls="yosoy"
@@ -240,14 +433,31 @@ export default function YoSoy() {
         data-testid="yosoy-boton"
         data-sonido="cuenco"
       >
-        <OjoPixel size={48} />
+        <OjoPixel size={48} mira={mira} />
       </button>
       {nube && !abierto && (
         <div className="yosoy-nube" role="status" data-testid="yosoy-nube">
-          <button type="button" className="yosoy-nube-texto" onClick={() => setAbierto(true)}>
-            <Tipeo texto={conSesion ? avisoCon(conSesion) : aviso} />
+          <button
+            type="button"
+            className="yosoy-nube-texto"
+            onClick={() => {
+              setAbierto(true);
+              if (nubeJuego) {
+                const ppt = temas.find((t) => t.id === "ppt");
+                if (ppt) responder("Dale, juguemos", ppt);
+              }
+            }}
+          >
+            <Tipeo
+              texto={
+                nubeTexto ||
+                (conSesion
+                  ? `${saludoHora(new Date().getHours(), conSesion)} ¿En qué ayudarte puedo?`
+                  : `${saludoHora(new Date().getHours(), nombreGuardado())} Yo Da soy. Para acceder a más funciones, crearte una cuenta debés. ¿En qué ayudarte puedo?`)
+              }
+            />
           </button>
-          {!conSesion && (
+          {!conSesion && !nubeJuego && (
             <Link href="/crear-cuenta" className="yosoy-nube-cuenta" onClick={() => setNube(false)}>
               Crear cuenta
             </Link>
@@ -260,7 +470,20 @@ export default function YoSoy() {
 
       <section id="yosoy" className={`yosoy ${abierto ? "abierto" : ""}`} aria-label={`${nombreBot}, la guía del sitio`} aria-hidden={!abierto} inert={!abierto} data-testid="yosoy">
         <header className="yosoy-cabecera">
-          <OjoPixel size={40} />
+          <button
+            type="button"
+            className={`yosoy-cabeza ${cosquilla ? "cosquillas" : ""}`}
+            aria-label="Hacerle cosquillas a Yo Da"
+            data-testid="yosoy-cabeza"
+            data-sonido="toque"
+            onClick={() => {
+              setCosquilla(true);
+              window.setTimeout(() => setCosquilla(false), 600);
+              setMensajes((m) => [...m, { de: "yo", texto: cosquillas[Math.floor(Math.random() * cosquillas.length)] }]);
+            }}
+          >
+            <OjoPixel size={40} mira={mira} />
+          </button>
           <div className="flex-1">
             <p className="text-lg leading-none">{nombreBot}</p>
             <p className="firma texto-2 text-[0.7rem] mt-1">guía del sitio</p>
@@ -286,6 +509,18 @@ export default function YoSoy() {
             <div key={i} className={`yosoy-msj ${m.de}`}>
               <p>{m.texto}</p>
               {m.acciones && m.acciones.length > 0 && <div className="yosoy-acciones">{m.acciones.map(accion)}</div>}
+              {m.sugerencias && m.sugerencias.length > 0 && (
+                <div className="yosoy-sugerencias">
+                  {m.sugerencias
+                    .map((id) => temas.find((t) => t.id === id))
+                    .filter((t): t is Tema => !!t)
+                    .map((t) => (
+                      <button key={t.id} type="button" className="yosoy-sugerencia" onClick={() => responder(t.etiqueta ?? t.chip ?? t.id, t)} data-sonido="toque">
+                        {t.etiqueta ?? t.chip}
+                      </button>
+                    ))}
+                </div>
+              )}
               {m.chips && (
                 <div className="yosoy-chips">
                   {chips.map((c) => (

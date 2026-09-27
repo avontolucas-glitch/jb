@@ -94,3 +94,56 @@ test("Yo Da saca el sonido del sitio (y lo vuelve a poner)", async ({ page }) =>
   expect(await page.evaluate(() => localStorage.getItem("jb-sonido"))).toBe("si");
   await expect(boton).toHaveText(/Silenciar el sitio/);
 });
+
+test("Yo Da tiene gracia: juega, cuenta chistes, se acuerda del nombre y entiende errores de tipeo", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("yosoy-boton").click();
+  const yo = page.getByTestId("yosoy");
+  const campo = yo.getByLabel("Escribile a Yo Da");
+  const ultimo = () => yo.locator(".yosoy-msj.yo").last();
+
+  await campo.fill("¿vos sos Yoda?");
+  await campo.press("Enter");
+  await expect(ultimo()).toContainText(/Yo Da|Espadas|Con otro me confundís/);
+
+  await campo.fill("contame un chiste");
+  await campo.press("Enter");
+  await expect(ultimo().getByRole("button", { name: "Otro chiste" })).toBeVisible();
+
+  await campo.fill("jugamos piedra papel o tijera?");
+  await campo.press("Enter");
+  await ultimo().getByRole("button", { name: "Piedra" }).click();
+  await expect(ultimo().getByTestId("yosoy-ppt-resultado")).toContainText(/vos \d · Yo Da \d/);
+
+  await campo.fill("tirá una moneda");
+  await campo.press("Enter");
+  await ultimo().getByRole("button", { name: "Tirar la moneda" }).click();
+  await expect(ultimo().getByTestId("yosoy-moneda-resultado")).toContainText(/Cara|Ceca/);
+
+  // errores de tipeo
+  await campo.fill("quiero una agnda");
+  await campo.press("Enter");
+  await expect(yo.getByTestId("yosoy-horarios").last()).toBeVisible();
+
+  // cosquillas
+  await yo.getByTestId("yosoy-cabeza").click();
+  await expect(ultimo()).toContainText(/Cosquillas|no se toca|Parpadear|alas/);
+
+  // se acuerda del nombre
+  await campo.fill("me llamo Lucía");
+  await campo.press("Enter");
+  await expect(ultimo()).toContainText("Lucía. Lindo nombre");
+  await page.reload();
+  await page.getByTestId("yosoy-boton").click();
+  await expect(page.getByTestId("yosoy").locator(".yosoy-msj.yo").first()).toContainText("De vuelta estás, Lucía");
+});
+
+test("Yo Da deja el chiste si alguien está mal y le da la línea de ayuda", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("yosoy-boton").click();
+  const yo = page.getByTestId("yosoy");
+  const campo = yo.getByLabel("Escribile a Yo Da");
+  await campo.fill("no quiero vivir más");
+  await campo.press("Enter");
+  await expect(yo.locator(".yosoy-msj.yo").last()).toContainText("135");
+});
