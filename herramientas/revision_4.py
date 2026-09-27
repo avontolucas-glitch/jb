@@ -2,7 +2,8 @@
 Revisión 4 de la trilogía: lo esencial de la conferencia en vivo de Julián (audio de
 94 minutos, fines de 2022) incorporado a los capítulos que ya existen, más dos
 correcciones pedidas por Lucas. Las portadas de Pensamiento y Biografía, sin el rombo
-del fondo (la de la Receta ya es negra pura).
+del fondo (la de la Receta ya es negra pura). En Pensamiento, la apertura de cada capítulo
+en la misma página que el comienzo del texto, como en los otros dos (apertura_unida.py).
 
 Parte de la revisión 3 («edición integral con sitio, revisión 3») y escribe, al lado,
 sin tocarla:
@@ -24,6 +25,7 @@ AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, AQUI)
 import revision_3 as r3
 import respiro
+import apertura_unida
 from revision3_datos import HOJA as HOJA3
 from revision4_datos import CORRECCIONES, HOJA_NUEVA, RESUELTAS
 
@@ -109,11 +111,17 @@ def procesar(k, nombre, registro, agregados, respiros):
         for f in grupo:
             agregados.append((k, n, f))
 
-    # 3) las páginas de respiro (lo que Julián escribió en THE CHANNEL), al final de sus capítulos
+    # 3) Pensamiento: la apertura de cada capítulo, en la misma página que el comienzo del texto
+    #    (antes iba sola, en una divisoria negra), como en la Receta y la Biografía
+    if k == 'pensamiento':
+        unidas = apertura_unida.unir(raiz, partes)
+        assert unidas == list(range(7)), unidas
+
+    # 4) las páginas de respiro (lo que Julián escribió en THE CHANNEL), al final de sus capítulos
     for n, palabras in respiro.agregar(k, raiz, partes, RESPIRO):
         respiros.append((k, n, next(p for p in RESPIRO if p['libro'] == k and p['capitulo'] == n)))
 
-    # 4) la portada sin el rombo de ELVERBO del fondo (Lucas: como la de la Receta, que ya es negra pura):
+    # 5) la portada sin el rombo de ELVERBO del fondo (Lucas: como la de la Receta, que ya es negra pura):
     #    la misma textura del libro, sin nada encima; los textos quedan igual
     if k != 'receta':
         doc = etree.tostring(raiz).decode('utf-8')
