@@ -9,6 +9,7 @@ import GuiaInstalar from "@/components/GuiaInstalar";
 import Musica from "@/components/Musica";
 import YoSoy from "@/components/YoSoy";
 import RecorridoYoDa from "@/components/RecorridoYoDa";
+import AtraparYoDa from "@/components/AtraparYoDa";
 import RegistrarSW from "@/components/RegistrarSW";
 import Revelar from "@/components/Revelar";
 import Umbral from "@/components/Umbral";
@@ -77,6 +78,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Musica />
         <YoSoy />
         <RecorridoYoDa />
+        <AtraparYoDa />
         <RegistrarSW />
         <Revelar />
         <Atencion />

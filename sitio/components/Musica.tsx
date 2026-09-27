@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { playlist, temas } from "@/content/musica";
-import { EVENTO_TEMA, esEscritorio, ficha, navegador, type Navegador, type TemaSonando } from "@/lib/musica";
+import { EVENTO_ESTADO, EVENTO_TEMA, esEscritorio, ficha, navegador, type Navegador, type TemaSonando } from "@/lib/musica";
 
 /**
  * Música de fondo: temas al azar de la playlist de Julián, con el reproductor
@@ -105,6 +105,8 @@ export default function Musica() {
   const actual = useRef<string>("");
   const ultimo = useRef({ pos: 0, dur: 0 });
   const anunciado = useRef("");
+  // el próximo tema lo pidió la persona («Otro tema»): Yo Da lo comenta siempre
+  const pedido = useRef(false);
   const esperandoSesion = useRef(false);
   const [nav, setNav] = useState<Navegador>("otro");
   const [movil, setMovil] = useState(false);
@@ -116,8 +118,12 @@ export default function Musica() {
   const vigia = useRef<number | undefined>(undefined);
   const estadoRef = useRef(estado);
   estadoRef.current = estado;
+  // Yo Da escucha con vos: se entera si suena o no
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent(EVENTO_ESTADO, { detail: { sonando: estado === "sonando" } }));
+  }, [estado]);
   // las funciones de adentro cambian en cada render: los eventos usan siempre la última
-  const accionesRef = useRef<{ empezar: () => void; siguiente: () => void; recargar: (auto?: boolean) => void }>({ empezar: () => {}, siguiente: () => {}, recargar: () => {} });
+  const accionesRef = useRef<{ empezar: () => void; siguiente: (porPedido?: boolean) => void; recargar: (auto?: boolean) => void }>({ empezar: () => {}, siguiente: () => {}, recargar: () => {} });
 
   useEffect(() => {
     setNav(navegador());
@@ -133,7 +139,7 @@ export default function Musica() {
       setAbierta(true);
       if (estadoRef.current !== "sonando" && estadoRef.current !== "cargando") accionesRef.current.empezar();
     };
-    const pasar = () => (control.current ? accionesRef.current.siguiente() : poner());
+    const pasar = () => (control.current ? accionesRef.current.siguiente(true) : poner());
     // al volver de iniciar sesión en Spotify, se prueba de nuevo sola
     const volver = () => {
       if (!esperandoSesion.current || document.visibilityState !== "visible") return;
@@ -161,9 +167,11 @@ export default function Musica() {
     };
   }, []);
 
-  const siguiente = () => {
+  /** Otro tema al azar. `porPedido`: lo pidió la persona (no es el que sigue solo al terminar). */
+  const siguiente = (porPedido = false) => {
     const c = control.current;
     if (!c) return;
+    pedido.current = porPedido;
     actual.current = alAzar(actual.current);
     ultimo.current = { pos: 0, dur: 0 };
     c.loadUri(`spotify:track:${actual.current}`);
@@ -228,7 +236,8 @@ export default function Musica() {
     window.__jbTema = t;
     if (sonando && duracion > 0 && anunciado.current !== id) {
       anunciado.current = id;
-      window.dispatchEvent(new CustomEvent<TemaSonando>(EVENTO_TEMA, { detail: t }));
+      window.dispatchEvent(new CustomEvent<TemaSonando>(EVENTO_TEMA, { detail: { ...t, pedido: pedido.current } }));
+      pedido.current = false;
     }
   }
 
@@ -308,7 +317,7 @@ export default function Musica() {
             {estado === "cargando" ? "Cargando…" : sonando ? "Pausa" : estado === "pausa" ? "Seguir" : "Escuchar"}
           </button>
           {control.current && (
-            <button type="button" className="boton py-1 px-3 text-sm" onClick={siguiente}>
+            <button type="button" className="boton py-1 px-3 text-sm" onClick={() => siguiente(true)}>
               Otro tema
             </button>
           )}

@@ -83,7 +83,7 @@ test("la música no suena sola: el botón abre el panel y explica el volumen", a
   await page.getByTestId("musica-boton").click();
   await expect(panel).toBeVisible();
   await expect(panel).toContainText("playlist de Julián");
-  await expect(panel).toContainText("El volumen, desde tu dispositivo");
+  await expect(panel).toContainText("El volumen, desde tu");
   await expect(panel.getByRole("button", { name: "Escuchar" })).toBeVisible();
 });
 

@@ -8,12 +8,14 @@ import Hora from "./Hora";
 import { abrirMusica } from "./Musica";
 import { instalar } from "@/lib/instalar";
 import { empezarRecorrido, recorridoVisto } from "@/lib/recorrido";
-import { EVENTO_TEMA, otroTema, pausarMusica, ponerMusica, temaActual, type TemaSonando } from "@/lib/musica";
+import { EVENTO_ATRAPAR_FIN, VUELTAS_MAX, empezarAtrapar, vueltasJugadas, type Resultado } from "@/lib/atrapar";
+import { EVENTO_ESTADO, EVENTO_TEMA, otroTema, pausarMusica, ponerMusica, temaActual, type TemaSonando } from "@/lib/musica";
 import { comentarTema, queSuena } from "@/content/yoda-musica";
 import { activarSonido, sonidoActivo } from "@/lib/sonido";
-import { cosquillas, despacio, interpretar, ESFUERZO_TICKET, horariosEnPausa, pausaAviso, pausaCuenta, pausaFin, ritmo, ofrecerTicket, ticketSinCuenta, invitacionQuieto, nombreBot, ofrecerRecorrido, nombreDicho, noEntendi, pedirCuenta, puertasCuenta, respuestaDe, saludo, saludoCon, saludoHora, temas, type Accion, type Interpretacion, type Tema } from "@/content/yosoy";
+import { cosquillas, despacio, interpretar, ESFUERZO_TICKET, horariosEnPausa, pausaAviso, pausaCuenta, pausaFin, ritmo, ofrecerTicket, ticketSinCuenta, invitacionQuieto, nombreBot, ofrecerRecorrido, nombreDicho, noEntendi, pedirCuenta, puertasCuenta, respuestaDe, resultadoAtrapar, saludo, saludoCon, saludoHora, temas, type Accion, type Interpretacion, type Tema } from "@/content/yosoy";
 import { cargarRegiones, regionDelDispositivo } from "@/content/yoda-habla";
 import { contextoEn, queHora, saludoConHora } from "@/content/yoda-hora";
+import { extraDelDia, queTiempo, type Clima } from "@/content/yoda-estacion";
 import { desfase } from "@/lib/zona";
 
 type Mensaje = { de: "yo" | "vos"; texto: string; acciones?: Accion[]; chips?: boolean; sugerencias?: string[] };
@@ -94,13 +96,39 @@ function contarVisita(clave: string, sumar = false): number {
 const PARTIDAS_MAX = 3; // partidas de piedra, papel o tijera por visita
 const TIRADAS_MAX = 10; // tiradas de moneda por visita
 
-/** Piedra, papel o tijera: a 5 o a 10 puntos (el que llega primero gana; los empates no suman); hasta 3 partidas por visita. */
-function Ppt() {
+/**
+ * Lo que Yo Da cree que vas a jugar (0 piedra, 1 papel, 2 tijera), leyendo tus jugadas:
+ * lo que más jugás (lo último pesa más), lo que solés jugar después de tu última jugada,
+ * y dos costumbres de todos: el que gana repite, y el que pierde se pasa a lo que le
+ * habría ganado a Yo Da. Sin datos todavía, null.
+ */
+function predecir(tuyas: number[], mias: number[], resultados: number[]): number | null {
+  if (tuyas.length < 2) return null;
+  const peso = [0, 0, 0];
+  tuyas.forEach((m, i) => (peso[m] += 0.4 + i / tuyas.length));
+  const ultima = tuyas[tuyas.length - 1];
+  for (let i = 0; i < tuyas.length - 1; i++) if (tuyas[i] === ultima) peso[tuyas[i + 1]] += 2;
+  const r = resultados[resultados.length - 1];
+  if (r === 1) peso[ultima] += 1.6; // ganó: repite
+  if (r === 2) peso[(mias[mias.length - 1] + 1) % 3] += 1.4; // perdió: va a lo que le ganaba a Yo Da
+  if (r === 0) peso[(ultima + 1) % 3] += 0.8; // empate: suele cambiar
+  const max = Math.max(...peso);
+  const mejores = [0, 1, 2].filter((i) => peso[i] === max);
+  return mejores[Math.floor(Math.random() * mejores.length)];
+}
+
+/**
+ * Piedra, papel o tijera: a 5 o a 10 puntos (el que llega primero gana; los empates no suman); hasta 3 partidas por visita.
+ * Difícil: Yo Da aprende tus costumbres en la partida y juega a ganarles (casi siempre; algo de azar le queda).
+ */
+function Ppt({ alDejar }: { alDejar?: () => void }) {
   const OPC = ["Piedra", "Papel", "Tijera"] as const;
   const [meta, setMeta] = useState<5 | 10 | null>(null);
   const [cuenta, setCuenta] = useState({ vos: 0, yo: 0, jugadas: 0 });
   const [ultima, setUltima] = useState<string | null>(null);
   const [agotado, setAgotado] = useState(false);
+  const [dejado, setDejado] = useState(false);
+  const historia = useRef<{ tuyas: number[]; mias: number[]; resultados: number[] }>({ tuyas: [], mias: [], resultados: [] });
   const resultado = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setAgotado(contarVisita("jb-yoda-partidas") >= PARTIDAS_MAX);
@@ -115,17 +143,28 @@ function Ppt() {
     setMeta(n);
     setCuenta({ vos: 0, yo: 0, jugadas: 0 });
     setUltima(null);
+    historia.current = { tuyas: [], mias: [], resultados: [] };
   };
   const terminada = meta !== null && (cuenta.vos >= meta || cuenta.yo >= meta);
 
   const jugar = (i: number) => {
     if (!meta || terminada) return;
-    const mia = Math.floor(Math.random() * 3);
+    // Yo Da lee tus costumbres y juega a ganarle a lo que cree que vas a jugar (con algo de azar: invencible no es)
+    const h = historia.current;
+    const prevista = predecir(h.tuyas, h.mias, h.resultados);
+    const confianza = Math.min(meta === 10 ? 0.82 : 0.76, 0.5 + h.tuyas.length * 0.05);
+    const leyo = prevista !== null && Math.random() < confianza;
+    const mia = leyo ? (prevista + 1) % 3 : Math.floor(Math.random() * 3);
     const r = (i - mia + 3) % 3; // 0 empate, 1 gana la persona, 2 gana Yo Da
+    h.tuyas.push(i);
+    h.mias.push(mia);
+    h.resultados.push(r);
     const frases = [
       [`${OPC[mia]} también. Empate. Pensamos igual, parece. Hmm.`, `Empate: ${OPC[mia].toLowerCase()} y ${OPC[mia].toLowerCase()}. Conectados estamos.`],
       [`${OPC[mia]} elegí… ganaste. Hmm. Suerte de principiante, será.`, `Ganaste. ${OPC[i]} le gana a ${OPC[mia].toLowerCase()}. Aprendiendo estoy.`],
-      [`${OPC[mia]}. ¡Gané! Hmm, hmm. Ojo que todo lo ve, soy.`, `${OPC[mia]} le gana a ${OPC[i].toLowerCase()}. Perdón. Bueno, no tanto.`],
+      leyo
+        ? [`${OPC[mia]}. ¡Gané! Hmm. Tu patrón, leí: el ojo, todo lo ve.`, `${OPC[mia]} le gana a ${OPC[i].toLowerCase()}. Predecible, un poco, sos. Hmm, hmm.`]
+        : [`${OPC[mia]}. ¡Gané! Hmm, hmm. Ojo que todo lo ve, soy.`, `${OPC[mia]} le gana a ${OPC[i].toLowerCase()}. Perdón. Bueno, no tanto.`],
     ][r];
     setUltima(frases[Math.floor(Math.random() * 2)]);
     setCuenta((c) => ({ vos: c.vos + (r === 1 ? 1 : 0), yo: c.yo + (r === 2 ? 1 : 0), jugadas: c.jugadas + 1 }));
@@ -135,6 +174,13 @@ function Ppt() {
     cuenta.vos > cuenta.yo
       ? `¡Llegaste a ${meta}! Ganaste ${cuenta.vos} a ${cuenta.yo}. Hmm. Buen rival, sos.`
       : `A ${meta} llegué primero: gané ${cuenta.yo} a ${cuenta.vos}. Hmm, hmm. La revancha, otro día.`;
+
+  if (dejado)
+    return (
+      <p className="italic w-full" data-testid="yosoy-ppt-dejado">
+        Hmm. Cuando quieras, la revancha. Aquí, atento, te espero.
+      </p>
+    );
 
   if (agotado && !meta)
     return (
@@ -185,8 +231,19 @@ function Ppt() {
             </p>
             {contarVisita("jb-yoda-partidas") < PARTIDAS_MAX ? (
               <div className="yosoy-acciones">
-                <button type="button" className="yosoy-accion" onClick={() => setMeta(null)} data-sonido="toque">
+                <button type="button" className="yosoy-accion" onClick={() => setMeta(null)} data-sonido="toque" data-testid="yosoy-ppt-otra">
                   Otra partida
+                </button>
+                <button
+                  type="button"
+                  className="yosoy-accion"
+                  onClick={() => {
+                    setDejado(true);
+                    alDejar?.();
+                  }}
+                  data-testid="yosoy-ppt-dejar"
+                >
+                  Dejar de jugar
                 </button>
               </div>
             ) : (
@@ -304,6 +361,8 @@ export default function YoSoy() {
   const [nubeJuego, setNubeJuego] = useState(false);
   const [ofrecer, setOfrecer] = useState(false);
   const [nubeMusica, setNubeMusica] = useState(false);
+  // la nube cuenta cómo salió «Atrapame» (con «Otra vez»)
+  const [nubeAtrapar, setNubeAtrapar] = useState(false);
   const [zonaConexion, setZonaConexion] = useState<string | null>(null);
   const ultimaRespuesta = useRef<string>(saludo);
   // cuántas vueltas dio la persona sin resolver (para ofrecer, recién ahí, escribirle a una persona)
@@ -327,13 +386,24 @@ export default function YoSoy() {
   const [avisoPausa, setAvisoPausa] = useState("");
   const enPausa = pausa > 0;
 
+  // la latitud aproximada (grados enteros: solo para la estación) y el tiempo que hace, de /api/yo
+  const lugar = useRef<{ lat: number | null; clima: Clima | null }>({ lat: null, clima: null });
+  // mientras suena la música, Yo Da asiente, escuchando con vos
+  const [escuchando, setEscuchando] = useState(false);
+  useEffect(() => {
+    const oir = (e: Event) => setEscuchando(!!(e as CustomEvent<{ sonando: boolean }>).detail?.sonando);
+    window.addEventListener(EVENTO_ESTADO, oir);
+    return () => window.removeEventListener(EVENTO_ESTADO, oir);
+  }, []);
+
   const quienEs = () =>
     fetch("/api/yo")
       // con 429 (o cualquier error) no se toca nada: sigue como estaba (sin sesión, si no se sabía)
-      .then((r) => (r.ok ? (r.json() as Promise<{ nombre?: string | null; zonaConexion?: string | null }>) : null))
+      .then((r) => (r.ok ? (r.json() as Promise<{ nombre?: string | null; zonaConexion?: string | null; lat?: number | null; clima?: Clima | null }>) : null))
       .then((d) => {
         if (!d) return;
         setZonaConexion(d.zonaConexion ?? null);
+        lugar.current = { lat: d.lat ?? null, clima: d.clima ?? null };
         nombre.current = d.nombre ?? null;
         setConSesion(d.nombre ?? null);
         const guardado = nombreGuardado();
@@ -382,11 +452,39 @@ export default function YoSoy() {
     };
   }, []);
 
+  // al terminar «Atrapame», Yo Da cuenta cómo salió (y ofrece otra vuelta)
+  useEffect(() => {
+    let t: number | undefined;
+    const alTerminar = (e: Event) => {
+      const r = (e as CustomEvent<Resultado>).detail;
+      setNubeJuego(false);
+      setNubeMusica(false);
+      setOfrecer(false);
+      setNubeAtrapar(true);
+      setNubeTexto(resultadoAtrapar(r, vueltasJugadas() >= VUELTAS_MAX));
+      setNube(true);
+      setHablando(true);
+      window.clearTimeout(t);
+      t = window.setTimeout(() => {
+        setNube(false);
+        setHablando(false);
+        setNubeAtrapar(false);
+      }, 14000);
+    };
+    window.addEventListener(EVENTO_ATRAPAR_FIN, alTerminar);
+    return () => {
+      window.removeEventListener(EVENTO_ATRAPAR_FIN, alTerminar);
+      window.clearTimeout(t);
+    };
+  }, []);
+
   // cuando empieza un tema, Yo Da lo comenta (sin pesar: el primero, los que tienen guiño, y cada tanto otro)
   const abiertoRef = useRef(abierto);
   abiertoRef.current = abierto;
   const nubeRef = useRef(nube);
   nubeRef.current = nube;
+  const nubeMusicaRef = useRef(nubeMusica);
+  nubeMusicaRef.current = nubeMusica;
   const musica = useRef({ ultimo: 0, temas: 0 });
   useEffect(() => {
     let t: number | undefined;
@@ -396,10 +494,20 @@ export default function YoSoy() {
       m.temas += 1;
       const { texto, especial } = comentarTema(tema);
       const ahora = Date.now();
-      const decir = m.temas === 1 || (especial && ahora - m.ultimo > 90_000) || (m.temas % 3 === 0 && ahora - m.ultimo > 240_000);
-      if (!decir || abiertoRef.current || nubeRef.current || document.querySelector("[data-testid=recorrido]")) return;
+      // si la persona pidió el tema («Otro tema»), lo comenta siempre: con el chat abierto, ahí; si no, en la nube
+      const decir = tema.pedido || m.temas === 1 || (especial && ahora - m.ultimo > 90_000) || (m.temas % 3 === 0 && ahora - m.ultimo > 240_000);
+      if (!decir || document.querySelector("[data-testid=recorrido], [data-testid=atrapar]")) return;
+      if (abiertoRef.current) {
+        if (tema.pedido) {
+          m.ultimo = ahora;
+          setMensajes((ms) => [...ms, { de: "yo", texto, acciones: [{ tipo: "musica-otro" }] }]);
+        }
+        return;
+      }
+      if (nubeRef.current && !(tema.pedido && nubeMusicaRef.current)) return;
       m.ultimo = ahora;
       setNubeJuego(false);
+      setNubeAtrapar(false);
       setNubeMusica(true);
       setOfrecer(false);
       setNubeTexto(texto);
@@ -457,6 +565,7 @@ export default function YoSoy() {
         if (document.documentElement.classList.contains("en-umbral")) return;
         setNubeJuego(true);
         setNubeMusica(false);
+        setNubeAtrapar(false);
         setNubeTexto(invitacionQuieto);
         setNube(true);
         window.setTimeout(() => setNube(false), 14000);
@@ -577,6 +686,18 @@ export default function YoSoy() {
       return;
     }
     // la hora de quien escribe
+    if (tema?.efecto === "clima") {
+      window.setTimeout(() => {
+        setPensando(false);
+        ultimoTema.current = tema.id;
+        let zona: string | null = null;
+        try {
+          zona = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        } catch {}
+        setMensajes((m) => [...m, { de: "yo", texto: queTiempo({ zona, lat: lugar.current.lat, clima: lugar.current.clima, region: region.current }) }]);
+      }, 650);
+      return;
+    }
     if (tema?.efecto === "hora") {
       window.setTimeout(() => {
         setPensando(false);
@@ -676,6 +797,26 @@ export default function YoSoy() {
     if (a.tipo === "ticket")
       return <TicketYoDa key={i} conversacion={mensajes.filter((m) => m.texto).map(({ de, texto }) => ({ de, texto }))} />;
     if (a.tipo === "moneda") return <Moneda key={i} />;
+    if (a.tipo === "atrapar")
+      return (
+        <button
+          key={i}
+          type="button"
+          className="yosoy-accion"
+          onClick={() => {
+            if (vueltasJugadas() >= VUELTAS_MAX) {
+              setMensajes((m) => [...m, { de: "yo", texto: "Hmm. Suficiente vuelo por hoy: las alas, cansadas están. Mañana, la revancha." }]);
+              return;
+            }
+            setAbierto(false);
+            setNube(false);
+            window.setTimeout(empezarAtrapar, 420);
+          }}
+          data-testid="yosoy-atrapar"
+        >
+          Atrapame
+        </button>
+      );
     if (a.tipo === "link" && a.externo)
       return (
         <a key={i} href={a.href} target="_blank" rel="noopener noreferrer" className="yosoy-accion">
@@ -729,7 +870,7 @@ export default function YoSoy() {
   };
 
   // quien entra por primera vez, sin cuenta: Yo Da le ofrece el recorrido
-  const nuevo = ofrecer && !conSesion && !nubeJuego && !nubeMusica;
+  const nuevo = ofrecer && !conSesion && !nubeJuego && !nubeMusica && !nubeAtrapar;
 
   // el saludo de la nube, desde la hora de quien entra (se arma una vez por nube: tiene su parte al azar)
   const zonaRef = useRef(zonaConexion);
@@ -743,10 +884,17 @@ export default function YoSoy() {
       if (zonaRef.current && desfase(ahora, zonaRef.current) !== desfase(ahora, propia)) ctx.otraZona = true;
     } catch {}
     const nombreVisto = conSesion ?? nombreGuardado();
-    if (conSesion) return `${saludoConHora(ctx, conSesion, region.current)} ¿En qué ayudarte puedo?`;
+    // la fiesta del día, el comienzo de la estación o el tiempo que hace (a lo sumo una cosa)
+    let zona: string | null = null;
+    try {
+      zona = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    } catch {}
+    const delDia = extraDelDia({ zona, lat: lugar.current.lat, clima: lugar.current.clima, region: region.current });
+    const extra = delDia ? ` ${delDia}` : "";
+    if (conSesion) return `${saludoConHora(ctx, conSesion, region.current)}${extra} ¿En qué ayudarte puedo?`;
     // quien llega por primera vez: el saludo corto, así entra el recorrido
     if (nuevo) return `${saludoHora(ctx.hora, nombreVisto, region.current)} Yo Da soy. ${ofrecerRecorrido} Para acceder a más funciones, crearte una cuenta debés.`;
-    return `${saludoConHora(ctx, nombreVisto, region.current)} Yo Da soy. Para acceder a más funciones, crearte una cuenta debés. ¿En qué ayudarte puedo?`;
+    return `${saludoConHora(ctx, nombreVisto, region.current)}${extra} Yo Da soy. Para acceder a más funciones, crearte una cuenta debés. ¿En qué ayudarte puedo?`;
   }, [nube, conSesion, nuevo]);
 
   return (
@@ -754,7 +902,7 @@ export default function YoSoy() {
       <button
         ref={boton}
         type="button"
-        className={`yosoy-boton ${abierto ? "abierto" : ""} ${presente ? "presente" : ""} ${hablando || nube ? "hablando" : ""}`}
+        className={`yosoy-boton ${abierto ? "abierto" : ""} ${presente ? "presente" : ""} ${hablando || nube ? "hablando" : ""} ${escuchando ? "escuchando" : ""}`}
         onClick={() => setAbierto((a) => !a)}
         aria-expanded={abierto}
         aria-controls="yosoy"
@@ -763,7 +911,9 @@ export default function YoSoy() {
         data-recorrido="yoda"
         data-sonido="cuenco"
       >
-        <OjoPixel size={48} mira={mira} />
+        <span className="yosoy-asiente">
+          <OjoPixel size={48} mira={mira} />
+        </span>
       </button>
       {nube && !abierto && (
         <div className={`yosoy-nube ${nuevo ? "larga" : ""}`} role="status" data-testid="yosoy-nube">
@@ -801,7 +951,34 @@ export default function YoSoy() {
               Mostrame el lugar
             </button>
           )}
-          {!conSesion && !nubeJuego && !nubeMusica && (
+          {nubeAtrapar && vueltasJugadas() < VUELTAS_MAX && (
+            <button
+              type="button"
+              className="yosoy-nube-cuenta yosoy-nube-mostrar"
+              onClick={() => {
+                setNube(false);
+                window.setTimeout(empezarAtrapar, 250);
+              }}
+              data-testid="yosoy-nube-atrapar"
+            >
+              Otra partida
+            </button>
+          )}
+          {nubeAtrapar && (
+            <button
+              type="button"
+              className="yosoy-nube-cuenta"
+              onClick={() => {
+                setNubeTexto("Hmm. Cuando quieras, la revancha. Aquí, quieto, te espero.");
+                setNubeAtrapar(false);
+                window.setTimeout(() => setNube(false), 3500);
+              }}
+              data-testid="yosoy-nube-dejar"
+            >
+              Dejar de jugar
+            </button>
+          )}
+          {!conSesion && !nubeJuego && !nubeMusica && !nubeAtrapar && (
             <Link href="/crear-cuenta" className="yosoy-nube-cuenta" onClick={() => setNube(false)}>
               Crear cuenta
             </Link>
@@ -816,7 +993,7 @@ export default function YoSoy() {
         <header className="yosoy-cabecera">
           <button
             type="button"
-            className={`yosoy-cabeza ${cosquilla ? "cosquillas" : ""}`}
+            className={`yosoy-cabeza ${cosquilla ? "cosquillas" : ""} ${escuchando ? "escuchando" : ""}`}
             aria-label="Hacerle cosquillas a Yo Da"
             data-testid="yosoy-cabeza"
             data-sonido="toque"
@@ -826,7 +1003,9 @@ export default function YoSoy() {
               setMensajes((m) => [...m, { de: "yo", texto: cosquillas[Math.floor(Math.random() * cosquillas.length)] }]);
             }}
           >
-            <OjoPixel size={40} mira={mira} />
+            <span className="yosoy-asiente">
+              <OjoPixel size={40} mira={mira} />
+            </span>
           </button>
           <div className="flex-1">
             <p className="text-lg leading-none">{nombreBot}</p>

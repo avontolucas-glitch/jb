@@ -11,6 +11,8 @@ export type TemaSonando = {
   sonando: boolean;
   /** Spotify no reconoce la sesión: suenan 30 segundos. */
   fragmento: boolean;
+  /** Lo pidió la persona («Otro tema», en la música o a Yo Da): Yo Da siempre lo comenta. */
+  pedido?: boolean;
 };
 
 declare global {
@@ -21,6 +23,8 @@ declare global {
 
 /** Avisa cuando empieza un tema nuevo (detail: TemaSonando). */
 export const EVENTO_TEMA = "jb:musica-tema";
+/** Avisa si la música suena o no (detail: { sonando: boolean }): Yo Da asiente mientras suena. */
+export const EVENTO_ESTADO = "jb:musica-estado";
 
 export const ficha = (id: string) => {
   const f = fichas[id];

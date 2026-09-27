@@ -6,7 +6,7 @@
  * vuelven a verificar. Para sumar una, copiala exacta del manuscrito.
  *
  * Además, lo que Julián escribió en su canal de Instagram («The Channel»), que
- * pasó Lucas (fuente «canal»; en `capitulo`, la fecha del mensaje). Esas van como
+ * pasó Lucas (fuente «canal», firmadas «THE CHANNEL»; en `capitulo`, la fecha del mensaje, solo de referencia). Esas van como
  * las escribió él (con su «tú» de lo escrito): solo se corrigieron tildes, signos
  * de apertura (¿ ¡) y algún error de tipeo del teclado del celular («casa» por
  * «cada»). No aparecen en la página de los libros.
@@ -17,7 +17,7 @@ export const tituloLibro = {
   receta: "La Receta de la Manifestación",
   pensamiento: "El Pensamiento es Tu Fe",
   biografia: "Biografía",
-  canal: "desde su canal",
+  canal: "THE CHANNEL",
 };
 
 export const frases: Frase[] = [

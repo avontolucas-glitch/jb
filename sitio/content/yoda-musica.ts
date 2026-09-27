@@ -79,9 +79,42 @@ const generales = [
   (t: string, a: string) => `Ahora: ${a}, «${t}». Si un deseo tenés, su banda sonora este tema puede ser.`,
   (t: string, a: string) => `«${t}», de ${a}. Sentilo como si ya hubiera pasado: en eso, la música ayuda.`,
   (_: string, a: string) => `Hmm. ${a}. Buen tema, este, para vivir en el final.`,
+  (t: string, a: string) => `«${t}». Cerrá los ojos un compás: lo que querés, ya tuyo es. ${a} de fondo, además.`,
+  (t: string, a: string) => `${a}, «${t}». Bailar podés; asumir, también. Las dos cosas a la vez, mejor salen.`,
+  (t: string, a: string) => `«${t}», de ${a}. El estado, como la música: se sube el volumen desde adentro.`,
+  (t: string, a: string) => `Suena ${a}. «${t}». Una escena chiquita imaginá: alguien te felicita. Eso, repetilo.`,
+  (t: string, a: string) => `«${t}». Hmm. ${a} lo sabía: lo que se siente, se vuelve canción. Y la canción, hecho.`,
+  (t: string, a: string) => `${a}: «${t}». Tres minutos de deseo cumplido, este tema dura. Aprovechalos.`,
+  (t: string, a: string) => `«${t}», de ${a}. Tararealo como quien ya llegó. Llegar, así empieza.`,
 ];
 
-/** Lo que Yo Da comenta de un tema que empieza. `especial`: tiene guiño propio (se dice aunque haya hablado hace poco). */
+/** Cuando la persona pide otro tema: Yo Da nota el cambio (y lo lleva a su terreno). */
+const alPasar = [
+  (t: string, a: string) => `Otro tema pediste. Con los pensamientos, lo mismo: el que no sirve, se pasa. Ahora: «${t}», de ${a}.`,
+  (t: string, a: string) => `¿No era ese? Hmm. Elegir, el primer paso es. Ahora suena «${t}», de ${a}.`,
+  (t: string, a: string) => `Saltaste de tema. Así se salta de estado también: sin pedir permiso. «${t}», ${a}.`,
+  (t: string, a: string) => `Cambiaste. Bien. Ni la música ni el pensamiento obligatorios son. Suena ${a}: «${t}».`,
+  (t: string, a: string) => `Hmm, exigente. Me gusta. Con tu deseo, igual de exigente sé. «${t}», de ${a}, ahora.`,
+  (t: string, a: string) => `Siguiente. Como en la vida: lo que no vibra con vos, al costado. «${t}», de ${a}.`,
+  (t: string, a: string) => `Otra vuelta de la ruleta. ${a}, «${t}». El azar, aquí, también a tu favor juega.`,
+];
+
+/** Lo último que dijo (qué guiño o qué molde de frase), para no repetirse en la visita. */
+const recientes: string[] = [];
+function sinRepetir(opciones: { clave: string; texto: string }[]): string {
+  const nuevas = opciones.filter((o) => !recientes.includes(o.clave));
+  const lista = nuevas.length ? nuevas : opciones;
+  const elegido = lista[Math.floor(Math.random() * lista.length)];
+  recientes.push(elegido.clave);
+  if (recientes.length > 10) recientes.shift();
+  return elegido.texto;
+}
+const moldes = (nombre: string, fs: ((t: string, a: string) => string)[], t: string, a: string) => fs.map((f, i) => ({ clave: `${nombre}:${i}`, texto: f(t, a) }));
+
+/**
+ * Lo que Yo Da comenta de un tema que empieza. `especial`: tiene guiño propio (se dice aunque haya hablado hace poco).
+ * Si la persona pidió el tema («Otro tema»), nota el cambio; nunca repite lo que dijo hace poco.
+ */
 export function comentarTema(t: TemaSonando, ahora = new Date()): { texto: string; especial: boolean } {
   let enAmerica = true;
   try {
@@ -89,13 +122,13 @@ export function comentarTema(t: TemaSonando, ahora = new Date()): { texto: strin
   } catch {}
   const c: Contexto = { hora: ahora.getHours(), diaSemana: ahora.getDay(), enAmerica };
   if (t.fragmento) return { texto: `«${t.titulo}»… treinta segundos, nomás. Poco es, para asumir nada. Enteros los querés: en la música, el camino te dejé.`, especial: true };
-  const g = guinos[t.titulo];
-  if (g) return { texto: g(c), especial: true };
   const artista = t.artista.split(",")[0].trim();
-  if (porArtista[artista]) return { texto: porArtista[artista], especial: true };
-  if (c.hora < 6) return { texto: `A esta hora, ${artista}. Antes de dormir, el deseo cumplido sentí: esa, la hora buena es.`, especial: false };
-  const f = generales[Math.floor(Math.random() * generales.length)];
-  return { texto: f(t.titulo, artista), especial: false };
+  const g = guinos[t.titulo];
+  if (g && !recientes.includes(`tema:${t.titulo}`)) return { texto: sinRepetir([{ clave: `tema:${t.titulo}`, texto: g(c) }]), especial: true };
+  if (porArtista[artista] && !recientes.includes(`artista:${artista}`)) return { texto: sinRepetir([{ clave: `artista:${artista}`, texto: porArtista[artista] }]), especial: true };
+  if (t.pedido) return { texto: sinRepetir(moldes("pasar", alPasar, t.titulo, artista)), especial: false };
+  if (c.hora < 6 && !recientes.includes("madrugada")) return { texto: sinRepetir([{ clave: "madrugada", texto: `A esta hora, ${artista}. Antes de dormir, el deseo cumplido sentí: esa, la hora buena es.` }]), especial: false };
+  return { texto: sinRepetir(moldes("general", generales, t.titulo, artista)), especial: false };
 }
 
 /** «¿Qué suena?» */

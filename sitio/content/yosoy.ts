@@ -26,7 +26,8 @@ export type Accion =
   | { tipo: "ticket" }
   | { tipo: "recorrido" }
   | { tipo: "musica-otro" }
-  | { tipo: "musica-poner" };
+  | { tipo: "musica-poner" }
+  | { tipo: "atrapar" };
 
 /** `cuenta: true`: tema de una compra, un encuentro o el acceso; sin sesión, Yo Da primero pide ingresar o crear la cuenta. */
 export type Tema = {
@@ -51,7 +52,7 @@ export type Tema = {
   /** Problema serio (plata, acceso): cuenta doble para ofrecer, antes, escribirle a una persona. */
   urgente?: boolean;
   /** Algo que Yo Da hace además de contestar (con la música de fondo). */
-  efecto?: "que-suena" | "otro-tema" | "pausar" | "poner" | "hora";
+  efecto?: "que-suena" | "otro-tema" | "pausar" | "poner" | "hora" | "clima";
 };
 
 export const nombreBot = "Yo Da";
@@ -263,7 +264,7 @@ export const temas: Tema[] = [
     etiqueta: "Música",
     siguientes: ["sonido"],
     claves: ["musica", "cancion", "playlist", "spotify", "escuchar"],
-    respuesta: "Música, hay. De la playlist de Julián, al azar los temas llegan. Solo si la pedís, suena.",
+    respuesta: "Música, hay. De la playlist de Julián, al azar los temas llegan. Solo si la pedís, suena. Enteros, en la compu con tu Spotify abierto en el navegador; en el celular, fragmentos: enteros, en la app.",
     acciones: [{ tipo: "musica" }],
   },
   {
@@ -301,6 +302,13 @@ export const temas: Tema[] = [
     respuesta: "",
     acciones: [],
     efecto: "hora",
+  },
+  {
+    id: "clima",
+    claves: ["que tiempo hace", "como esta el tiempo", "como esta el clima", "el clima", "hace frio", "hace calor", "que temperatura", "cuantos grados", "que estacion", "en que estacion", "estacion del año", "llueve", "esta lloviendo", "es feriado", "que se festeja", "que se celebra", "semana santa", "navidad", "año nuevo", "reyes", "primavera", "verano", "otoño", "invierno"],
+    respuesta: "",
+    acciones: [],
+    efecto: "clima",
   },
   {
     id: "recorrido",
@@ -407,16 +415,23 @@ export const temas: Tema[] = [
   {
     id: "aburrido",
     claves: ["aburrido", "aburrida", "me aburro", "nada que hacer", "estoy al pedo"],
-    respuesta: "¿Aburrimiento? Hmm. Jugar podemos. Piedra, papel o tijera… o una moneda tiramos.",
-    acciones: [{ tipo: "ppt" }, { tipo: "moneda" }],
+    respuesta: "¿Aburrimiento? Hmm. Jugar podemos. Piedra, papel o tijera, una moneda… o atraparme, si podés: rapidísimo vuelo.",
+    acciones: [{ tipo: "ppt" }, { tipo: "moneda" }, { tipo: "atrapar" }],
   },
   {
     id: "ppt",
     chip: "Jugar",
     etiqueta: "Piedra, papel o tijera",
     claves: ["jugar", "juego", "jugamos", "piedra", "papel", "tijera"],
-    respuesta: "Hmm. Jugar querés. Piedra, papel o tijera. Elegí, y yo también elijo… sin espiar, prometido.",
-    acciones: [{ tipo: "ppt" }],
+    respuesta: "Hmm. Jugar querés. Piedra, papel o tijera: elegí, y yo también elijo… sin espiar, prometido. O atraparme, si te animás.",
+    acciones: [{ tipo: "ppt" }, { tipo: "atrapar" }],
+  },
+  {
+    id: "atrapar",
+    etiqueta: "Atrapar a Yo Da",
+    claves: ["atrapar", "atraparte", "atrapame", "atrapalo", "atrapar a yo da", "te atrapo", "a que no te atrapo", "snitch", "perseguirte", "juego del ojo", "quidditch"],
+    respuesta: "¿Atraparme querés? Hmm. Rapidísimo vuelo, como la snitch dorada. Si me tocás, ganás.",
+    acciones: [{ tipo: "atrapar" }],
   },
   {
     id: "moneda",
@@ -657,7 +672,7 @@ export const recorrido: Parada[] = [
   { id: "masterclass", donde: ["masterclass"], texto: "La masterclass: en vivo, grabada, o a solas con Julián, uno a uno. Los horarios, en tu propia hora los ves." },
   { id: "mas", donde: ["conferencias", "fragmentos", "lista"], texto: "Conferencias, fragmentos de su obra, y una lista para que de lo que viene te avisen. Todo, aquí arriba." },
   { id: "menu", donde: ["menu"], texto: "En este menú, todo el lugar está: libros, masterclass, conferencias, fragmentos. Y la app, para instalar." },
-  { id: "musica", donde: ["musica"], texto: "Si aquí tocás, música suena: la playlist de Julián es. Con tu Spotify abierto en este navegador, los temas enteros escuchás; si no, un pedacito nomás." },
+  { id: "musica", donde: ["musica"], texto: "Si aquí tocás, música suena: la playlist de Julián es. Enteros, los temas aquí suenan solo en la compu, con tu Spotify abierto en el navegador. En el celular, un pedacito nomás: enteros, en la app de Spotify." },
   { id: "app", donde: ["instalar"], texto: "La app, instalar podés: en el teléfono o en la compu, a un toque la tenés." },
   {
     id: "cuenta",
@@ -672,3 +687,30 @@ export const recorrido: Parada[] = [
     sinSesion: "Para acceder a más funciones, crearte una cuenta debés.",
   },
 ];
+
+/** Lo que dice Yo Da al terminar una vuelta de «Atrapame» (con la snitch dorada de por medio, si se le escapa). */
+export function resultadoAtrapar(r: { atrapado: boolean; ms: number; recordAnterior: number | null; salio?: boolean }, sinVueltas = false): string {
+  const azar = <T,>(xs: T[]) => xs[Math.floor(Math.random() * xs.length)];
+  if (r.salio) return "Hmm. Cuando quieras, la revancha. Aquí, quieto, te espero.";
+  const fin = sinVueltas ? " Suficiente vuelo por hoy: las alas, cansadas están." : "";
+  if (!r.atrapado)
+    return (
+      azar([
+        "Hmm. Muy rápido fui. Llamar a Harry Potter debés.",
+        "Se te escapó la snitch dorada. Hmm. Una escoba conseguir debés… o otra vuelta intentar.",
+        "Volé, volé, y nadie me atrapó. A Hogwarts, a entrenar para buscador, ir debés.",
+        "Ni cerca. Hmm. Buscador de Gryffindor todavía no sos. Practicá, y lo serás.",
+      ]) + fin
+    );
+  const s = (r.ms / 1000).toFixed(1).replace(".", ",");
+  const record = r.recordAnterior && r.ms < r.recordAnterior ? " Récord nuevo, este: tu mejor tiempo." : "";
+  return (
+    azar([
+      `¡Me atrapaste! ${s} segundos. Ganaste. Hmm… reflejos de buscador tenés.`,
+      `¡Atrapado! En ${s} segundos. Ganaste. Lo que con decisión se busca, se atrapa: el deseo, igual.`,
+      `Ganaste: ${s} segundos. Hmm. Ni la snitch dorada tan rápido cae. Ciento cincuenta puntos, para tu casa.`,
+    ]) +
+    record +
+    (sinVueltas ? fin : " La próxima, más rápido vuelo.")
+  );
+}
