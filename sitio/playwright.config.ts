@@ -3,7 +3,7 @@ import { existsSync } from "fs";
 import os from "os";
 import path from "path";
 
-const PUERTO = 3200;
+const PUERTO = Number(process.env.PUERTO_PRUEBAS) || 3200; // otro puerto (PUERTO_PRUEBAS) para correr dos copias a la vez
 // Datos de prueba en una carpeta temporal nueva: las pruebas no tocan los datos del prototipo.
 const DATA_DIR = path.join(os.tmpdir(), `jb-pruebas-${Date.now()}`);
 // En algunos entornos el navegador viene preinstalado en otra ruta.
