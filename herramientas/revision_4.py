@@ -1,7 +1,8 @@
 """
 Revisión 4 de la trilogía: lo esencial de la conferencia en vivo de Julián (audio de
 94 minutos, fines de 2022) incorporado a los capítulos que ya existen, más dos
-correcciones pedidas por Lucas.
+correcciones pedidas por Lucas. Las portadas de Pensamiento y Biografía, sin el rombo
+del fondo (la de la Receta ya es negra pura).
 
 Parte de la revisión 3 («edición integral con sitio, revisión 3») y escribe, al lado,
 sin tocarla:
@@ -16,7 +17,7 @@ por ¶ de la revisión 3, con las primeras palabras del párrafo de anclaje para
 comprobar que el lugar es el que se eligió); las correcciones y la Hoja nueva, en
 revision4_datos.py.
 """
-import copy, json, os, re, sys, zipfile
+import copy, io, json, os, re, sys, zipfile
 from lxml import etree
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -111,6 +112,16 @@ def procesar(k, nombre, registro, agregados, respiros):
     # 3) las páginas de respiro (lo que Julián escribió en THE CHANNEL), al final de sus capítulos
     for n, palabras in respiro.agregar(k, raiz, partes, RESPIRO):
         respiros.append((k, n, next(p for p in RESPIRO if p['libro'] == k and p['capitulo'] == n)))
+
+    # 4) la portada sin el rombo de ELVERBO del fondo (Lucas: como la de la Receta, que ya es negra pura):
+    #    la misma textura del libro, sin nada encima; los textos quedan igual
+    if k != 'receta':
+        doc = etree.tostring(raiz).decode('utf-8')
+        assert doc.count('name="FondoPortadilla"') == 2 and partes['word/_rels/document.xml.rels'].decode('utf-8').count('media/fondo_portadilla.jpg') == 1
+        rgb, _, claro = respiro.PAPEL[k]
+        b = io.BytesIO()
+        respiro.textura(rgb, 1, claro).save(b, 'JPEG', quality=86, optimize=True, progressive=True)
+        partes['word/media/fondo_portadilla.jpg'] = b.getvalue()
 
     partes['word/document.xml'] = etree.tostring(raiz, xml_declaration=True, encoding='UTF-8', standalone=True)
     ct = partes['[Content_Types].xml'].decode('utf-8')
