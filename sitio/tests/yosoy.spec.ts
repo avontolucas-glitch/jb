@@ -10,6 +10,17 @@ test("Yo Da: el ojo abre la guía y muestra los próximos horarios libres en tu 
   await expect(yo).toBeVisible();
   await expect(yo).toContainText("Yo Da soy, el ojo que guía este lugar");
   await expect(yo.locator(".yosoy-msj.yo").first().getByRole("link", { name: "Crear cuenta" })).toBeVisible();
+  // sin cuenta, el 1 a 1 está bloqueado: Yo Da pide crearla
+  await yo.getByRole("button", { name: "Agendar un 1 a 1" }).click();
+  const pedido = yo.locator(".yosoy-msj.yo").last();
+  await expect(pedido).toContainText("Para agendar un 1 a 1, crear una cuenta debés");
+  await expect(pedido.getByRole("link", { name: "Crear cuenta" })).toHaveAttribute("href", "/crear-cuenta");
+  // con la cuenta, se desbloquea
+  await page.keyboard.press("Escape");
+  await page.goto("/ingresar");
+  await page.getByRole("button", { name: "Entrar como comprador@demo.com" }).click();
+  await page.waitForURL("**/mi-espacio");
+  await page.getByTestId("yosoy-boton").click();
   await yo.getByRole("button", { name: "Agendar un 1 a 1" }).click();
   const horarios = yo.getByTestId("yosoy-horarios");
   await expect(horarios).toBeVisible();
@@ -51,7 +62,8 @@ test("Yo Da: entiende lo que se escribe y, si no, ofrece opciones y una persona"
 
   await campo.fill("xyzzy");
   await campo.press("Enter");
-  await expect(yo.locator(".yosoy-msj.yo").last()).toContainText("Con otras palabras probá");
+  // no entendió (con su forma de decirlo): ofrece las puertas
+  await expect(yo.locator(".yosoy-msj.yo:not(.yosoy-pensando)").last().locator(".yosoy-chips")).toBeVisible();
 
   // un problema con una compra, sin sesión: primero la cuenta
   await campo.fill("pagué y no veo mi compra");
@@ -125,10 +137,10 @@ test("Yo Da tiene gracia: juega, cuenta chistes, se acuerda del nombre y entiend
   await ultimo().getByRole("button", { name: "Tirar la moneda" }).click();
   await expect(ultimo().getByTestId("yosoy-moneda-resultado")).toContainText(/Cara|Ceca/);
 
-  // errores de tipeo
+  // errores de tipeo («agnda» es la agenda: sin cuenta, pide crearla)
   await campo.fill("quiero una agnda");
   await campo.press("Enter");
-  await expect(yo.getByTestId("yosoy-horarios").last()).toBeVisible();
+  await expect(ultimo()).toContainText("Para agendar un 1 a 1, crear una cuenta debés");
 
   // cosquillas
   await yo.getByTestId("yosoy-cabeza").click();

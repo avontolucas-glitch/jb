@@ -21,11 +21,11 @@ async function cerrarSaludo(page: Page) {
 async function escribir(page: Page, texto: string) {
   const yo = page.getByTestId("yosoy");
   if (!(await yo.isVisible())) await page.getByTestId("yosoy-boton").click();
-  const antes = await yo.locator(".yosoy-msj.yo").count();
+  const antes = await yo.locator(".yosoy-msj.yo:not(.yosoy-pensando)").count();
   const campo = yo.getByLabel("Escribile a Yo Da");
   await campo.fill(texto);
   await campo.press("Enter");
-  await expect.poll(() => yo.locator(".yosoy-msj.yo").count()).toBeGreaterThan(antes);
+  await expect.poll(() => yo.locator(".yosoy-msj.yo:not(.yosoy-pensando)").count()).toBeGreaterThan(antes);
   return yo;
 }
 
@@ -86,9 +86,9 @@ test("Problemas concretos: la solución primero, aunque escriban con abreviatura
   await escribir(page, "me cobraron dos veces");
   await expect(yo).toContainText("Con la plata, cuidado máximo");
   await expect(yo).toContainText("Para dejarle tu consulta a una persona");
-  // abreviaturas y letras estiradas
+  // abreviaturas y letras estiradas (y el 1 a 1, sin cuenta, pide crearla)
   await escribir(page, "q onda, kiero agendar un turno xfaaa");
-  await expect(yo.getByTestId("yosoy-horarios").last()).toBeVisible();
+  await expect(yo.locator(".yosoy-msj.yo").last()).toContainText("Para agendar un 1 a 1, crear una cuenta debés");
 });
 
 test("Con sesión, un pago con problemas va directo a Mi espacio", async ({ page }) => {

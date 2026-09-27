@@ -598,8 +598,12 @@ html.sin-revelar .foto .foto-pie { opacity: 1 !important; }
 .recorrido-seguir:hover, .recorrido-seguir:focus-visible { background: var(--crema); color: var(--negro); }
 .recorrido.saliendo .recorrido-luz { animation: recorrido-cierra 0.8s var(--lento) both; }
 @keyframes recorrido-cierra { to { box-shadow: 0 0 0 200vmax rgba(5, 5, 5, 0); border-color: transparent; } }
-.recorrido.saliendo .recorrido-yo { opacity: 0; transition: transform 0.95s cubic-bezier(0.45, 0, 0.2, 1), opacity 0.25s linear 0.7s; }
+/* uno solo: mientras dura el recorrido, el ojo del rincón se oculta (vuela la copia, que sale y vuelve con su mismo tamaño) */
+html.en-recorrido .yosoy-boton .ojo-pixel { visibility: hidden; }
+.recorrido-yo-escala { transform-origin: 50% 50%; transition: transform 0.95s cubic-bezier(0.45, 0, 0.2, 1); }
+.recorrido-yo-escala.en-casa { transform: scale(var(--en-casa, 0.75)); }
+.recorrido-yo-escala.en-casa .recorrido-yo-cuerpo:not(.volando) { animation: none; }
 .recorrido.saliendo .recorrido-capa { pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
-  .recorrido, .recorrido-luz, .recorrido-yo, .recorrido-globo, .recorrido-yo-cuerpo, .recorrido-yo-cuerpo.volando, .recorrido-yo-cuerpo .ojo-pixel-orejas { transition: none !important; animation: none !important; }
+  .recorrido, .recorrido-luz, .recorrido-yo, .recorrido-yo-escala, .recorrido-globo, .recorrido-yo-cuerpo, .recorrido-yo-cuerpo.volando, .recorrido-yo-cuerpo .ojo-pixel-orejas { transition: none !important; animation: none !important; }
 }

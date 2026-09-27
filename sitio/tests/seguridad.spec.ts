@@ -114,6 +114,10 @@ test("con la CSP, las páginas principales no registran violaciones y el umbral,
   const page = await ctx.newPage();
   const violaciones = await vigilarCsp(page);
   try {
+    // con sesión (el 1 a 1 se desbloquea con la cuenta), así Yo Da trae los horarios
+    await page.goto("/ingresar");
+    await page.getByRole("button", { name: "Entrar como comprador@demo.com" }).click();
+    await page.waitForURL("**/mi-espacio");
     await page.goto("/");
     await page.getByRole("button", { name: "Entrar" }).click();
     await expect(page.getByTestId("umbral")).toBeHidden();

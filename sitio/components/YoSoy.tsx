@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import OjoPixel from "./OjoPixel";
 import TicketYoDa from "./TicketYoDa";
@@ -12,7 +12,9 @@ import { EVENTO_TEMA, otroTema, pausarMusica, ponerMusica, temaActual, type Tema
 import { comentarTema, queSuena } from "@/content/yoda-musica";
 import { activarSonido, sonidoActivo } from "@/lib/sonido";
 import { cosquillas, despacio, interpretar, ESFUERZO_TICKET, horariosEnPausa, pausaAviso, pausaCuenta, pausaFin, ritmo, ofrecerTicket, ticketSinCuenta, invitacionQuieto, nombreBot, ofrecerRecorrido, nombreDicho, noEntendi, pedirCuenta, puertasCuenta, respuestaDe, saludo, saludoCon, saludoHora, temas, type Accion, type Interpretacion, type Tema } from "@/content/yosoy";
-import { regionDelDispositivo } from "@/content/yoda-habla";
+import { cargarRegiones, regionDelDispositivo } from "@/content/yoda-habla";
+import { contextoEn, queHora, saludoConHora } from "@/content/yoda-hora";
+import { desfase } from "@/lib/zona";
 
 type Mensaje = { de: "yo" | "vos"; texto: string; acciones?: Accion[]; chips?: boolean; sugerencias?: string[] };
 type Libre = { id: string; inicio: string };
@@ -302,6 +304,7 @@ export default function YoSoy() {
   const [nubeJuego, setNubeJuego] = useState(false);
   const [ofrecer, setOfrecer] = useState(false);
   const [nubeMusica, setNubeMusica] = useState(false);
+  const [zonaConexion, setZonaConexion] = useState<string | null>(null);
   const ultimaRespuesta = useRef<string>(saludo);
   // cuántas vueltas dio la persona sin resolver (para ofrecer, recién ahí, escribirle a una persona)
   const esfuerzo = useRef(0);
@@ -327,9 +330,10 @@ export default function YoSoy() {
   const quienEs = () =>
     fetch("/api/yo")
       // con 429 (o cualquier error) no se toca nada: sigue como estaba (sin sesión, si no se sabía)
-      .then((r) => (r.ok ? (r.json() as Promise<{ nombre?: string | null }>) : null))
+      .then((r) => (r.ok ? (r.json() as Promise<{ nombre?: string | null; zonaConexion?: string | null }>) : null))
       .then((d) => {
         if (!d) return;
+        setZonaConexion(d.zonaConexion ?? null);
         nombre.current = d.nombre ?? null;
         setConSesion(d.nombre ?? null);
         const guardado = nombreGuardado();
@@ -480,6 +484,7 @@ export default function YoSoy() {
   useEffect(() => {
     if (!abierto) return;
     setNube(false);
+    cargarRegiones();
     // cada vez que se abre, se fija si hay sesión (pudo haber ingresado recién)
     quienEs();
     // en computadora, listo para escribir; en el celular no, para que el teclado no tape las opciones
@@ -571,6 +576,15 @@ export default function YoSoy() {
       }, 650);
       return;
     }
+    // la hora de quien escribe
+    if (tema?.efecto === "hora") {
+      window.setTimeout(() => {
+        setPensando(false);
+        ultimoTema.current = tema.id;
+        setMensajes((m) => [...m, { de: "yo", texto: queHora(contextoEn()) }]);
+      }, 650);
+      return;
+    }
     // con la música: qué suena, otro tema, pausa, play
     if (tema?.efecto) {
       const ef = tema.efecto;
@@ -625,7 +639,7 @@ export default function YoSoy() {
           : sinCuenta && !ofrecer
             ? {
                 de: "yo",
-                texto: pedirCuenta,
+                texto: tema.sinCuenta ?? pedirCuenta,
                 acciones: [
                   { tipo: "link", texto: "Ingresar", href: "/ingresar" },
                   { tipo: "link", texto: "Crear cuenta", href: "/crear-cuenta" },
@@ -637,13 +651,14 @@ export default function YoSoy() {
     }, 650);
   };
 
-  const enviar = (e: React.FormEvent) => {
+  const enviar = async (e: React.FormEvent) => {
     e.preventDefault();
     const t = texto.trim();
     if (!t || enPausa) return;
     // si se pasa del ritmo, lo escrito queda en el campo para mandarlo después
     if (!dejar()) return;
     setTexto("");
+    await cargarRegiones();
     const r = interpretar(t, { region: region.current, sugerencias: ofrecido.current });
     if (r.detectada) {
       region.current = r.region;
@@ -716,6 +731,24 @@ export default function YoSoy() {
   // quien entra por primera vez, sin cuenta: Yo Da le ofrece el recorrido
   const nuevo = ofrecer && !conSesion && !nubeJuego && !nubeMusica;
 
+  // el saludo de la nube, desde la hora de quien entra (se arma una vez por nube: tiene su parte al azar)
+  const zonaRef = useRef(zonaConexion);
+  zonaRef.current = zonaConexion;
+  const saludoNube = useMemo(() => {
+    if (!nube) return "";
+    const ctx = contextoEn();
+    try {
+      const ahora = new Date();
+      const propia = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (zonaRef.current && desfase(ahora, zonaRef.current) !== desfase(ahora, propia)) ctx.otraZona = true;
+    } catch {}
+    const nombreVisto = conSesion ?? nombreGuardado();
+    if (conSesion) return `${saludoConHora(ctx, conSesion, region.current)} ¿En qué ayudarte puedo?`;
+    // quien llega por primera vez: el saludo corto, así entra el recorrido
+    if (nuevo) return `${saludoHora(ctx.hora, nombreVisto, region.current)} Yo Da soy. ${ofrecerRecorrido} Para acceder a más funciones, crearte una cuenta debés.`;
+    return `${saludoConHora(ctx, nombreVisto, region.current)} Yo Da soy. Para acceder a más funciones, crearte una cuenta debés. ¿En qué ayudarte puedo?`;
+  }, [nube, conSesion, nuevo]);
+
   return (
     <>
       <button
@@ -751,12 +784,7 @@ export default function YoSoy() {
           >
             <Tipeo
               texto={
-                nubeTexto ||
-                (conSesion
-                  ? `${saludoHora(new Date().getHours(), conSesion, region.current)} ¿En qué ayudarte puedo?`
-                  : nuevo
-                    ? `${saludoHora(new Date().getHours(), nombreGuardado(), region.current)} Yo Da soy. ${ofrecerRecorrido} Para acceder a más funciones, crearte una cuenta debés.`
-                    : `${saludoHora(new Date().getHours(), nombreGuardado(), region.current)} Yo Da soy. Para acceder a más funciones, crearte una cuenta debés. ¿En qué ayudarte puedo?`)
+                nubeTexto || saludoNube
               }
             />
           </button>

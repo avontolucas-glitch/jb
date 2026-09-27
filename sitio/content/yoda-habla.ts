@@ -7,8 +7,12 @@
  *
  * De dónde es alguien se sabe por cómo escribe («wena», «quiubo», «klk», «che»…)
  * y, si no se nota, por el idioma y la zona horaria del dispositivo.
+ *
+ * Los datos de los países pesan (unos 200 KB): se cargan aparte, recién cuando
+ * alguien le escribe a Yo Da (cargarRegiones). Mientras tanto, entiende lo de
+ * todas partes (GLOBAL y SINONIMOS_BASE).
  */
-import { REGIONES, type Ficha } from "./yoda-regiones";
+import type { Ficha } from "./yoda-regiones";
 
 export type Intencion = "saludo" | "comoEstas" | "gracias" | "chau" | "si" | "no" | "risa" | "genial" | "enojo";
 
@@ -73,14 +77,47 @@ function variantes(lista: string[] | undefined): string[] {
 }
 
 const BASE = "ar";
-const porId = new Map<string, Ficha>(REGIONES.map((r) => [r.id, r]));
+/** Los países que hay en content/yoda-regiones.ts (para el dispositivo, sin cargar los datos). */
+const IDS = new Set(["ar", "uy", "py", "bo", "cl", "pe", "ec", "co", "ve", "mx", "gt", "sv", "hn", "ni", "cr", "pa", "cu", "do", "pr", "us", "es", "gq", "br", "en"]);
+
+let REGIONES: Ficha[] = [];
+let cargando: Promise<void> | null = null;
+/** Trae los datos de los países (una vez). */
+export function cargarRegiones(): Promise<void> {
+  cargando ??= import("./yoda-regiones")
+    .then((m) => {
+      REGIONES = m.REGIONES;
+      cache = null;
+    })
+    .catch(() => {
+      cargando = null;
+    });
+  return cargando;
+}
+
+type Indices = {
+  porId: Map<string, Ficha>;
+  pistas: { region: string; frase: string }[];
+  porIntencion: Record<Intencion, string[]>;
+  /** Los de todas partes: se reemplazan en el texto («no me anda» → «no funciona»). */
+  reemplazos: [string, string][];
+  /** Los de cada país: no se reemplazan (una palabra común puede querer decir otra cosa), solo suman la palabra conocida. */
+  agregados: [string, string][];
+};
+let cache: Indices | null = null;
+const indices = (): Indices => (cache ??= construir());
+
+function construir(): Indices {
+  const porId = new Map<string, Ficha>(REGIONES.map((r) => [r.id, r]));
+  return { porId, pistas: armarPistas(), porIntencion: armarIntenciones(), ...armarSinonimos() };
+}
 
 /** Pistas que delatan a un solo país (si una aparece en dos, no delata a ninguno). */
-const pistas: { region: string; frase: string }[] = (() => {
+function armarPistas(): { region: string; frase: string }[] {
   const cuenta = new Map<string, Set<string>>();
   for (const r of REGIONES) for (const f of variantes(r.pistas)) (cuenta.get(f) ?? cuenta.set(f, new Set()).get(f)!).add(r.id);
   return [...cuenta.entries()].filter(([f, rs]) => rs.size === 1 && f.length >= 2).map(([frase, rs]) => ({ region: [...rs][0], frase }));
-})();
+}
 
 const GLOBAL: Record<Intencion, string[]> = {
   saludo: ["hola", "buenas", "buen dia", "buenos dias", "buenas tardes", "buenas noches", "que tal", "que onda", "hey", "saludos", "hi", "hello", "oi", "ola", "ciao", "alo"],
@@ -97,9 +134,11 @@ const GLOBAL: Record<Intencion, string[]> = {
 const INTENCIONES = Object.keys(GLOBAL) as Intencion[];
 const LISTA: Record<Intencion, keyof Ficha> = { saludo: "saludos", comoEstas: "comoEstas", gracias: "gracias", chau: "chau", si: "si", no: "no", risa: "risas", genial: "genial", enojo: "enojo" };
 
-const porIntencion: Record<Intencion, string[]> = Object.fromEntries(
-  INTENCIONES.map((i) => [i, [...new Set([...variantes(GLOBAL[i]), ...REGIONES.flatMap((r) => variantes(r[LISTA[i]] as string[]))])]]),
-) as Record<Intencion, string[]>;
+function armarIntenciones(): Record<Intencion, string[]> {
+  return Object.fromEntries(
+    INTENCIONES.map((i) => [i, [...new Set([...variantes(GLOBAL[i]), ...REGIONES.flatMap((r) => variantes(r[LISTA[i]] as string[]))])]]),
+  ) as Record<Intencion, string[]>;
+}
 
 /** Los de todas partes (los de cada país vienen en su ficha). */
 const SINONIMOS_BASE: Record<string, string[]> = {
@@ -112,14 +151,24 @@ const SINONIMOS_BASE: Record<string, string[]> = {
   descargar: ["bajarme", "descargarme"],
 };
 
+/** Palabras de todos los días que un país usa con otro sentido: como sinónimo, confundirían (hora ≠ turno, lugar ≠ turno). */
+const COMUNES = new Set(["hora", "horas", "lugar", "dia", "fecha", "espacio", "agendar", "reservar", "pague", "pago", "pagar", "cuenta", "codigo", "ver", "tener", "hacer", "estar", "ir", "venir", "salir", "entrar", "abrir", "cerrar"]);
+
 /** Modismos de cada país → la palabra que Yo Da ya conoce («lana», «guita», «feria» → «plata»; «no jala» → «no funciona»). */
-const sinonimos: [string, string][] = (() => {
-  const pares = new Map<string, string>();
-  for (const [canonico, lista] of Object.entries(SINONIMOS_BASE)) for (const f of variantes(lista)) if (f !== canonico) pares.set(f, canonico);
+function armarSinonimos(): { reemplazos: [string, string][]; agregados: [string, string][] } {
+  const base = new Map<string, string>();
+  for (const [canonico, lista] of Object.entries(SINONIMOS_BASE)) for (const f of variantes(lista)) if (f !== canonico) base.set(f, canonico);
+  const agregados = new Map<string, string>();
   for (const r of REGIONES)
-    for (const [canonico, lista] of Object.entries(r.sinonimos ?? {})) for (const f of variantes(lista)) if (f !== canonico && !pares.has(f)) pares.set(f, canonico);
-  return [...pares.entries()].sort((a, b) => b[0].length - a[0].length);
-})();
+    for (const [canonico, lista] of Object.entries(r.sinonimos ?? {}))
+      for (const f of variantes(lista)) {
+        // fuera: las frases que ya dicen la palabra, las de más de tres palabras (traen contexto) y las palabras comunes
+        if (f === canonico || tiene(f, canonico) || f.split(" ").length > 3 || COMUNES.has(f) || base.has(f) || agregados.has(f)) continue;
+        agregados.set(f, canonico);
+      }
+  const orden = (m: Map<string, string>) => [...m.entries()].sort((a, b) => b[0].length - a[0].length);
+  return { reemplazos: orden(base), agregados: orden(agregados) };
+}
 
 // ───────── lectura
 
@@ -134,10 +183,13 @@ export type Lectura = {
 };
 
 export function leer(texto: string): Lectura {
+  const { pistas, porIntencion, reemplazos, agregados } = indices();
   const t = limpiar(texto);
   let limpio = ` ${t} `;
-  for (const [f, c] of sinonimos) if (limpio.includes(` ${f} `)) limpio = limpio.split(` ${f} `).join(` ${c} `);
-  limpio = limpio.trim();
+  for (const [f, c] of reemplazos) if (limpio.includes(` ${f} `)) limpio = limpio.split(` ${f} `).join(` ${c} `);
+  const suma = new Set<string>();
+  for (const [f, c] of agregados) if (tiene(t, f) && !tiene(limpio, c)) suma.add(c);
+  limpio = `${limpio.trim()}${suma.size ? ` ${[...suma].join(" ")}` : ""}`;
 
   const puntos = new Map<string, number>();
   for (const p of pistas) if (tiene(t, p.frase)) puntos.set(p.region, (puntos.get(p.region) ?? 0) + p.frase.length);
@@ -164,19 +216,22 @@ const azar = <T,>(xs: T[]) => xs[Math.floor(Math.random() * xs.length)];
 
 /** Una respuesta de Yo Da en el registro de ese país (o en el de base). */
 export function frase(region: string | null | undefined, clave: ClaveRespuesta): string | null {
+  const { porId } = indices();
   const propias = (region && porId.get(region)?.respuestas[clave]) || [];
   const lista = propias.length ? propias : porId.get(BASE)?.respuestas[clave] ?? [];
   return lista.length ? azar(lista) : null;
 }
 
-/** El saludo corto de ese país, para anteponer («¡Wena!», «¡Quiubo!»). */
+/** El saludo corto de ese país, para anteponer («¡Wena!», «¿Qué onda?», «Llegado has, che.»): la primera frase breve que no sea el «Hmm», ni la presentación, ni la oferta de ayuda. */
 export function saludoCorto(region: string | null | undefined): string | null {
   const s = frase(region, "saludo");
-  const m = s && /^(¡[^!]{1,28}!|[^.!?]{1,24}[.!])/.exec(s);
-  return m ? m[1] : null;
+  if (!s) return null;
+  const frases = s.match(/[¿¡]?[^.!?…]+[.!?…]+/g) ?? [];
+  const f = frases.map((x) => x.trim()).find((x) => x.length <= 30 && !/^hmm/i.test(x) && !/yo da/i.test(x) && !/(en qu[eé]|ayud|mano|colabor)/i.test(x));
+  return f ?? null;
 }
 
-export const nombreRegion = (region: string | null | undefined) => (region ? porId.get(region)?.nombre ?? null : null);
+export const nombreRegion = (region: string | null | undefined) => (region ? indices().porId.get(region)?.nombre ?? null : null);
 
 // ───────── de dónde es el dispositivo
 
@@ -214,10 +269,10 @@ export function regionDelDispositivo(): string | null {
     const idioma = (navigator.language || "").toLowerCase();
     if (!idioma.startsWith("es")) return null;
     const pais = idioma.split("-")[1];
-    if (pais && porId.has(pais)) return pais;
+    if (pais && IDS.has(pais)) return pais;
     const zona = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const r = ZONAS.find(([re]) => re.test(zona));
-    return r && porId.has(r[1]) ? r[1] : null;
+    return r && IDS.has(r[1]) ? r[1] : null;
   } catch {
     return null;
   }

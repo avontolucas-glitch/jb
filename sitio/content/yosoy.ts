@@ -46,10 +46,12 @@ export type Tema = {
   voz?: boolean;
   /** La persona está trabada con algo (suma para ofrecerle, recién después de varios intentos, escribirle a una persona). */
   atasca?: boolean;
+  /** Sin sesión, en vez del pedido general de cuenta, este texto (la función se desbloquea con la cuenta). */
+  sinCuenta?: string;
   /** Problema serio (plata, acceso): cuenta doble para ofrecer, antes, escribirle a una persona. */
   urgente?: boolean;
   /** Algo que Yo Da hace además de contestar (con la música de fondo). */
-  efecto?: "que-suena" | "otro-tema" | "pausar" | "poner";
+  efecto?: "que-suena" | "otro-tema" | "pausar" | "poner" | "hora";
 };
 
 export const nombreBot = "Yo Da";
@@ -88,6 +90,8 @@ export const temas: Tema[] = [
     claves: ["hablar con julian", "agenda", "agendar", "turno", "reserv", "horario", "1 a 1", "uno a uno", "1a1", "sesion", "encuentro", "cita", "videollamada", "privad", "disponib", "fecha libre"],
     respuesta: "Un encuentro uno a uno con Julián buscás, por videollamada. Estos horarios libres hay, en tu hora. Elegí uno, y como ya hecho, sentilo:",
     acciones: [{ tipo: "horarios" }, { tipo: "link", texto: "Ver todo el calendario", href: "/masterclass/1-a-1" }],
+    cuenta: true,
+    sinCuenta: "Hmm. Para agendar un 1 a 1, crear una cuenta debés. Un minuto es; después, los horarios libres aquí mismo te muestro, en tu hora.",
   },
   {
     id: "mis-encuentros",
@@ -290,6 +294,13 @@ export const temas: Tema[] = [
     respuesta: "Hmm. Música, entonces. Abajo a la izquierda, el reproductor se abre. Si no suena, «Escuchar» tocá.",
     acciones: [],
     efecto: "poner",
+  },
+  {
+    id: "hora",
+    claves: ["que hora es", "que hora tenes", "que hora son", "hora es", "que dia es hoy", "que dia es", "que fecha es", "what time"],
+    respuesta: "",
+    acciones: [],
+    efecto: "hora",
   },
   {
     id: "recorrido",

@@ -7,7 +7,8 @@ import { nombreBot, recorrido, type Parada } from "@/content/yosoy";
 import { EVENTO_RECORRIDO, marcarRecorridoVisto, type Inicio } from "@/lib/recorrido";
 
 /**
- * El recorrido de Yo Da: sale de su rincón, vuela hasta cada cosa, la ilumina
+ * El recorrido de Yo Da: sale de su rincón (el ojo de siempre se oculta en el
+ * mismo instante: vuela uno solo, nunca dos), vuela hasta cada cosa, la ilumina
  * (el resto queda en penumbra) y la explica en un globo. Se maneja con los
  * botones o el teclado (→ sigue, ← vuelve, Esc sale); el foco queda en el globo
  * y, al terminar, vuelve a donde estaba. Sin movimiento si la persona lo pidió.
@@ -19,6 +20,9 @@ type Punto = { x: number; y: number };
 
 const YO_W = 64; // el ojo en vuelo: la grilla de 32 × 9, al doble
 const YO_H = 18;
+/** En su rincón, el ojo mide 48 (components/YoSoy.tsx): al salir y al volver, la copia tiene ese tamaño. */
+const EN_CASA = 48 / YO_W;
+const CLASE = "en-recorrido";
 const MARGEN = 12;
 const VUELO_MS = 950;
 
@@ -46,7 +50,13 @@ function cajaDe(donde: string[] | undefined): Caja | null {
   const h = Math.max(...rs.map((r) => r.bottom)) - y;
   const redondo = rs.length === 1 && Math.abs(w - h) < 4;
   const aire = redondo ? 3 : 7;
-  return { x: x - aire, y: y - aire, w: w + aire * 2, h: h + aire * 2, redondo };
+  return {
+    x: x - aire,
+    y: y - aire,
+    w: w + aire * 2,
+    h: h + aire * 2,
+    redondo,
+  };
 }
 
 /** Dónde se posa Yo Da y dónde va el globo: debajo si la parada está arriba, encima si está abajo. */
@@ -55,7 +65,14 @@ function ubicar(c: Caja | null, vw: number, vh: number): { yo: Punto; globo: CSS
   const dentro = (x: number, w: number) => Math.max(MARGEN, Math.min(vw - w - MARGEN, x));
   if (!c) {
     const y = Math.round(vh * 0.32);
-    return { yo: { x: dentro(vw / 2 - YO_W / 2, YO_W), y }, globo: { left: dentro(vw / 2 - gw / 2, gw), top: y + YO_H + 18, width: gw } };
+    return {
+      yo: { x: dentro(vw / 2 - YO_W / 2, YO_W), y },
+      globo: {
+        left: dentro(vw / 2 - gw / 2, gw),
+        top: y + YO_H + 18,
+        width: gw,
+      },
+    };
   }
   const cx = c.x + c.w / 2;
   const x = dentro(cx - YO_W / 2, YO_W);
@@ -85,6 +102,7 @@ export default function RecorridoYoDa() {
   const [globo, setGlobo] = useState<CSSProperties>({});
   const [volando, setVolando] = useState(0);
   const [giro, setGiro] = useState(1);
+  const [enCasa, setEnCasa] = useState(true);
   const posicion = useRef<Punto | null>(null);
   const quieto = useRef(false);
   const previo = useRef<HTMLElement | null>(null);
@@ -111,6 +129,9 @@ export default function RecorridoYoDa() {
       const inicio = casa();
       posicion.current = inicio;
       setYo(inicio);
+      setEnCasa(true);
+      // el ojo de siempre se oculta ya: el que sale volando es él
+      document.documentElement.classList.add(CLASE);
       setSesion(!!(e as CustomEvent<Inicio>).detail?.sesion);
       setParadas(lista);
       setCaja(null);
@@ -131,6 +152,7 @@ export default function RecorridoYoDa() {
       const l = ubicar(c, window.innerWidth, window.innerHeight);
       setCaja(c);
       setGlobo(l.globo);
+      setEnCasa(false);
       volarA(l.yo, animar);
     },
     [paradas, i, volarA],
@@ -173,9 +195,12 @@ export default function RecorridoYoDa() {
     if (!activo || saliendo) return;
     const c = casa();
     if (c) volarA(c, true);
+    setEnCasa(true);
     setSaliendo(true);
     window.setTimeout(
       () => {
+        // se posó: vuelve a ser el de siempre, en el mismo lugar y del mismo tamaño
+        document.documentElement.classList.remove(CLASE);
         setActivo(false);
         setSaliendo(false);
         const volver = previo.current?.isConnected ? previo.current : document.querySelector<HTMLElement>('[data-recorrido="yoda"]');
@@ -190,6 +215,9 @@ export default function RecorridoYoDa() {
     else cerrar();
   }, [i, paradas.length, cerrar]);
   const atras = useCallback(() => setI((n) => Math.max(0, n - 1)), []);
+
+  // si el recorrido se desarma a mitad de camino, el ojo de siempre vuelve
+  useEffect(() => () => document.documentElement.classList.remove(CLASE), []);
 
   // el foco, en «Seguir» de cada parada
   useEffect(() => {
@@ -234,60 +262,92 @@ export default function RecorridoYoDa() {
   // la luz se abre desde el centro de la parada, cuando Yo Da llega (--cx, --cy: de dónde se abre)
   const luz = (
     caja
-      ? { left: caja.x, top: caja.y, width: caja.w, height: caja.h, "--cx": `${caja.x + caja.w / 2}px`, "--cy": `${caja.y + caja.h / 2}px` }
-      : { left: window.innerWidth / 2, top: window.innerHeight * 0.4, width: 0, height: 0, "--cx": "50vw", "--cy": "40vh" }
+      ? {
+          left: caja.x,
+          top: caja.y,
+          width: caja.w,
+          height: caja.h,
+          "--cx": `${caja.x + caja.w / 2}px`,
+          "--cy": `${caja.y + caja.h / 2}px`,
+        }
+      : {
+          left: window.innerWidth / 2,
+          top: window.innerHeight * 0.4,
+          width: 0,
+          height: 0,
+          "--cx": "50vw",
+          "--cy": "40vh",
+        }
   ) as CSSProperties;
 
   return (
-    <div className={`recorrido ${saliendo ? "saliendo" : ""}`} data-testid="recorrido" data-parada={p.id}>
-      <div className="recorrido-capa" aria-hidden="true" />
-      <div key={`luz-${p.id}`} className={`recorrido-luz ${caja ? "" : "sin-foco"} ${caja?.redondo ? "redondo" : ""}`} style={luz} aria-hidden="true" data-testid="recorrido-luz" />
-      {yo && (
-        <div className="recorrido-yo" style={{ transform: `translate3d(${yo.x}px, ${yo.y}px, 0)`, ["--giro" as string]: giro }} aria-hidden="true">
-          <div key={volando} className={`recorrido-yo-cuerpo ${volando ? "volando" : ""}`}>
-            <OjoPixel size={YO_W} mira={giro as -1 | 1} />
-          </div>
-        </div>
-      )}
-      {!saliendo && (
+    <>
+      <div className={`recorrido ${saliendo ? "saliendo" : ""}`} data-testid="recorrido" data-parada={p.id}>
+        <div className="recorrido-capa" aria-hidden="true" />
         <div
-          key={`globo-${p.id}`}
-          ref={globoRef}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="recorrido-paso"
-          aria-describedby="recorrido-texto"
-          className="recorrido-globo"
-          style={globo}
-          data-testid="recorrido-globo"
-        >
-          <p id="recorrido-paso" className="recorrido-paso">
-            Recorrido con {nombreBot} · {i + 1} de {paradas.length}
-          </p>
-          <p id="recorrido-texto" className="recorrido-texto" aria-live="polite" data-testid="recorrido-texto">
-            <Tipeo texto={texto} />
-          </p>
-          <div className="recorrido-botones">
-            <button type="button" className="recorrido-saltar" onClick={cerrar} data-testid="recorrido-saltar">
-              {final ? "Cerrar" : "Saltar el recorrido"}
-            </button>
-            <span className="flex-1" />
-            {i > 0 && (
-              <button type="button" className="recorrido-atras" onClick={atras} aria-label="Parada anterior">
-                ←
+          key={`luz-${p.id}`}
+          className={`recorrido-luz ${caja ? "" : "sin-foco"} ${caja?.redondo ? "redondo" : ""}`}
+          style={luz}
+          aria-hidden="true"
+          data-testid="recorrido-luz"
+        />
+        {!saliendo && (
+          <div
+            key={`globo-${p.id}`}
+            ref={globoRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="recorrido-paso"
+            aria-describedby="recorrido-texto"
+            className="recorrido-globo"
+            style={globo}
+            data-testid="recorrido-globo"
+          >
+            <p id="recorrido-paso" className="recorrido-paso">
+              Recorrido con {nombreBot} · {i + 1} de {paradas.length}
+            </p>
+            <p id="recorrido-texto" className="recorrido-texto" aria-live="polite" data-testid="recorrido-texto">
+              <Tipeo texto={texto} />
+            </p>
+            <div className="recorrido-botones">
+              <button type="button" className="recorrido-saltar" onClick={cerrar} data-testid="recorrido-saltar">
+                {final ? "Cerrar" : "Saltar el recorrido"}
               </button>
-            )}
-            {final && !sesion && (
-              <Link href="/crear-cuenta" className="recorrido-cuenta" onClick={cerrar}>
-                Crear cuenta
-              </Link>
-            )}
-            <button ref={seguirRef} type="button" className="recorrido-seguir" onClick={seguir} data-sonido="toque" data-testid="recorrido-seguir">
-              {final ? "Listo" : "Seguir"}
-            </button>
+              <span className="flex-1" />
+              {i > 0 && (
+                <button type="button" className="recorrido-atras" onClick={atras} aria-label="Parada anterior">
+                  ←
+                </button>
+              )}
+              {final && !sesion && (
+                <Link href="/crear-cuenta" className="recorrido-cuenta" onClick={cerrar}>
+                  Crear cuenta
+                </Link>
+              )}
+              <button ref={seguirRef} type="button" className="recorrido-seguir" onClick={seguir} data-sonido="toque" data-testid="recorrido-seguir">
+                {final ? "Listo" : "Seguir"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+      {/* el ojo, afuera del fundido del velo: sale entero, en el mismo instante en que se oculta el del rincón */}
+      {yo && (
+        <div
+          className="recorrido-yo"
+          style={{
+            transform: `translate3d(${yo.x}px, ${yo.y}px, 0)`,
+            ["--giro" as string]: giro,
+          }}
+          aria-hidden="true"
+        >
+          <div className={`recorrido-yo-escala ${enCasa ? "en-casa" : ""}`} style={{ ["--en-casa" as string]: EN_CASA }}>
+            <div key={volando} className={`recorrido-yo-cuerpo ${volando ? "volando" : ""}`}>
+              <OjoPixel size={YO_W} mira={giro as -1 | 1} />
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
