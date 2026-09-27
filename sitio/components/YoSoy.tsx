@@ -92,16 +92,45 @@ const nombreGuardado = () => {
   }
 };
 
-/** Piedra, papel o tijera, con la cuenta de la partida. */
+/** Cuántas veces se jugó en esta visita (para que el juego tenga un límite). */
+function contarVisita(clave: string, sumar = false): number {
+  try {
+    const n = Number(sessionStorage.getItem(clave) || 0) + (sumar ? 1 : 0);
+    if (sumar) sessionStorage.setItem(clave, String(n));
+    return n;
+  } catch {
+    return 0;
+  }
+}
+const PARTIDAS_MAX = 3; // partidas de piedra, papel o tijera por visita
+const TIRADAS_MAX = 10; // tiradas de moneda por visita
+
+/** Piedra, papel o tijera: a 5 o a 10 puntos (el que llega primero gana; los empates no suman); hasta 3 partidas por visita. */
 function Ppt() {
   const OPC = ["Piedra", "Papel", "Tijera"] as const;
-  const [cuenta, setCuenta] = useState({ vos: 0, yo: 0 });
+  const [meta, setMeta] = useState<5 | 10 | null>(null);
+  const [cuenta, setCuenta] = useState({ vos: 0, yo: 0, jugadas: 0 });
   const [ultima, setUltima] = useState<string | null>(null);
-  const resultado = useRef<HTMLParagraphElement>(null);
+  const [agotado, setAgotado] = useState(false);
+  const resultado = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    setAgotado(contarVisita("jb-yoda-partidas") >= PARTIDAS_MAX);
+  }, []);
   useEffect(() => {
     if (ultima) resultado.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [ultima, cuenta]);
+
+  const empezar = (n: 5 | 10) => {
+    if (contarVisita("jb-yoda-partidas") >= PARTIDAS_MAX) return setAgotado(true);
+    contarVisita("jb-yoda-partidas", true);
+    setMeta(n);
+    setCuenta({ vos: 0, yo: 0, jugadas: 0 });
+    setUltima(null);
+  };
+  const terminada = meta !== null && (cuenta.vos >= meta || cuenta.yo >= meta);
+
   const jugar = (i: number) => {
+    if (!meta || terminada) return;
     const mia = Math.floor(Math.random() * 3);
     const r = (i - mia + 3) % 3; // 0 empate, 1 gana la persona, 2 gana Yo Da
     const frases = [
@@ -110,35 +139,92 @@ function Ppt() {
       [`${OPC[mia]}. ¡Gané! Hmm, hmm. Ojo que todo lo ve, soy.`, `${OPC[mia]} le gana a ${OPC[i].toLowerCase()}. Perdón. Bueno, no tanto.`],
     ][r];
     setUltima(frases[Math.floor(Math.random() * 2)]);
-    setCuenta((c) => (r === 1 ? { ...c, vos: c.vos + 1 } : r === 2 ? { ...c, yo: c.yo + 1 } : c));
+    setCuenta((c) => ({ vos: c.vos + (r === 1 ? 1 : 0), yo: c.yo + (r === 2 ? 1 : 0), jugadas: c.jugadas + 1 }));
   };
+
+  const final =
+    cuenta.vos > cuenta.yo
+      ? `¡Llegaste a ${meta}! Ganaste ${cuenta.vos} a ${cuenta.yo}. Hmm. Buen rival, sos.`
+      : `A ${meta} llegué primero: gané ${cuenta.yo} a ${cuenta.vos}. Hmm, hmm. La revancha, otro día.`;
+
+  if (agotado && !meta)
+    return (
+      <p className="italic w-full" data-testid="yosoy-ppt-agotado">
+        Hmm. Suficiente juego por hoy. Descansar, el ojo necesita. Mañana, la revancha.
+      </p>
+    );
+
+  if (!meta)
+    return (
+      <div className="w-full" data-testid="yosoy-ppt">
+        <p className="texto-2 text-sm mb-1">¿A cuántos puntos? El que llega primero, gana.</p>
+        <div className="yosoy-acciones">
+          <button type="button" className="yosoy-accion" onClick={() => empezar(5)} data-sonido="toque">
+            A 5
+          </button>
+          <button type="button" className="yosoy-accion" onClick={() => empezar(10)} data-sonido="toque">
+            A 10
+          </button>
+        </div>
+      </div>
+    );
+
   return (
     <div className="w-full" data-testid="yosoy-ppt">
-      <div className="yosoy-acciones">
-        {OPC.map((o, i) => (
-          <button key={o} type="button" className="yosoy-accion" onClick={() => jugar(i)} data-sonido="toque">
-            {o}
-          </button>
-        ))}
-      </div>
-      {ultima && (
-        <p ref={resultado} className="mt-2 italic" aria-live="polite" data-testid="yosoy-ppt-resultado">
-          {ultima} <span className="texto-2 not-italic text-sm">(vos {cuenta.vos} · Yo Da {cuenta.yo})</span>
-        </p>
+      {!terminada && (
+        <div className="yosoy-acciones">
+          {OPC.map((o, i) => (
+            <button key={o} type="button" className="yosoy-accion" onClick={() => jugar(i)} data-sonido="toque">
+              {o}
+            </button>
+          ))}
+        </div>
       )}
+      <div ref={resultado} aria-live="polite">
+        {ultima && (
+          <p className="mt-2 italic" data-testid="yosoy-ppt-resultado">
+            {ultima}{" "}
+            <span className="texto-2 not-italic text-sm">
+              (vos {cuenta.vos} · Yo Da {cuenta.yo} · a {meta})
+            </span>
+          </p>
+        )}
+        {terminada && (
+          <>
+            <p className="mt-2" data-testid="yosoy-ppt-final">
+              {final}
+            </p>
+            {contarVisita("jb-yoda-partidas") < PARTIDAS_MAX ? (
+              <div className="yosoy-acciones">
+                <button type="button" className="yosoy-accion" onClick={() => setMeta(null)} data-sonido="toque">
+                  Otra partida
+                </button>
+              </div>
+            ) : (
+              <p className="italic mt-2 texto-2">Hmm. Suficiente juego por hoy. Descansar, el ojo necesita.</p>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
 
-/** Cara o ceca. */
+/** Cara o ceca, hasta 10 tiradas por visita. */
 function Moneda() {
   const [lado, setLado] = useState<string | null>(null);
   const [girando, setGirando] = useState(false);
+  const [cansada, setCansada] = useState(false);
   const caja = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    setCansada(contarVisita("jb-yoda-tiradas") >= TIRADAS_MAX);
+  }, []);
   useEffect(() => {
     if (lado) caja.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [lado]);
   const tirar = () => {
+    if (contarVisita("jb-yoda-tiradas") >= TIRADAS_MAX) return setCansada(true);
+    contarVisita("jb-yoda-tiradas", true);
     setGirando(true);
     setLado(null);
     window.setTimeout(() => {
@@ -146,14 +232,22 @@ function Moneda() {
       setLado(Math.random() < 0.5 ? "Cara" : "Ceca");
     }, 900);
   };
+  if (cansada && !lado && !girando)
+    return (
+      <p className="italic w-full" data-testid="yosoy-moneda-cansada">
+        Hmm. La moneda, cansada está: diez vueltas ya dio. Decidir, ahora te toca a vos.
+      </p>
+    );
   return (
     <div ref={caja} className="w-full flex flex-wrap items-center gap-2 mt-1" data-testid="yosoy-moneda">
       <span className={`yosoy-moneda ${girando ? "girando" : ""}`} aria-hidden="true">
         {lado ? lado[0] : "¤"}
       </span>
-      <button type="button" className="yosoy-accion" onClick={tirar} disabled={girando} data-sonido="campana">
-        {lado ? "Otra vez" : "Tirar la moneda"}
-      </button>
+      {!cansada && (
+        <button type="button" className="yosoy-accion" onClick={tirar} disabled={girando} data-sonido="campana">
+          {lado ? "Otra vez" : "Tirar la moneda"}
+        </button>
+      )}
       <span aria-live="polite" className="italic" data-testid="yosoy-moneda-resultado">
         {girando ? "Girando…" : lado ? `${lado}. ${lado === "Cara" ? "Hmm. La cara, el destino mostró." : "Ceca salió. Hmm. Así es."}` : ""}
       </span>

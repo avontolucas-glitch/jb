@@ -112,8 +112,13 @@ test("Yo Da tiene gracia: juega, cuenta chistes, se acuerda del nombre y entiend
 
   await campo.fill("jugamos piedra papel o tijera?");
   await campo.press("Enter");
-  await ultimo().getByRole("button", { name: "Piedra" }).click();
-  await expect(ultimo().getByTestId("yosoy-ppt-resultado")).toContainText(/vos \d · Yo Da \d/);
+  // a 5 puntos: el que llega primero gana
+  await ultimo().getByRole("button", { name: "A 5" }).click();
+  const ppt = ultimo().getByTestId("yosoy-ppt");
+  for (let i = 0; i < 60 && (await ppt.getByTestId("yosoy-ppt-final").count()) === 0; i++) await ppt.getByRole("button", { name: "Piedra" }).click();
+  await expect(ppt.getByTestId("yosoy-ppt-final")).toContainText(/Llegaste a 5|A 5 llegué primero/);
+  await expect(ppt.getByTestId("yosoy-ppt-resultado")).toContainText(/(vos 5 · Yo Da [0-4]|vos [0-4] · Yo Da 5) · a 5/);
+  await expect(ppt.getByRole("button", { name: "Piedra" })).toHaveCount(0);
 
   await campo.fill("tirá una moneda");
   await campo.press("Enter");
