@@ -1,0 +1,132 @@
+[
+ {
+  "libro": "receta",
+  "capitulo": 0,
+  "texto": "No te dejes llevar por las noticias, sigue tu vida con normalidad en tu éxito, porque las noticias tratan de hacer lo que vienen a hacer en este mundo, que es sembrar el miedo. Pero no pueden sembrar donde ya fue sembrada la paz, el amor y el triunfo.\nSé un buen jardinero de tu mente.",
+  "original": "No te dejes llevar por las noticias, sigue tu vida con normalidad en tu éxito, porque las noticias tratan de hacer lo que vienen a hacer en este mundo, que es sembrar el miedo. Pero no pueden sembrar donde ya fue sembrada La Paz, el amor y el triunfo.\nSe un buen jardinero de tu mente",
+  "correcciones": [
+   "«La Paz» → «la paz» (error del teclado, de la lista permitida)",
+   "«Se un buen jardinero» → «Sé un buen jardinero» (tilde del imperativo)",
+   "punto final agregado (el mensaje no lo tiene; mismo criterio que sitio/content/frases.ts)",
+   "se conserva el salto de línea antes de «Sé un buen jardinero de tu mente»"
+  ],
+  "motivo": "El Cap. 0 dice que «hay una lucha interna y externa en quién domina tu atención. Todo el mundo externo trata de llamar tu atención» (¶58) y que el exterior «es muy seductor» (¶59). El mensaje da un caso concreto de ese afuera que pelea por la atención (las noticias que siembran miedo) y la salida práctica: cuidar lo sembrado y ser jardinero de la propia mente. El capítulo no habla de noticias ni de miedo ni usa la imagen del jardín. Lo negativo viene con su mensaje positivo. Es un mensaje entero del canal abierto (56 palabras). Pensamiento también lo proponía para su Cap. 1; va a la Receta porque es un consejo práctico y porque es el único texto del canal que le sirve al Cap. 0 de la Receta."
+ },
+ {
+  "libro": "receta",
+  "capitulo": 1,
+  "texto": "Cuando hablas del trabajo de tus sueños estás expresando la distancia y la lejanía con ese estado.\nQuítale el concepto de mis sueños y entiende que los sueños son una realidad vista por uno que luego es vista por todos.",
+  "original": "Cuando hablas del trabajo de tus sueños estás expresando la distancia y la lejanía con ese estado.\nQuítale el concepto de mis sueños y entiende que los sueños son una realidad vista por uno que luego es vista por todos",
+  "correcciones": [
+   "punto final agregado",
+   "se conservan el salto de línea del original y «mis sueños» sin comillas, tal como lo escribió"
+  ],
+  "motivo": "El Cap. 1 cierra con el punto cero (hablar como si ya se tuviera lo que se quiere tener) y con que el exterior y el interior terminan siendo uno. El texto muestra el mecanismo en una frase concreta: decir «el trabajo de mis sueños» ya habla de lejanía con el estado. En la Receta no aparece la palabra «sueños», así que suma y no repite. Son las dos últimas oraciones, seguidas, de una respuesta a un miembro, y se entienden solas porque «el trabajo de tus sueños» es una expresión general. Tiene 41 palabras."
+ },
+ {
+  "libro": "receta",
+  "capitulo": 2,
+  "texto": "Con ayer no basta, tenés que hacerlo hoy también. Debes compensar la balanza de pensamientos de escasez con pensamientos de tener más que suficiente. Debes hacerlo hoy también, son 6 días de trabajo, si ayer lo hiciste, te quedan 5. Si querés cambiar tu realidad de verdad, no dudes en seguir esta dieta mínimamente los 6 días. El 7mo día podés descansar de tu obra.",
+  "original": "Con ayer no basta, tenes que hacerlo hoy también. Debes compensar la balanza de pensamientos de escasez con pensamientos de tener más que suficiente. Debes hacerlo hoy también, son 6 días de trabajo, si ayer lo hiciste te quedan 5. Si queres cambiar tu realidad de verdad no dudes en seguir esta dieta mínimamente los 6 días. El 7mo día podes descansar de tu obra.",
+  "correcciones": [
+   "«tenes» → «tenés»",
+   "«queres» → «querés»",
+   "«podes» → «podés»",
+   "coma en «si ayer lo hiciste, te quedan 5»",
+   "coma en «de verdad, no dudes»",
+   "se conservan la mezcla de tú y vos («Debes», «tenés») y el «7mo» tal como lo escribió"
+  ],
+  "motivo": "El Cap. 2 dice: «Por eso se ponen estos seis días de trabajo y después entrás en el descanso del Señor, el Shabbat» (¶113). El mensaje lleva esa cuenta a la práctica de cada día («si ayer lo hiciste, te quedan 5») y suma la imagen de la balanza de pensamientos, que el capítulo no tiene. Es un mensaje entero del canal abierto (65 palabras) y no cita ningún versículo: «descansar de tu obra» es su frase, no una cita textual."
+ },
+ {
+  "libro": "receta",
+  "capitulo": 3,
+  "texto": "Imagina ahora mismo, estés donde estés, que te encontraste un sobre de papel madera, adentro tiene dinero fresco.\nUsa tu Photoshop mental para ver ese sobre ahora mismo con los ojos abiertos, estés donde estés.\nNo cuestiones, solo siente que de verdad acabas de encontrar ese sobre.\nUn momento más tarde, cuando recuerdes este ejercicio, no lo recuerdes como un ejercicio, sino como que realmente encontraste un sobre con dinero que ahora podés pensar bien en qué invertirás.",
+  "original": "Imagina ahora mismo, estés donde estés; que te encontraste un sobre de papel madera, adentro tiene dinero fresco.\nUsa tu Photoshop mental para ver ese sobre ahora mismo con los ojos abiertos, estés donde estés.\nNo cuestiones, solo siente que de verdad acabas de encontrar ese sobre.\nUn momento más tarde, cuando recuerdes este ejercicio, no lo recuerdes como un ejercicio, sino como que realmente encontraste un sobre con dinero que ahora podes pensar bien en que invertirás.",
+  "correcciones": [
+   "«estés donde estés; que te encontraste» → «estés donde estés, que te encontraste» (el punto y coma pasa a coma, puntuación que ordena)",
+   "«podes» → «podés»",
+   "«en que invertirás» → «en qué invertirás»",
+   "se conservan sus cortes de línea y la mezcla de tú y vos"
+  ],
+  "motivo": "El Cap. 3 es «Ahora mismo»: el ejercicio se hace ahora, donde uno esté, y cierra con sentir que el trabajo ya está hecho (¶157: «si lo empezás a sentir como que ya hiciste el trabajo, de hecho ya lo estás haciendo»). El ejercicio del sobre es eso con sus palabras, y su última oración (recordarlo no como ejercicio sino como hecho) es la vuelta del cierre. Suma un ejercicio de dinero, porque el del capítulo es de pareja. Es un tramo contiguo de 78 palabras y se corta antes de «Creé que esto dará fruto… ese simbolismo es lo verás como materializado», que tiene la sintaxis rota."
+ },
+ {
+  "libro": "pensamiento",
+  "capitulo": 0,
+  "texto": "La lengua es la única llave que, con sus combinaciones de palabras y tonos, es capaz de abrir cualquier puerta. Debes poner en tu lengua lo que quieres que la lengua ponga en tu mundo.",
+  "original": "La lengua es la única llave que con sus combinaciones de palabras y tonos es capaz de abrir cualquier puerta. Debes poner en tu lengua lo que quieres que la lengua ponga en tu mundo.",
+  "correcciones": [
+   "dos comas que encierran el inciso «con sus combinaciones de palabras y tonos»",
+   "afuera la firma «— JB» (la página lleva «desde su canal») y el versículo que lo acompañaba (Mateo 13:11-12), que no va y que el texto no necesita"
+  ],
+  "motivo": "El Cap. 0, La Palabra, trata del Verbo como origen de lo que existe («yo gano dinero muy fuerte por mi palabra», ¶57). El capítulo no tiene la imagen de la lengua como llave ni la consigna de ida y vuelta. Habla de palabra y Verbo, o sea del porqué. Es un mensaje entero (35 palabras) y se entiende sin el versículo."
+ },
+ {
+  "libro": "pensamiento",
+  "capitulo": 1,
+  "texto": "La vida puede insistir en los mismos escenarios, pero tu actitud siempre tiene el poder de cambiar el guion.",
+  "original": "La vida puede insistir en los mismos escenarios, pero tu actitud siempre tiene el poder de cambiar el guion.",
+  "correcciones": [
+   "ninguna"
+  ],
+  "motivo": "Libertad Interna abre con «mis experiencias son todas en realidad proyecciones externas de una libertad interna» (¶82) y sostiene que «las cosas en el mundo están ahí, pero vos estás adentro tuyo. Nada puede interceder» (¶95). El mensaje dice esa libertad en una línea. Lo negativo (la repetición) viene con su salida. Es un mensaje entero del canal abierto (4 abr. 2025, 20 palabras), no una respuesta a nadie, y el capítulo no usa la imagen del escenario y el guion. Se prefiere a la versión de la respuesta a Ilse, que sale de una charla sobre la depresión."
+ },
+ {
+  "libro": "pensamiento",
+  "capitulo": 2,
+  "texto": "Cuando las personas hacen de un tema una moda, naturalmente después de un tiempo pierden el encanto. Pero el principio fisicoquímico con el que se hace un huevo frito es y será por siempre. Lo mismo con la ley de la conciencia: puedes creer que es viejo, que es antiguo, que los tiempos cambiaron, pero nadie puede quitar la piedra angular. La conciencia crea la realidad desde el origen del tiempo y cuando el tiempo deje de existir, también seguirá creando.",
+  "original": "Cuando las personas hacen de un tema una moda, naturalmente después de un tiempo pierden el encanto. Pero el principio físico químico con el que se hace un huevo frito es y será por siempre. Lo mismo con la ley de la conciencia: puedes creer que es viejo, que es antiguo, que los tiempos cambiaron, pero nadie puede quitar la piedra angular. La conciencia crea la realidad desde el origen del tiempo y cuando el tiempo deje de existir, también seguirá creando.",
+  "correcciones": [
+   "«físico químico» → «fisicoquímico» (de la lista permitida)",
+   "se conservan «que es viejo» y su «tú» («puedes creer»)"
+  ],
+  "motivo": "El Observador Eterno tiene como epígrafe al «Anciano de días» y habla del «Anciano de los Tiempos», el Ojo Observador (¶106, ¶111). El mensaje da el porqué de esa eternidad: la ley de la conciencia puede parecer antigua, pero «la conciencia crea la realidad desde el origen del tiempo y cuando el tiempo deje de existir, también seguirá creando». El capítulo no lo dice. Es un mensaje entero del canal abierto (31 mar. 2025, 81 palabras). Reemplaza al tramo de «todo es uno», que es del mismo mensaje que la página de Receta Cap. 1, le habla al miembro («así como lo llamas») y repite Receta ¶80. Si Lucas quiere una página más breve, sirve sola la última oración (21 palabras)."
+ },
+ {
+  "libro": "pensamiento",
+  "capitulo": 3,
+  "texto": "Eso que llaman Alma es el oído universal, solo tu Alma escucha tus conversaciones, eso debería parecerte algo importante para cuidar.",
+  "original": "Eso que llaman Alma es el oído universal, solo tu Alma escucha tus conversaciones, eso debería parecerte algo importante para cuidar.",
+  "correcciones": [
+   "ninguna; se conserva la mayúscula de «Alma»"
+  ],
+  "motivo": "Conversaciones Sinceras enseña a cambiar las conversaciones mentales, pero no dice quién las escucha. El mensaje lo dice: el Alma es el oído universal, la única que escucha tus conversaciones, y por eso hay que cuidarlas. Es el porqué de todo el capítulo. Mensaje entero del canal abierto (21 palabras); en los tres libros no aparecen «Alma» ni «oído»."
+ },
+ {
+  "libro": "pensamiento",
+  "capitulo": 4,
+  "texto": "Al fin de cuentas, el ego es verdaderamente nuestro amigo, él cree en nosotros mismos inclusive cuando nosotros dudamos. Vas a encontrar en este mundo todo tipo de información sobre que si no te peleas con tu Ego, no vas a progresar, no vas a conseguir, no vas a trascender. Bueno, fíjate muy bien que las personas que tienen algún tipo de éxito en sus vidas verdaderamente se llevan bien con su sistema de creencias propio, o su Ego.",
+  "original": "Al fin de cuentas, el ego, es verdaderamente nuestro amigo, él cree en nosotros mismos inclusive cuando nosotros dudamos. Vas a encontrar en este mundo, todo tipo de información sobre que si no te peleas con tu Ego, no vas a progresar, no vas a conseguir, no vas a trascender. Bueno, fíjate muy bien que las personas que tienen algún tipo de éxito en sus vidas, verdaderamente se llevan bien con su sistema de creencias propio, o su Ego.",
+  "correcciones": [
+   "se sacan tres comas que separaban el sujeto o el verbo de su complemento: «el ego, es», «en este mundo, todo tipo», «en sus vidas, verdaderamente»",
+   "se conserva la alternancia «ego» / «Ego» tal como la escribió, y su «tú» («te peleas», «fíjate»)"
+  ],
+  "motivo": "En el Cap. 4, el ¶150 dice: «La gente como no cree en sí misma, como nunca conoce esa parte de sí misma… accede inmediatamente a cualquier cosa que la tienta en el desierto». La página responde con la otra cara: algo en nosotros «cree en nosotros mismos inclusive cuando nosotros dudamos». También conversa con la información de afuera que el capítulo discute. El ego es identidad, o sea Pensamiento. El capítulo no lo trata, y el Cap. 6 lo deja apenas como duda (¶204). Es un mensaje entero (79 palabras). El segundo mensaje del ego no va: tiene tono de réplica («la gente… dice que el ego es malo») y habla del mensaje que se está leyendo."
+ },
+ {
+  "libro": "biografia",
+  "capitulo": 0,
+  "texto": "Todas mis conferencias, toda la información que les comunico está basada en el real entendimiento que la vida, la realidad, el mundo puede cambiar en los próximos 10 minutos, todos los ejemplos, todo lo que digo es para que simplemente entiendan que la vida puede cambiar en los próximos 10 minutos y que la única forma que tenemos de contribuir con eso es ayudando con nuestros sentimientos.\nY el sentimiento que acompaña esto es justamente el sentir que dentro de 10 minutos tenés mejores posibilidades que 10 minutos atrás.",
+  "original": "Todas mis conferencias, toda la información que les comunico está basada en el real entendimiento que la vida, la realidad, el mundo puede cambiar en los próximos 10 minutos, todos los ejemplos, todo lo que digo es para que simplemente entiendan que la vida puede cambiar en los próximos 10 minutos y que la única forma que tenemos de contribuir con eso es ayudando con nuestros sentiemientos.\nY el sentimiento que acompaña esto es justamente el sentir que dentro de 10 minutos tenes mejores posibilidades que 10 minutos atrás",
+  "correcciones": [
+   "«sentiemientos» → «sentimientos» (de la lista permitida)",
+   "«tenes» → «tenés»",
+   "punto final agregado",
+   "se conserva el salto de línea antes de «Y el sentimiento…»"
+  ],
+  "motivo": "Julián lo presenta como aquello «en lo que se basan mis enseñanzas y mi vida». Esa burbuja de anuncio no va, pero el texto es él hablando de su propia base, así que va en la Biografía, en el Cap. 0, el del principio. El capítulo cierra con él tratando siempre de «tener la imagen del mejor resultado posible sobre lo que sea y de sentir imágenes de suerte» (¶57), y la página nombra ese mismo sentir tal como lo vive hoy. El capítulo no habla de los 10 minutos. Es un mensaje entero de 89 palabras, no dirigido a ningún miembro."
+ },
+ {
+  "libro": "biografia",
+  "capitulo": 1,
+  "texto": "A mí me gustan las sorpresas y tengo en mí las emociones correspondientes a una vida llena de sorpresas, una cada 10 minutos.",
+  "original": "A mi me gustan las sorpresas y tengo en mí las emociones correspondientes a una vida llena de sorpresas, una casa 10 minutos",
+  "correcciones": [
+   "«A mi» → «A mí»",
+   "«casa» → «cada» (de la lista permitida)",
+   "punto final agregado"
+  ],
+  "motivo": "El Cap. 1 termina con Julián contando cómo es su vida ahora (¶88: «¿cómo es la vida ahora, Julián, para vos?»), y el capítulo es una cadena de sorpresas: el casting y los seguidores nuevos. La página es él mismo, en primera persona, diciendo cómo vive hoy. Es cómo vive lo que enseña, así que va en la Biografía. Es un mensaje entero (24 palabras). Comparte los «10 minutos» con la página del Cap. 0, pero la idea es otra: allá, la base de su enseñanza; acá, su emoción de vivirlo. Las separa todo el Cap. 1."
+ }
+]
